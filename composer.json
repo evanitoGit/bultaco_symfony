@@ -84,7 +84,39 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "start": [
+            "symfony serve"
+        ],
+        "test:cs" : [
+            "php-cs-fixer fix --dry-run"
+        ],
+        "fix:cs": [
+            "php-cs-fixer fix"
+        ],
+        "test:twig": [
+            "vendor/bin/twig-cs-fixer lint"
+        ],
+        "fix:twig": [
+            "vendor/bin/twig-cs-fixer fix"
+        ],
+        "test": [
+            "@test:cs",
+            "@test:twig"
+        ],
+        "fix": [
+            "@fix:cs",
+            "@fix:twig"
         ]
+    },
+    "scripts-descriptions": {
+        "start" : "Run Web server on Symfony",
+        "fix:cs": "Fix PHP code with PHP CS Fixer",
+        "test:cs" : "Test PHP code with PHP CS Fixer",
+        "fix:twig": "Fix PHP code with Twig",
+        "test:twig" : "Test PHP code with Twig",
+        "test" : "Run all tests",
+        "fix" : "Fix all tests"
     },
     "conflict": {
         "symfony/symfony": "*"
