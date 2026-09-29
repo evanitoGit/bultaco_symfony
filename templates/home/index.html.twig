@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body_class %}page-index{% endblock %}
+
+{% block body %}
+    <section class='hero'>
+        <img src="{{ asset('img/img_logo.png') }}" alt='logo'>
+    </section>
+
+    <section class='presentation'>
+        <p class='txt_pres'>{{ texte_presentation }}</p>
+
+        <div class='buttons'>
+            <ul>
+                {% for label, routeName in quick_links %}
+                    <li><a href="{{ path(routeName) }}">{{ label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+{% endblock %}

@@ -1,24 +1,86 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Club Bultaco - Escuyer{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo_rond.png') }}" sizes="50x50">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="{% block body_class %}page-default{% endblock %}">
+<header class='nav'>
+    <nav class='header-nav'>
+        <ul>
+            <li>
+                <a href="{{ path('app_home') }}">
+                    <img src="{{ asset('img/logo_bultaco.png') }}" alt='logo'>
+                </a>
+            </li>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+            <li class="categorie">
+                <h3 class="main-link">Modèles</h3>
+                <ul>
+                    <li><a href="{{ path('app_modeles_liste') }}">Liste</a></li>
+                    <li><a href="{{ path('app_modeles_restaurations') }}">Restaurations</a></li>
+                    <li><a href="{{ path('app_modeles_pilotes') }}">Pilotes</a></li>
+                </ul>
+            </li>
 
-        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphp_hot_reload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+            <li class="categorie">
+                <h3 class="main-link">Documentation</h3>
+                <ul>
+                    <li><a href="{{ path('app_doc_logos') }}">Logos</a></li>
+                    <li><a href="{{ path('app_doc_pressbook') }}">Pressbook</a></li>
+                </ul>
+            </li>
+
+            <li class="categorie">
+                <h3 class="main-link">Boutique</h3>
+                <ul>
+                    <li><a href="{{ path('app_boutique_pieces') }}">Pièces détachées</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+{% block body %}{% endblock %}
+
+<section class='coordonnees'>
+    <div class='coord-content'>
+        <div class='coord-left'>
+            <div class='coord-bloc adresse'>
+                <h3>ADRESSE</h3>
+                <p>4 Chemin du Glais-Malet</p>
+                <p>51220 Merfy, France</p>
+                <h3>CONTACT</h3>
+                <p>06 75 06 83 20</p>
+                <p>bultaco.club.france@gmail.com</p>
+            </div>
+        </div>
+        <div class='coord-bloc reseaux-bloc'>
+            <h3>RÉSEAUX SOCIAUX</h3>
+            <div class='reseaux-links'>
+                <a href="https://www.instagram.com/bultaco_club_france/" class='reseau-item' target='_blank'>
+                    <img src="{{ asset('img/sociale.png') }}" alt='Social'>
+                    <span>@bultaco_club_france</span>
+                </a>
+                <a href="https://www.facebook.com/share/g/1Ak8gYsypU/" class='reseau-item' target='_blank'>
+                    <img src="{{ asset('img/facebook.png') }}" alt='Social'>
+                    <span>Groupe Bultaco Club France</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class='coord-footer'>
+        <p>PASSION BULTACO DEPUIS 1958</p>
+    </div>
+    <a href="/login" style='cursor: default;'>
+        <img src="{{ asset('img/logo_rond.png') }}" alt='logorond' class='logorond'>
+    </a>
+</section>
+
+<script src="{{ asset('js/script.js') }}"></script>
+{% block javascripts %}{% endblock %}
+</body>
 </html>

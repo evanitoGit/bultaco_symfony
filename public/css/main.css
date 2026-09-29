@@ -1,0 +1,251 @@
+/* ==========================================================================
+   1. VARIABLES & FONTS
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+@font-face {
+    font-family: 'Terran';
+    src: url('../../../bultaco/assets/fonts/terran.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --sepia: #ccaf92;
+    --dark-gray: #5c5b5b;
+    --carbone: #474747;
+    --black: #000000;
+    --white: #ede8e8;
+    --beige: #FFF2E3;
+    --header-height: 70px;
+}
+
+/* ==========================================================================
+   2. RESET & BASE
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    scrollbar-width: none;
+}
+
+*::-webkit-scrollbar { display: none; }
+
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    color: var(--white);
+}
+
+body {
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Identifiants de page pour les backgrounds */
+.page-index { background-image: url("../img/restau.png"); }
+.page-album { background-image: url("../img/emblemes.png"); }
+
+/* ==========================================================================
+   3. HEADER & NAVIGATION (Version Corrigée)
+   ========================================================================== */
+header {
+    background-color: var(--carbone);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    z-index: 1000;
+    border-bottom: 3px solid var(--sepia);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.header-nav ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%; /* Force l'occupation de l'espace */
+}
+
+/* Alignement du Logo */
+.header-nav > ul > li:first-child {
+    margin-right: auto; /* Pousse le reste vers la droite */
+    display: flex;
+    align-items: center;
+}
+
+.header-nav img {
+    height: 40px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+/* Liens et Catégories */
+.header-nav > ul > li:not(:first-child),
+.categorie {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.header-nav a, .categorie h3 {
+    text-decoration: none;
+    color: var(--beige);
+    text-transform: uppercase;
+    font-size: 1em;
+    padding: 0 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    transition: color 0.3s ease;
+}
+
+/* Hover Global Navigation */
+.header-nav a:hover, .categorie:hover h3 {
+    color: var(--sepia);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Dropdown (Sous-menus) */
+.categorie ul {
+    display: none; /* Caché par défaut */
+    flex-direction: column;
+    position: absolute;
+    top: var(--header-height);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--carbone);
+    border: 2px solid var(--sepia);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    min-width: 200px;
+    z-index: 1001;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.categorie:hover ul {
+    display: flex; /* Apparaît au hover de la section parent */
+}
+
+.categorie ul li {
+    width: 100%;
+    height: auto;
+}
+
+.categorie ul li a {
+    padding: 15px 20px;
+    width: 100%;
+    justify-content: center;
+    font-size: 0.85em;
+}
+
+/* Séparateurs (Barres verticales entre les menus) */
+.categorie:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 20px;
+    background-color: var(--sepia);
+}
+
+/* ==========================================================================
+   4. STRUCTURE DES PAGES (Hero & Container)
+   ========================================================================== */
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+    padding-top: var(--header-height);
+}
+
+/* Pour index.php (section presentation) */
+.presentation {
+    background-color: var(--beige);
+    color: var(--carbone);
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 3px solid var(--carbone);
+}
+
+/* Pour album.php (main container) */
+.container {
+    background-color: var(--beige);
+    color: var(--carbone);
+    min-height: 100vh;
+    padding: 100px 20px; /* Espace pour le header fixe */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==========================================================================
+   5. COMPOSANTS (Cards, Modals, Search)
+   ========================================================================== */
+/* Grilles */
+.album-grid, .grille-modeles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 2000;
+    display: none;
+}
+.modal-overlay.active { display: block; }
+
+.modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 700px;
+    z-index: 2001;
+    display: none;
+}
+.modal.active { display: block; }
+
+/* ==========================================================================
+   6. RESPONSIVE
+   ========================================================================== */
+@media (max-width: 992px) {
+    .coord-content { grid-template-columns: 1fr; }
+    h1 { font-size: 3em; }
+}

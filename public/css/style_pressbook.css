@@ -1,0 +1,228 @@
+body {
+    background-image: url("../img/accueil.png");
+}
+
+/* ── GRILLE ───────────────────────────────────────────────── */
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    width: 100%;
+    max-width: 1400px;
+    padding-left: 60px;
+    padding-right: 60px;
+    margin: 0 auto;
+}
+
+/* ── CARTE ────────────────────────────────────────────────── */
+.press-card {
+    background-color: white;
+    border: 3px solid var(--carbone);
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.press-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    border-color: var(--sepia);
+}
+
+.press-photo {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    border-bottom: 3px solid var(--carbone);
+}
+
+.press-photo--empty {
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.press-icon {
+    font-size: 4em;
+}
+
+.type-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7em;
+    font-weight: bold;
+}
+
+.press-info {
+    padding: 20px;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.press-info h3 {
+    color: var(--carbone);
+    font-size: 1.4em;
+}
+
+.press-dates {
+    color: #888;
+    font-size: 0.95em;
+}
+
+.press-source {
+    color: var(--sepia);
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+/* ── PAS DE RÉSULTATS ─────────────────────────────────────── */
+.no-items {
+    text-align: center;
+    color: #999;
+    font-size: 1.5em;
+    padding: 60px 20px;
+    font-style: italic;
+    width: 100%;
+}
+
+/* ── MODALE ───────────────────────────────────────────────── */
+.modal {
+    max-width: 900px;
+}
+
+.modal-body {
+    padding: 30px 40px;
+}
+
+.press-detail {
+    padding: 10px 0;
+}
+
+.press-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--carbone);
+    flex-wrap: wrap;
+}
+
+.press-header h2 {
+    color: var(--carbone);
+    font-size: 2em;
+    margin: 0;
+    flex: 1;
+}
+
+.badge-press {
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: bold;
+    white-space: nowrap;
+    align-self: center;
+}
+
+.press-image {
+    width: 100%;
+    max-height: 600px;
+    object-fit: contain;
+    border-radius: 15px;
+    border: 3px solid var(--carbone);
+    margin-bottom: 25px;
+}
+
+.press-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #f0f0f0;
+    border-radius: 15px;
+    border: 3px solid var(--carbone);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+}
+
+.press-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.press-info-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.press-info-label {
+    display: block;
+    color: #666;
+    font-size: 0.85em;
+    margin-bottom: 4px;
+}
+
+.press-info-value {
+    display: block;
+    color: var(--carbone);
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.press-description {
+    margin-bottom: 25px;
+}
+
+.press-description p {
+    color: var(--carbone);
+    font-size: 1.05em;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+.press-link {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.btn-external {
+    display: inline-block;
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 14px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-external:hover {
+    background-color: var(--sepia);
+    transform: translateY(-2px);
+}
+
+/* Style des boutons dans l'admin */

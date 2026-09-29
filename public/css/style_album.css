@@ -1,0 +1,70 @@
+body {
+    background-image: url("../img/accueil.png");
+}
+
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    width: 100%;
+    max-width: 1400px;
+    padding-left: 60px;
+    padding-right: 60px;
+    margin: 0 auto;
+}
+
+.album-photo.no-photo {
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5em;
+}
+
+.album-type {
+    color: var(--sepia);
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.album-dates {
+    color: #888;
+    font-size: 0.95em;
+}
+
+#searchResults {
+    border-radius: 0 0 20px 20px;
+}
+
+.search-result-item {
+    text-align: left;
+}
+
+.badge-modele {
+    background-color: var(--sepia);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.7em;
+}
+
+.info-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.description-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-top: 15px;
+}
+
+.caracteristiques-text {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    line-height: 1.8;
+    margin-top: 15px;
+}

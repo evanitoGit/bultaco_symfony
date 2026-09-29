@@ -1,0 +1,235 @@
+body {
+    background-image: url("../img/accueil.png");
+}
+
+/* ── HERO (surcharge : h2 supplémentaire) ── */
+.hero h2 {
+    font-size: 3em;
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* ── RECHERCHE (surcharges spécifiques pièces) ── */
+.search-result-item {
+    transition: all 0.2s ease;
+}
+
+.search-result-item:hover {
+    padding-left: 25px;
+}
+
+.search-result-content {
+    color: var(--carbone);
+}
+
+.search-result-content strong {
+    display: block;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.search-result-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.search-category { font-style: italic; }
+
+.search-price {
+    font-weight: bold;
+    color: var(--carbone);
+}
+
+.no-results {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+/* Scrollbar visible pour les résultats de recherche */
+#searchResults::-webkit-scrollbar { width: 8px; }
+#searchResults::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+#searchResults::-webkit-scrollbar-thumb { background: var(--carbone); border-radius: 10px; }
+
+/* ── CATÉGORIES ── */
+.pieces-section {
+    width: 100%;
+    padding: 40px;
+}
+
+.categories-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.categorie-block {
+    background-color: white;
+    border: 3px solid var(--carbone);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.categorie-header {
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.categorie-header:hover { background-color: var(--sepia); }
+
+.categorie-header h3 {
+    font-size: 1.8em;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.arrow {
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+}
+
+.badge {
+    margin-left: auto;
+    background-color: var(--beige);
+    color: var(--carbone);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.6em;
+    font-weight: bold;
+}
+
+.categorie-content { padding: 20px; }
+
+/* ── SOUS-CATÉGORIES ── */
+.sous-categorie-block {
+    margin-bottom: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.sous-categorie-header {
+    background-color: #e0e0e0;
+    color: var(--carbone);
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sous-categorie-header:hover { background-color: #d0d0d0; }
+
+.sous-categorie-header h4 {
+    font-size: 1.4em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.arrow-small {
+    font-size: 0.7em;
+    transition: transform 0.3s ease;
+}
+
+.badge-small {
+    margin-left: auto;
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.7em;
+}
+
+.sous-categorie-content {
+    padding: 20px;
+    background-color: #fafafa;
+}
+
+.no-pieces {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* ── GRILLE PIÈCES ── */
+.pieces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.piece-card {
+    background-color: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.piece-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    border-color: var(--carbone);
+}
+
+.piece-card.highlighted {
+    animation: highlight-pulse 1s ease-in-out 3;
+    box-shadow: 0 0 30px rgba(255, 235, 59, 0.8);
+}
+
+.piece-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.no-image {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    font-size: 4em;
+    color: #ccc;
+}
+
+.piece-info { padding: 15px; }
+
+.piece-info h5 {
+    color: var(--carbone);
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.piece-description {
+    color: #666;
+    font-size: 0.95em;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    min-height: 40px;
+}
+
+.piece-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 2px solid #eee;
+}
+
+.piece-prix {
+    color: var(--carbone);
+    font-size: 1.8em;
+    font-weight: bold;
+}

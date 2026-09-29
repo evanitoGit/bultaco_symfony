@@ -1,0 +1,201 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url("img/accueil.png");
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+.login-box {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 400px;
+    border: 3px solid #474747;
+}
+
+.login-title {
+    color: #474747;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+    font-family: "Playfair Display", serif;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #474747;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px 0;
+    border: 2px solid #474747;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #ccaf92;
+    box-shadow: 0 0 5px rgba(204, 175, 146, 0.5);
+}
+
+.btn-login {
+    width: 100%;
+    background-color: #474747;
+    color: #FFF2E3;
+    padding: 15px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background-color: #FFF2E3;
+    color: #474747;
+    border: 2px solid #474747;
+    transform: translateY(-2px);
+}
+
+.error-message {
+    background-color: #ff4444;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #474747;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.pressbook-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.pressbook-admin-card {
+    background-color: #f9f9f9;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.pressbook-admin-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pressbook-admin-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.no-image-admin-press {
+    width: 100%;
+    height: 250px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4em;
+    color: #999;
+}
+
+.pressbook-admin-info {
+    padding: 20px;
+}
+
+.pressbook-admin-info h3 {
+    color: var(--carbone);
+    font-size: 1.3em;
+    margin-bottom: 10px;
+}
+
+.pressbook-type-badge {
+    display: inline-block;
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.75em;
+    margin-bottom: 10px;
+}
+
+.pressbook-meta {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.pressbook-description {
+    color: #555;
+    font-size: 0.95em;
+    line-height: 1.4;
+    margin-bottom: 15px;
+}
+
+.pressbook-admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.pressbook-admin-actions .btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+.edit-form-press {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    border: 2px solid var(--carbone);
+}
+
+.edit-form-press .form-group {
+    margin-bottom: 12px;
+}
+
+.edit-form-press textarea {
+    min-height: 80px;
+}
+
+.no-items-admin {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 40px;
+}
