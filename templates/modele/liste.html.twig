@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block body_class %}page-album{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <h1>Album Photos</h1>
+    </div>
+
+    <div class='container'>
+        <section class='hero'>
+            <p>{{ texte_presentation }}</p>
+            <div class='search-container'>
+                <input type='text' id='searchInput' placeholder='Rechercher un modèle...' autocomplete='off'>
+                <div id='searchResults' class='search-results'></div>
+            </div>
+        </section>
+
+        <section class='emblemes-section'>
+            <div class='album-grid'>
+                {% if modeles is empty %}
+                    <p class='no-items'>Aucun modèle pour le moment</p>
+                {% else %}
+                    {% for modele in modeles %}
+                        <div class='album-card modele-item' data-id='{{ modele.id }}' data-nom='{{ modele.nom|lower }}' onclick='openModeleModal({{ modele.id }})'>
+                            {% if modele.image_path %}
+                                <div class='album-photo' style='background-image: url("{{ modele.image_path }}")'></div>
+                            {% else %}
+                                <div class='album-photo no-photo'>🏍️</div>
+                            {% endif %}
+                            <div class='album-info'>
+                                <h3>{{ modele.nom }}</h3>
+                                <p class='album-type'>{{ modele.type_moto ?? '' }}</p>
+                                {% if modele.annee_debut or modele.annee_fin %}
+                                    <p class='album-dates'>{{ modele.annee_debut ?: '?' }} - {{ modele.annee_fin ?: '?' }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Modale -->
+    <div id='modalOverlay' class='modal-overlay' onclick='closeModal()'></div>
+    <div id='modeleModal' class='modal'>
+        <div class='modal-content'>
+            <span class='close-btn' onclick='closeModal()'>&times;</span>
+            <div class='modal-body' id='modeleModalContent'></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const modeles = {{ modeles|json_encode|raw }};
+
+        window.searchConfig = {
+            data       : modeles,
+            fields     : ['nom', 'type_moto', 'description'],
+            labelField : 'nom',
+            metaFields : ['type_moto'],
+            onSelect   : function(item) { openModeleModal(item.id); }
+        };
+
+        function openModeleModal(id) {
+            const modele = modeles.find(m => m.id == id);
+            if (!modele) return;
+
+            const content = `
+                <div class='carte-identite'>
+                    <div class='carte-header'>
+                        <h2>\${modele.nom}</h2>
+                        <span class='badge-modele'>MODÈLE</span>
+                    </div>
+                    \${modele.image_path ?
+                        `<img src='\${modele.image_path}' alt='\${modele.nom}' class='carte-photo'>` :
+                        '<div class=\"carte-photo-placeholder\">🏍️</div>'
+                    }
+                    <div class='carte-section'>
+                        <div class='info-grid'>
+                            <div class='info-item'>
+                                <span class='info-label'>Période :</span>
+                                <span class='info-value'>\${modele.annee_debut || '?'} - \${modele.annee_fin || '?'}</span>
+                            </div>
+                            <div class='info-item'>
+                                <span class='info-label'>Cylindrée :</span>
+                                <span class='info-value'>\${modele.cylindree || 'N/A'}</span>
+                            </div>
+                            <div class='info-item'>
+                                <span class='info-label'>Type :</span>
+                                <span class='info-value'>\${modele.type_moto || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    \${modele.description ? `<div class='carte-section'><p class='description-text'>\${modele.description}</p></div>` : ''}
+                    \${modele.caracteristiques ? `<div class='carte-section'><div class='caracteristiques-text'>\${modele.caracteristiques.replace(/\\n/g, '<br>')}</div></div>` : ''}
+                </div>
+            `;
+
+            document.getElementById('modeleModalContent').innerHTML = content;
+            document.getElementById('modeleModal').classList.add('active');
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modeleModal').classList.remove('active');
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+    </script>
+    <script src="{{ asset('js/search.js') }}"></script>
+{% endblock %}

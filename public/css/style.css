@@ -51,12 +51,16 @@ body {
     background-repeat: no-repeat;
 }
 
-/* Fonds par défaut selon les pages */
-.page-index { background-image: url("../img/restau.png"); }
-.page-album { background-image: url("../img/emblemes.png"); }
+/* --- Fonds d'écran spécifiques par page (via le body) --- */
+body.page-index     { background-image: url("../img/restau.png"); }
+body.page-album     { background-image: url("../img/emblemes.png"); }
+body.page-pieces    { background-image: url("../img/accueil.png"); }
+body.page-logos     { background-image: url("../img/accueil.png"); }
+body.page-press     { background-image: url("../img/accueil.png"); }
+body.page-admin     { background-color: var(--carbone); }
 
 /* ==========================================================================
-   3. HEADER & NAVIGATION
+   3. HEADER & NAVIGATION (Commun à toutes les pages)
    ========================================================================== */
 header, header.nav {
     background-color: var(--carbone);
@@ -197,51 +201,9 @@ header, header.nav {
 }
 
 /* ==========================================================================
-   4. STRUCTURE DES PAGES (Hero, Head, Container)
+   4. STRUCTURE DE LA PAGE D'ACCUEIL (.page-index)
    ========================================================================== */
-.head {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 15% 3% 8% 3%;
-    width: 100%;
-}
-
-.head h1 {
-    display: inline-block;
-    width: 100%;
-    text-align: center;
-    font-family: "M PLUS Rounded 1c", sans-serif;
-    font-weight: bold;
-    color: var(--carbone);
-    -webkit-text-stroke: 3px var(--carbone);
-    font-size: 5vw;
-    letter-spacing: 0.15em;
-    margin-bottom: 2%;
-}
-
-h2 {
-    color: var(--sepia);
-    -webkit-text-stroke: 4px var(--carbone);
-    font-size: 3.5vw;
-    margin-bottom: 3%;
-    letter-spacing: 0.3em;
-    text-align: center;
-}
-
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--beige);
-    color: var(--carbone);
-    width: 100%;
-    padding: 5% 3%;
-}
-
-.hero {
+body.page-index .hero {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -252,19 +214,8 @@ h2 {
     padding: 5% 3%;
 }
 
-.hero p {
-    color: var(--carbone);
-    font-size: 1.8vw;
-    width: 75%;
-    max-width: 1200px;
-    text-align: center;
-    margin-bottom: 4%;
-    line-height: 1.4;
-}
-
-/* Règle renforcée et fluide pour le logo central */
-.hero img {
-    width: 25% !important;
+body.page-index .hero img {
+    width: 35% !important;
     min-width: 220px !important;
     max-width: 100% !important;
     height: auto !important;
@@ -272,7 +223,7 @@ h2 {
     margin: 0 auto !important;
 }
 
-.presentation {
+body.page-index .presentation {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -284,7 +235,7 @@ h2 {
     width: 100%;
 }
 
-.presentation .txt_pres {
+body.page-index .presentation .txt_pres {
     color: var(--carbone);
     font-size: 1.6vw;
     text-align: center;
@@ -294,9 +245,9 @@ h2 {
     line-height: 1.5;
 }
 
-.presentation ul {
+body.page-index .presentation ul {
     display: grid;
-    grid-template-columns: repeat(3, minmax(220px, 300px)); /* 3 colonnes fixes et centrées */
+    grid-template-columns: repeat(3, minmax(220px, 300px));
     justify-content: center;
     gap: 20px;
     width: 100%;
@@ -306,11 +257,11 @@ h2 {
     padding: 0;
 }
 
-.presentation ul li {
+body.page-index .presentation ul li {
     width: 100%;
 }
 
-.presentation ul li a {
+body.page-index .presentation ul li a {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -328,25 +279,68 @@ h2 {
     font-size: 1em;
 }
 
-.presentation ul li a:hover {
+body.page-index .presentation ul li a:hover {
     background-color: var(--carbone);
     color: var(--beige);
     transform: translateY(-5px);
 }
 
 /* ==========================================================================
-   5. COMPOSANTS (Recherche, Grilles, Modales, Cartes)
+   5. STRUCTURE DES SOUS-PAGES (Modales, Listes, Grilles, Blocs communs)
    ========================================================================== */
+.head {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: calc(var(--header-height) + 40px) 3% 40px 3%;
+    width: 100%;
+}
+
+.head h1 {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    font-weight: bold;
+    color: var(--carbone);
+    -webkit-text-stroke: 3px var(--carbone);
+    font-size: 4vw;
+    letter-spacing: 0.15em;
+}
+
+h2 {
+    color: var(--sepia);
+    -webkit-text-stroke: 4px var(--carbone);
+    font-size: 3vw;
+    margin-bottom: 3%;
+    letter-spacing: 0.3em;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: var(--beige);
+    color: var(--carbone);
+    width: 100%;
+    min-height: calc(100vh - var(--header-height));
+    padding: 40px 3%;
+}
+
+/* Barre de recherche partagée */
 .search-container {
     position: relative;
     width: 80%;
     max-width: 600px;
-    margin: 2% auto 4% auto;
+    margin: 20px auto 40px auto;
 }
 
 #searchInput {
     width: 100%;
-    padding: 3% 4%;
+    padding: 15px 20px;
     font-size: 1.2em;
     border: 3px solid var(--carbone);
     border-radius: 50px;
@@ -391,18 +385,18 @@ h2 {
     background-color: var(--beige);
 }
 
-/* Grilles de cartes communes */
-.album-grid, .grille-modeles {
+/* Grilles de cartes (Album, Modèles, Pièces, Logos, Pressbook) */
+.album-grid, .grille-modeles, .masonry-grid, .pieces-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(22%, 1fr));
-    gap: 3%;
-    width: 95%;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2%;
+    padding: 20px;
 }
 
-.album-card {
+.album-card, .piece-card, .pressbook-admin-card {
     background-color: white;
     border: 3px solid var(--carbone);
     border-radius: 15px;
@@ -413,7 +407,7 @@ h2 {
     flex-direction: column;
 }
 
-.album-card:hover {
+.album-card:hover, .piece-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     border-color: var(--sepia);
@@ -438,7 +432,7 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* Modales */
+/* Modales partagées */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -493,7 +487,7 @@ h2 {
 }
 
 /* ==========================================================================
-   6. SECTION COORDONNÉES & FOOTER (Page d'accueil)
+   6. SECTION COORDONNÉES & FOOTER (Exclusif Page d'accueil)
    ========================================================================== */
 .coordonnees {
     background-color: var(--carbone);
@@ -513,7 +507,7 @@ h2 {
     grid-template-columns: 1fr 1fr;
     gap: 40px;
     width: 100%;
-    max-width: 1200px; /* Élargi pour prendre plus de place */
+    max-width: 1200px;
     margin: 40px auto;
 }
 
@@ -526,7 +520,7 @@ h2 {
 
 .coord-bloc {
     text-align: left;
-    padding: 40px; /* Plus d'espace intérieur */
+    padding: 40px;
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 15px;
     border: 2px solid rgba(204, 175, 146, 0.3);
@@ -534,7 +528,7 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    min-height: 280px; /* Plus grand en hauteur */
+    min-height: 280px;
     justify-content: center;
 }
 
@@ -546,14 +540,14 @@ h2 {
 
 .coord-bloc h3 {
     color: var(--sepia);
-    font-size: 1.8em; /* Titres plus grands */
+    font-size: 1.8em;
     margin-bottom: 20px;
     letter-spacing: 0.08em;
 }
 
 .coord-bloc p {
     color: var(--beige);
-    font-size: 1.25em; /* Texte des coordonnées plus grand */
+    font-size: 1.25em;
     line-height: 1.8;
     margin: 6px 0;
 }
@@ -571,20 +565,26 @@ h2 {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    padding: 18px 30px; /* Boutons plus grands */
+    padding: 18px 30px;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 50px;
     text-decoration: none;
     color: var(--beige);
     transition: all 0.3s ease;
     border: 2px solid transparent;
-    font-size: 1.1em; /* Texte des boutons plus grand */
+    font-size: 1.1em;
 }
 
 .reseau-item:hover {
     background-color: var(--sepia);
     color: var(--carbone);
     transform: scale(1.05);
+}
+
+.reseau-item img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
 }
 
 .coord-footer {
@@ -598,7 +598,7 @@ h2 {
 
 .coord-footer p {
     color: var(--sepia);
-    font-size: 1.6em; /* Citation du bas agrandie */
+    font-size: 1.6em;
     font-style: italic;
     letter-spacing: 0.08em;
 }
@@ -619,8 +619,8 @@ h2 {
 .admin-container, .login-box {
     width: 80%;
     max-width: 800px;
-    margin: 10% auto 5% auto;
-    padding: 5%;
+    margin: 120px auto 50px auto;
+    padding: 40px;
     background-color: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -659,18 +659,11 @@ textarea {
     border: 2px solid var(--carbone);
 }
 
-/* Correction de la taille des icônes des réseaux sociaux */
-.reseau-item img {
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
-}
-
 /* ==========================================================================
    8. MEDIA QUERIES (Responsive)
    ========================================================================== */
 @media (max-width: 992px) {
     .coord-content { grid-template-columns: 1fr; }
-    .head h1, h1 { font-size: 3em; }
-    .hero p, .presentation .txt_pres { font-size: 1.2em; width: 90%; }
+    .head h1, h1 { font-size: 2.5em; }
+    body.page-index .presentation .txt_pres { font-size: 1.2em; width: 90%; }
 }
