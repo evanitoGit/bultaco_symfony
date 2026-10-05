@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Logos - Club Bultaco{% endblock %}
+{% block meta_description %}L'évolution des logos Bultaco à travers les décennies.{% endblock %}
 
 {% block body_class %}page-logos{% endblock %}
 
@@ -10,30 +11,34 @@
     </div>
 
     <div class='container'>
-        <section class='hero'>
-            <p>{{ texte_presentation }}</p>
-            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher un logo...' } %}
-        </section>
+        {% include '_partials/_hero.html.twig' with {
+            texte: texte_presentation,
+            compteur: logos is empty ? null : logos|length ~ (logos|length > 1 ? ' logos' : ' logo'),
+            placeholder: 'Rechercher un logo...'
+        } %}
 
         <section class='pressbook-section'>
             {% if logos is empty %}
-                <p class='no-items'>Aucun logo pour le moment</p>
+                {% include '_partials/_empty.html.twig' with { icone: '🎨', message: 'Aucun logo pour le moment' } %}
             {% else %}
                 <div class='masonry-grid logos-grid'>
                     {% for logo in logos %}
-                        <div class='masonry-item logo-item' data-id='{{ logo.id }}' onclick='openLogoModal({{ logo.id }})'>
-                            {% if logo.image_path %}
-                                <img src='{{ logo.image_path }}' alt='{{ logo.titre }}' loading='lazy'>
-                            {% else %}
-                                <div class='no-image-press'>🎨</div>
-                            {% endif %}
-                            <div class='masonry-overlay'>
-                                <span class='type-badge logo-badge'>LOGO</span>
-                                <h3>{{ logo.titre }}</h3>
-                                {% if logo.date_publication %}<p class='item-date'>{{ logo.date_publication }}</p>{% endif %}
-                                {% if logo.source %}<p class='item-source'>{{ logo.source }}</p>{% endif %}
+                        <article class='masonry-item logo-item' data-id='{{ logo.id }}' role='button' tabindex='0'
+                                 aria-label='Voir le logo {{ logo.titre }}' onclick='openLogoModal({{ logo.id }})'>
+                            <div class='masonry-media'>
+                                {% if logo.image_path %}
+                                    <img src='{{ logo.image_path }}' alt='{{ logo.titre }}' loading='lazy'>
+                                {% else %}
+                                    <div class='no-image-press' aria-hidden='true'>🎨</div>
+                                {% endif %}
                             </div>
-                        </div>
+                            <div class='masonry-caption'>
+                                <h3>{{ logo.titre }}</h3>
+                                {% if logo.date_publication or logo.source %}
+                                    <p class='item-meta'>{{ [logo.date_publication, logo.source]|filter(v => v)|join(' · ') }}</p>
+                                {% endif %}
+                            </div>
+                        </article>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -46,7 +51,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const logos = {{ logos|json_encode|raw }};
+        const logos = {{ logos|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
         window.searchConfig = {
             data       : logos,
@@ -63,29 +68,30 @@
 
             openModal(`
                 <div class='press-detail'>
-                    <div class='press-header'>
+                    <div class='carte-header'>
                         <h2>${escapeHtml(logo.titre)}</h2>
-                        <span class='badge-press'>Logo</span>
+                        <span class='badge-modele'>Logo</span>
                     </div>
                     ${logo.image_path
                         ? `<img src='${escapeHtml(logo.image_path)}' alt='${escapeHtml(logo.titre)}' class='press-image logo-image'>`
-                        : `<div class='press-image-placeholder'>Aucune image disponible</div>`}
-                    <div class='press-info-grid'>
+                        : `<div class='carte-photo-placeholder'>🎨</div>`}
+                    ${(logo.date_publication || logo.source) ? `
+                    <div class='info-grid'>
                         ${logo.date_publication ? `
-                        <div class='press-info-item'>
-                            <span class='press-info-label'>Période :</span>
-                            <span class='press-info-value'>${escapeHtml(logo.date_publication)}</span>
+                        <div class='info-item'>
+                            <span class='info-label'>Période</span>
+                            <span class='info-value'>${escapeHtml(logo.date_publication)}</span>
                         </div>` : ''}
                         ${logo.source ? `
-                        <div class='press-info-item'>
-                            <span class='press-info-label'>Source :</span>
-                            <span class='press-info-value'>${escapeHtml(logo.source)}</span>
+                        <div class='info-item'>
+                            <span class='info-label'>Source</span>
+                            <span class='info-value'>${escapeHtml(logo.source)}</span>
                         </div>` : ''}
-                    </div>
+                    </div>` : ''}
                     ${logo.description ? `<div class='press-description'><p>${nl2br(logo.description)}</p></div>` : ''}
                     ${logo.lien_externe ? `
                     <div class='press-link'>
-                        <a href='${escapeHtml(logo.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>🔗 Voir la source originale</a>
+                        <a href='${escapeHtml(logo.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>Voir la source originale ↗</a>
                     </div>` : ''}
                 </div>
             `);

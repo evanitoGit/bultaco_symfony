@@ -1,0 +1,11 @@
+{# Introduction commune des sous-pages : texte, compteur, sous-titre et recherche #}
+<section class='hero'>
+    <p class='hero-text'>{{ texte }}</p>
+    {% if compteur is defined and compteur %}
+        <span class='hero-count'>{{ compteur }}</span>
+    {% endif %}
+    {% if sous_titre is defined %}
+        <h2>{{ sous_titre }}</h2>
+    {% endif %}
+    {% include '_partials/_search.html.twig' %}
+</section>

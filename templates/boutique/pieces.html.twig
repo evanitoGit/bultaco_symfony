@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% set email_commande = 'bultaco.club.france@gmail.com' %}
+
 {% block title %}Pièces détachées - Club Bultaco{% endblock %}
+{% block meta_description %}Catalogue de pièces détachées pour motos Bultaco : moteur, cadre, électricité...{% endblock %}
 
 {% block body_class %}page-pieces{% endblock %}
 
@@ -10,30 +13,33 @@
     </div>
 
     <div class='container'>
-        <section class='hero'>
-            <p>{{ texte_presentation }}</p>
-            <h2>CATALOGUE DES PIÈCES</h2>
-            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher une pièce...' } %}
-        </section>
+        {% include '_partials/_hero.html.twig' with {
+            texte: texte_presentation,
+            compteur: pieces is empty ? null : pieces|length ~ (pieces|length > 1 ? ' pièces disponibles' : ' pièce disponible'),
+            sous_titre: 'Catalogue des pièces',
+            placeholder: 'Rechercher une pièce...'
+        } %}
 
         <section class='pieces-section'>
             <div class='categories-container'>
                 {% for categorie in categories %}
                     <div class='categorie-block'>
-                        <div class='categorie-header' onclick="toggleBloc('cat-{{ categorie.id }}')">
+                        <div class='categorie-header' role='button' tabindex='0' aria-expanded='false' aria-controls='cat-{{ categorie.id }}'
+                             onclick="toggleBloc('cat-{{ categorie.id }}')">
                             <h3>
-                                <span class='arrow' id='arrow-cat-{{ categorie.id }}'>▶</span>
+                                <span class='arrow' aria-hidden='true'>▶</span>
                                 {{ categorie.nom }}
-                                <span class='badge'>{{ categorie.nb_pieces }} pièce(s)</span>
+                                <span class='badge'>{{ categorie.nb_pieces }} pièce{{ categorie.nb_pieces > 1 ? 's' }}</span>
                             </h3>
                         </div>
 
                         <div class='categorie-content' id='cat-{{ categorie.id }}' hidden>
                             {% for sousCategorie in categorie.sous_categories %}
                                 <div class='sous-categorie-block'>
-                                    <div class='sous-categorie-header' onclick="toggleBloc('sous-cat-{{ sousCategorie.id }}')">
+                                    <div class='sous-categorie-header' role='button' tabindex='0' aria-expanded='false' aria-controls='sous-cat-{{ sousCategorie.id }}'
+                                         onclick="toggleBloc('sous-cat-{{ sousCategorie.id }}')">
                                         <h4>
-                                            <span class='arrow-small' id='arrow-sous-cat-{{ sousCategorie.id }}'>▶</span>
+                                            <span class='arrow' aria-hidden='true'>▶</span>
                                             {{ sousCategorie.nom }}
                                             <span class='badge-small'>{{ sousCategorie.pieces|length }}</span>
                                         </h4>
@@ -42,20 +48,28 @@
                                     <div class='sous-categorie-content' id='sous-cat-{{ sousCategorie.id }}' hidden>
                                         <div class='pieces-grid'>
                                             {% for piece in sousCategorie.pieces %}
-                                                <div class='piece-card' data-id='{{ piece.id }}'>
-                                                    {% if piece.image_path %}
-                                                        <img src='{{ piece.image_path }}' alt='{{ piece.nom }}' loading='lazy'>
-                                                    {% else %}
-                                                        <div class='no-image'>📦</div>
-                                                    {% endif %}
+                                                <article class='piece-card' data-id='{{ piece.id }}'>
+                                                    <div class='piece-media'>
+                                                        {% if piece.image_path %}
+                                                            <img src='{{ piece.image_path }}' alt='{{ piece.nom }}' loading='lazy'>
+                                                        {% else %}
+                                                            <div class='no-image' aria-hidden='true'>📦</div>
+                                                        {% endif %}
+                                                    </div>
                                                     <div class='piece-info'>
                                                         <h5>{{ piece.nom }}</h5>
-                                                        <p class='piece-description'>{{ piece.description }}</p>
+                                                        {% if piece.description %}
+                                                            <p class='piece-description'>{{ piece.description }}</p>
+                                                        {% endif %}
                                                         <div class='piece-footer'>
                                                             <span class='piece-prix'>{{ piece.prix|number_format(2, ',', ' ') }} €</span>
+                                                            <a class='btn-commander'
+                                                               href='mailto:{{ email_commande }}?subject={{ ('Commande : ' ~ piece.nom)|url_encode }}&body={{ ("Bonjour,\n\nJe souhaite commander la pièce suivante :\n- " ~ piece.nom ~ ' (' ~ piece.prix|number_format(2, ',', ' ') ~ " €)\n\nMerci.")|url_encode }}'>
+                                                                Commander
+                                                            </a>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </article>
                                             {% else %}
                                                 <p class='no-pieces'>Aucune pièce disponible pour le moment</p>
                                             {% endfor %}
@@ -63,12 +77,12 @@
                                     </div>
                                 </div>
                             {% else %}
-                                <p class='no-pieces'>Aucune sous-catégorie pour le moment</p>
+                                <p class='no-pieces'>Aucune pièce dans cette catégorie pour le moment</p>
                             {% endfor %}
                         </div>
                     </div>
                 {% else %}
-                    <p class='no-items'>Aucune pièce pour le moment</p>
+                    {% include '_partials/_empty.html.twig' with { icone: '📦', message: 'Aucune pièce pour le moment' } %}
                 {% endfor %}
             </div>
         </section>
@@ -78,15 +92,15 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const pieces = {{ pieces|json_encode|raw }};
-        const formatPrix = prix => parseFloat(prix || 0).toFixed(2).replace('.', ',') + ' €';
+        const pieces = {{ pieces|json_encode(constant('JSON_HEX_TAG'))|raw }};
+        const formatPrix = prix => parseFloat(prix || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
         function setBloc(id, ouvert) {
             const content = document.getElementById(id);
-            const arrow = document.getElementById('arrow-' + id);
+            const header = document.querySelector(`[aria-controls='${id}']`);
             if (!content) return;
             content.hidden = !ouvert;
-            if (arrow) arrow.textContent = ouvert ? '▼' : '▶';
+            if (header) header.setAttribute('aria-expanded', ouvert);
         }
 
         function toggleBloc(id) {
@@ -98,7 +112,7 @@
             data       : pieces,
             fields     : ['description', 'categorie', 'sous_categorie'],
             labelField : 'nom',
-            metaFields : p => [`${p.categorie} > ${p.sous_categorie}`, formatPrix(p.prix)],
+            metaFields : p => [`${p.categorie} › ${p.sous_categorie}`, formatPrix(p.prix)],
             emptyText  : 'Aucune pièce trouvée',
             onSelect   : function (item) {
                 const card = document.querySelector(`.piece-card[data-id='${item.id}']`);

@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Pilotes de légende - Club Bultaco{% endblock %}
+{% block meta_description %}Les pilotes de légende qui ont écrit l'histoire de Bultaco en trial et en motocross.{% endblock %}
 
 {% block body_class %}page-pilotes{% endblock %}
 
@@ -10,30 +11,36 @@
     </div>
 
     <div class='container'>
-        <section class='hero'>
-            <p>{{ texte_presentation }}</p>
-            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher un pilote...' } %}
-        </section>
+        {% include '_partials/_hero.html.twig' with {
+            texte: texte_presentation,
+            compteur: pilotes is empty ? null : pilotes|length ~ (pilotes|length > 1 ? ' pilotes' : ' pilote'),
+            placeholder: 'Rechercher un pilote...'
+        } %}
 
         <section class='emblemes-section'>
             <div class='album-grid'>
                 {% for pilote in pilotes %}
-                    <div class='album-card pilote-item' data-id='{{ pilote.id }}' onclick='openPiloteModal({{ pilote.id }})'>
-                        {% if pilote.image_path %}
-                            <div class='album-photo' style='background-image: url("{{ pilote.image_path }}")'></div>
-                        {% else %}
-                            <div class='album-photo no-photo'>🏆</div>
-                        {% endif %}
-                        <div class='album-info'>
-                            <h3>{{ pilote.prenom }} {{ pilote.nom }}</h3>
-                            <p class='album-type'>{{ pilote.nationalite ?? '' }}</p>
-                            {% if pilote.date_naissance or pilote.date_deces %}
-                                <p class='album-dates'>{{ pilote.date_naissance ?: '?' }}{% if pilote.date_deces %} - {{ pilote.date_deces }}{% endif %}</p>
+                    {% set nom_complet = (pilote.prenom ~ ' ' ~ pilote.nom)|trim %}
+                    <article class='album-card pilote-item' data-id='{{ pilote.id }}' role='button' tabindex='0'
+                             aria-label='Voir la fiche de {{ nom_complet }}' onclick='openPiloteModal({{ pilote.id }})'>
+                        <div class='album-photo-wrap'>
+                            {% if pilote.image_path %}
+                                <div class='album-photo' style='background-image: url("{{ pilote.image_path }}")'></div>
+                            {% else %}
+                                <div class='album-photo no-photo'>🏆</div>
                             {% endif %}
                         </div>
-                    </div>
+                        <div class='album-info'>
+                            <h3>{{ nom_complet }}</h3>
+                            {% if pilote.nationalite %}<p class='album-type'>{{ pilote.nationalite }}</p>{% endif %}
+                            {% if pilote.date_naissance or pilote.date_deces %}
+                                <p class='album-dates'>{{ pilote.date_naissance ?: '?' }}{% if pilote.date_deces %} – {{ pilote.date_deces }}{% endif %}</p>
+                            {% endif %}
+                            <span class='card-cta'>Voir la fiche →</span>
+                        </div>
+                    </article>
                 {% else %}
-                    <p class='no-items'>Aucun pilote pour le moment</p>
+                    {% include '_partials/_empty.html.twig' with { icone: '🏆', message: 'Aucun pilote pour le moment' } %}
                 {% endfor %}
             </div>
         </section>
@@ -45,14 +52,15 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const pilotes = {{ pilotes|json_encode|raw }};
+        const pilotes = {{ pilotes|json_encode(constant('JSON_HEX_TAG'))|raw }};
         const nomComplet = p => [p.prenom, p.nom].filter(Boolean).join(' ');
+        const periode = p => p.date_naissance ? `${p.date_naissance}${p.date_deces ? ' – ' + p.date_deces : ''}` : null;
 
         window.searchConfig = {
             data       : pilotes,
             fields     : ['nationalite', 'description', 'palmares'],
             labelField : nomComplet,
-            metaFields : p => [p.nationalite, p.date_naissance ? `${p.date_naissance}${p.date_deces ? ' - ' + p.date_deces : ''}` : null],
+            metaFields : p => [p.nationalite, periode(p)],
             emptyText  : 'Aucun pilote trouvé',
             onSelect   : item => openPiloteModal(item.id)
         };
@@ -65,7 +73,7 @@
                 <div class='carte-identite'>
                     <div class='carte-header'>
                         <h2>${escapeHtml(nomComplet(pilote))}</h2>
-                        <span class='badge-modele'>PILOTE</span>
+                        <span class='badge-modele'>Pilote</span>
                     </div>
                     ${pilote.image_path
                         ? `<img src='${escapeHtml(pilote.image_path)}' alt='${escapeHtml(nomComplet(pilote))}' class='carte-photo'>`
@@ -73,22 +81,22 @@
                     <div class='carte-section'>
                         <div class='info-grid'>
                             <div class='info-item'>
-                                <span class='info-label'>Naissance :</span>
+                                <span class='info-label'>Naissance</span>
                                 <span class='info-value'>${escapeHtml(pilote.date_naissance || 'N/A')}</span>
                             </div>
                             ${pilote.date_deces ? `
                             <div class='info-item'>
-                                <span class='info-label'>Décès :</span>
+                                <span class='info-label'>Décès</span>
                                 <span class='info-value'>${escapeHtml(pilote.date_deces)}</span>
                             </div>` : ''}
                             <div class='info-item'>
-                                <span class='info-label'>Nationalité :</span>
+                                <span class='info-label'>Nationalité</span>
                                 <span class='info-value'>${escapeHtml(pilote.nationalite || 'N/A')}</span>
                             </div>
                         </div>
                     </div>
                     ${pilote.description ? `<div class='carte-section'><p class='description-text'>${nl2br(pilote.description)}</p></div>` : ''}
-                    ${pilote.palmares ? `<div class='carte-section'><h3 class='carte-titre'>Palmarès</h3><div class='caracteristiques-text'>${nl2br(pilote.palmares)}</div></div>` : ''}
+                    ${pilote.palmares ? `<div class='carte-section'><h3 class='carte-titre'>🏆 Palmarès</h3><div class='caracteristiques-text'>${nl2br(pilote.palmares)}</div></div>` : ''}
                 </div>
             `);
         }

@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Liste des modèles - Club Bultaco{% endblock %}
+{% block meta_description %}Les modèles Bultaco emblématiques : photos, périodes de production, cylindrées et fiches techniques.{% endblock %}
 
 {% block body_class %}page-album{% endblock %}
 
@@ -10,30 +11,36 @@
     </div>
 
     <div class='container'>
-        <section class='hero'>
-            <p>{{ texte_presentation }}</p>
-            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher un modèle...' } %}
-        </section>
+        {% include '_partials/_hero.html.twig' with {
+            texte: texte_presentation,
+            compteur: modeles is empty ? null : modeles|length ~ (modeles|length > 1 ? ' modèles' : ' modèle'),
+            placeholder: 'Rechercher un modèle...'
+        } %}
 
         <section class='emblemes-section'>
             <div class='album-grid'>
                 {% for modele in modeles %}
-                    <div class='album-card modele-item' data-id='{{ modele.id }}' onclick='openModeleModal({{ modele.id }})'>
-                        {% if modele.image_path %}
-                            <div class='album-photo' style='background-image: url("{{ modele.image_path }}")'></div>
-                        {% else %}
-                            <div class='album-photo no-photo'>🏍️</div>
-                        {% endif %}
+                    <article class='album-card modele-item' data-id='{{ modele.id }}' role='button' tabindex='0'
+                             aria-label='Voir la fiche du modèle {{ modele.nom }}' onclick='openModeleModal({{ modele.id }})'>
+                        <div class='album-photo-wrap'>
+                            {% if modele.image_path %}
+                                <div class='album-photo' style='background-image: url("{{ modele.image_path }}")'></div>
+                            {% else %}
+                                <div class='album-photo no-photo'>🏍️</div>
+                            {% endif %}
+                            {% if modele.cylindree %}<span class='card-tag'>{{ modele.cylindree }}</span>{% endif %}
+                        </div>
                         <div class='album-info'>
                             <h3>{{ modele.nom }}</h3>
-                            <p class='album-type'>{{ modele.type_moto ?? '' }}</p>
+                            {% if modele.type_moto %}<p class='album-type'>{{ modele.type_moto }}</p>{% endif %}
                             {% if modele.annee_debut or modele.annee_fin %}
-                                <p class='album-dates'>{{ modele.annee_debut ?: '?' }} - {{ modele.annee_fin ?: '?' }}</p>
+                                <p class='album-dates'>{{ modele.annee_debut ?: '?' }} – {{ modele.annee_fin ?: '?' }}</p>
                             {% endif %}
+                            <span class='card-cta'>Voir la fiche →</span>
                         </div>
-                    </div>
+                    </article>
                 {% else %}
-                    <p class='no-items'>Aucun modèle pour le moment</p>
+                    {% include '_partials/_empty.html.twig' with { icone: '🏍️', message: 'Aucun modèle pour le moment' } %}
                 {% endfor %}
             </div>
         </section>
@@ -45,13 +52,13 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const modeles = {{ modeles|json_encode|raw }};
+        const modeles = {{ modeles|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
         window.searchConfig = {
             data       : modeles,
-            fields     : ['nom', 'type_moto', 'description'],
+            fields     : ['type_moto', 'cylindree', 'description'],
             labelField : 'nom',
-            metaFields : ['type_moto'],
+            metaFields : m => [m.type_moto, (m.annee_debut || m.annee_fin) ? `${m.annee_debut || '?'} – ${m.annee_fin || '?'}` : null],
             emptyText  : 'Aucun modèle trouvé',
             onSelect   : item => openModeleModal(item.id)
         };
@@ -64,7 +71,7 @@
                 <div class='carte-identite'>
                     <div class='carte-header'>
                         <h2>${escapeHtml(modele.nom)}</h2>
-                        <span class='badge-modele'>MODÈLE</span>
+                        <span class='badge-modele'>Modèle</span>
                     </div>
                     ${modele.image_path
                         ? `<img src='${escapeHtml(modele.image_path)}' alt='${escapeHtml(modele.nom)}' class='carte-photo'>`
@@ -72,21 +79,21 @@
                     <div class='carte-section'>
                         <div class='info-grid'>
                             <div class='info-item'>
-                                <span class='info-label'>Période :</span>
-                                <span class='info-value'>${escapeHtml(modele.annee_debut || '?')} - ${escapeHtml(modele.annee_fin || '?')}</span>
+                                <span class='info-label'>Période</span>
+                                <span class='info-value'>${escapeHtml(modele.annee_debut || '?')} – ${escapeHtml(modele.annee_fin || '?')}</span>
                             </div>
                             <div class='info-item'>
-                                <span class='info-label'>Cylindrée :</span>
+                                <span class='info-label'>Cylindrée</span>
                                 <span class='info-value'>${escapeHtml(modele.cylindree || 'N/A')}</span>
                             </div>
                             <div class='info-item'>
-                                <span class='info-label'>Type :</span>
+                                <span class='info-label'>Type</span>
                                 <span class='info-value'>${escapeHtml(modele.type_moto || 'N/A')}</span>
                             </div>
                         </div>
                     </div>
                     ${modele.description ? `<div class='carte-section'><p class='description-text'>${nl2br(modele.description)}</p></div>` : ''}
-                    ${modele.caracteristiques ? `<div class='carte-section'><div class='caracteristiques-text'>${nl2br(modele.caracteristiques)}</div></div>` : ''}
+                    ${modele.caracteristiques ? `<div class='carte-section'><h3 class='carte-titre'>Caractéristiques</h3><div class='caracteristiques-text'>${nl2br(modele.caracteristiques)}</div></div>` : ''}
                 </div>
             `);
         }

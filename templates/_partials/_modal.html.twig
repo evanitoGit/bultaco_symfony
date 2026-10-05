@@ -1,7 +1,7 @@
 <div id='modalOverlay' class='modal-overlay' onclick='closeModal()'></div>
-<div id='modal' class='modal'>
+<div id='modal' class='modal' role='dialog' aria-modal='true' aria-hidden='true'>
     <div class='modal-content'>
-        <span class='close-btn' onclick='closeModal()'>&times;</span>
+        <button type='button' class='close-btn' onclick='closeModal()' aria-label='Fermer'>&times;</button>
         <div class='modal-body' id='modalContent'></div>
     </div>
 </div>
