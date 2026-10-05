@@ -16,7 +16,6 @@
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            compteur: items is empty ? null : items|length ~ (items|length > 1 ? ' documents' : ' document'),
             placeholder: 'Rechercher un article, un magazine...'
         } %}
 
@@ -45,9 +44,9 @@
                                 {% else %}
                                     <div class='no-image-press' aria-hidden='true'>{{ type_icons[item.type_contenu] ?? '📄' }}</div>
                                 {% endif %}
-                                <span class='card-tag'>{{ item.type_contenu|upper }}</span>
                             </div>
                             <div class='masonry-caption'>
+                                <span class='type-badge'>{{ item.type_contenu|upper }}</span>
                                 <h3>{{ item.titre }}</h3>
                                 {% if item.date_publication or item.source %}
                                     <p class='item-meta'>{{ [item.date_publication, item.source]|filter(v => v)|join(' · ') }}</p>

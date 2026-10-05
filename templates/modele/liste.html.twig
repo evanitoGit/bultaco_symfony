@@ -13,7 +13,6 @@
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            compteur: modeles is empty ? null : modeles|length ~ (modeles|length > 1 ? ' modèles' : ' modèle'),
             placeholder: 'Rechercher un modèle...'
         } %}
 
@@ -28,7 +27,6 @@
                             {% else %}
                                 <div class='album-photo no-photo'>🏍️</div>
                             {% endif %}
-                            {% if modele.cylindree %}<span class='card-tag'>{{ modele.cylindree }}</span>{% endif %}
                         </div>
                         <div class='album-info'>
                             <h3>{{ modele.nom }}</h3>
@@ -36,7 +34,6 @@
                             {% if modele.annee_debut or modele.annee_fin %}
                                 <p class='album-dates'>{{ modele.annee_debut ?: '?' }} – {{ modele.annee_fin ?: '?' }}</p>
                             {% endif %}
-                            <span class='card-cta'>Voir la fiche →</span>
                         </div>
                     </article>
                 {% else %}

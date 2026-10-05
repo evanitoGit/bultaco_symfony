@@ -13,7 +13,6 @@
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            compteur: pilotes is empty ? null : pilotes|length ~ (pilotes|length > 1 ? ' pilotes' : ' pilote'),
             placeholder: 'Rechercher un pilote...'
         } %}
 
@@ -36,7 +35,6 @@
                             {% if pilote.date_naissance or pilote.date_deces %}
                                 <p class='album-dates'>{{ pilote.date_naissance ?: '?' }}{% if pilote.date_deces %} – {{ pilote.date_deces }}{% endif %}</p>
                             {% endif %}
-                            <span class='card-cta'>Voir la fiche →</span>
                         </div>
                     </article>
                 {% else %}

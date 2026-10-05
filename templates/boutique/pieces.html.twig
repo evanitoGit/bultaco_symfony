@@ -15,7 +15,6 @@
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            compteur: pieces is empty ? null : pieces|length ~ (pieces|length > 1 ? ' pièces disponibles' : ' pièce disponible'),
             sous_titre: 'Catalogue des pièces',
             placeholder: 'Rechercher une pièce...'
         } %}

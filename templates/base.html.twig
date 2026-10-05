@@ -30,12 +30,17 @@
             } %}
             {% for categorie, liens in menu %}
                 <li class="categorie{{ current_route in liens ? ' active' }}">
-                    <h3 class="main-link">{{ categorie }}</h3>
-                    <ul>
-                        {% for label, route in liens %}
-                            <li><a href="{{ path(route) }}"{% if current_route == route %} class="active" aria-current="page"{% endif %}>{{ label }}</a></li>
-                        {% endfor %}
-                    </ul>
+                    <span class="main-link" tabindex="0" aria-haspopup="true">
+                        {{ categorie }}
+                        <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <div class="sous-menu">
+                        <ul>
+                            {% for label, route in liens %}
+                                <li><a href="{{ path(route) }}"{% if current_route == route %} class="active" aria-current="page"{% endif %}>{{ label }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -44,39 +49,48 @@
 
 {% block body %}{% endblock %}
 
-<section class='coordonnees'>
+<footer class='coordonnees'>
+    <div class='coord-header'>
+        <h2>BULTACO CLUB FRANCE</h2>
+        <div class='separator'></div>
+    </div>
+
     <div class='coord-content'>
-        <div class='coord-left'>
-            <div class='coord-bloc adresse'>
-                <h3>ADRESSE</h3>
-                <p>4 Chemin du Glais-Malet</p>
-                <p>51220 Merfy, France</p>
-                <h3>CONTACT</h3>
-                <p>06 75 06 83 20</p>
-                <p>bultaco.club.france@gmail.com</p>
-            </div>
+        <div class='coord-bloc adresse'>
+            <h3>ADRESSE</h3>
+            <p>4 Chemin du Glais-Malet</p>
+            <p>51220 Merfy</p>
+            <p>France</p>
         </div>
+
+        <div class='coord-bloc contact'>
+            <h3>CONTACT</h3>
+            <p><a href='tel:+33675068320'>06 75 06 83 20</a></p>
+            <p><a href='mailto:bultaco.club.france@gmail.com'>bultaco.club.france@gmail.com</a></p>
+        </div>
+
         <div class='coord-bloc reseaux-bloc'>
             <h3>RÉSEAUX SOCIAUX</h3>
             <div class='reseaux-links'>
-                <a href="https://www.instagram.com/bultaco_club_france/" class='reseau-item' target='_blank'>
-                    <img src="{{ asset('img/sociale.png') }}" alt='Social'>
+                <a href="https://www.instagram.com/bultaco_club_france/" class='reseau-item' target='_blank' rel='noopener'>
+                    <img src="{{ asset('img/sociale.png') }}" alt='Instagram'>
                     <span>@bultaco_club_france</span>
                 </a>
-                <a href="https://www.facebook.com/share/g/1Ak8gYsypU/" class='reseau-item' target='_blank'>
-                    <img src="{{ asset('img/facebook.png') }}" alt='Social'>
+                <a href="https://www.facebook.com/share/g/1Ak8gYsypU/" class='reseau-item' target='_blank' rel='noopener'>
+                    <img src="{{ asset('img/facebook.png') }}" alt='Facebook'>
                     <span>Groupe Bultaco Club France</span>
                 </a>
             </div>
         </div>
     </div>
+
     <div class='coord-footer'>
-        <p>PASSION BULTACO DEPUIS 1958</p>
+        <p>Passion Bultaco depuis 1958</p>
     </div>
     <a href="{{ path('app_login') }}" class='logorond-link' aria-label='Espace administrateur'>
-        <img src="{{ asset('img/logo_rond.png') }}" alt='logorond' class='logorond'>
+        <img src="{{ asset('img/logo_rond.png') }}" alt='' class='logorond'>
     </a>
-</section>
+</footer>
 
 <script src="{{ asset('js/script.js') }}"></script>
 {% block javascripts %}{% endblock %}

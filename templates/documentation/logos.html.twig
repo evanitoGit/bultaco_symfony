@@ -13,7 +13,6 @@
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            compteur: logos is empty ? null : logos|length ~ (logos|length > 1 ? ' logos' : ' logo'),
             placeholder: 'Rechercher un logo...'
         } %}
 
@@ -33,6 +32,7 @@
                                 {% endif %}
                             </div>
                             <div class='masonry-caption'>
+                                <span class='type-badge'>LOGO</span>
                                 <h3>{{ logo.titre }}</h3>
                                 {% if logo.date_publication or logo.source %}
                                     <p class='item-meta'>{{ [logo.date_publication, logo.source]|filter(v => v)|join(' · ') }}</p>
