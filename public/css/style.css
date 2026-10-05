@@ -57,6 +57,8 @@ body.page-album     { background-image: url("../img/emblemes.png"); }
 body.page-pieces    { background-image: url("../img/accueil.png"); }
 body.page-logos     { background-image: url("../img/accueil.png"); }
 body.page-press     { background-image: url("../img/accueil.png"); }
+body.page-restau    { background-image: url("../img/accueil.png"); }
+body.page-pilotes   { background-image: url("../img/accueil.png"); }
 body.page-admin     { background-color: var(--carbone); }
 
 /* ==========================================================================
@@ -296,6 +298,8 @@ body.page-index .presentation ul li a:hover {
     padding: calc(var(--header-height) + 40px) 3% 40px 3%;
     width: 100%;
 }
+
+[hidden] { display: none !important; }
 
 .head h1 {
     display: inline-block;
@@ -660,10 +664,576 @@ textarea {
 }
 
 /* ==========================================================================
-   8. MEDIA QUERIES (Responsive)
+   8. CONTENU DES SOUS-PAGES (Modèles, Pilotes, Restaurations, Pièces, Logos, Pressbook)
    ========================================================================== */
+.container .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
+}
+
+.container .hero > p {
+    font-size: 1.3em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.container .hero h2 {
+    font-size: 2.5em;
+    margin: 40px 0 0 0;
+}
+
+.emblemes-section, .restau-section, .pressbook-section, .pieces-section {
+    width: 100%;
+}
+
+.no-items {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #999;
+    font-size: 1.5em;
+    padding: 60px 20px;
+    font-style: italic;
+    width: 100%;
+}
+
+/* --- Résultats de recherche --- */
+.search-result-content strong {
+    display: block;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.search-result-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.search-result-meta span:first-child { font-style: italic; }
+.search-result-meta span:last-child:not(:first-child) { font-weight: bold; color: var(--carbone); }
+
+.highlight {
+    background-color: var(--sepia);
+    color: var(--carbone);
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+.no-results {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+/* --- Mise en évidence après une recherche --- */
+@keyframes highlight-pulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(204, 175, 146, 0); }
+    50%      { box-shadow: 0 0 30px rgba(204, 175, 146, 1); }
+}
+
+.highlighted {
+    animation: highlight-pulse 1s ease-in-out 3;
+    border-color: var(--sepia) !important;
+}
+
+/* --- Cartes (Album, Pilotes) --- */
+.album-photo.no-photo {
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5em;
+}
+
+.album-type {
+    color: var(--sepia);
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.album-dates {
+    color: #888;
+    font-size: 0.95em;
+}
+
+/* --- Fiche d'identité dans la modale --- */
+.carte-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 15px;
+    margin: 0 40px 20px 0;
+    border-bottom: 3px solid var(--carbone);
+    flex-wrap: wrap;
+}
+
+.modal h2 {
+    color: var(--carbone);
+    -webkit-text-stroke: 0;
+    font-size: 2em;
+    letter-spacing: 0.05em;
+    text-align: left;
+    margin: 0;
+    flex: 1;
+}
+
+.badge-modele {
+    background-color: var(--sepia);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.8em;
+    white-space: nowrap;
+}
+
+.carte-photo {
+    width: 100%;
+    max-height: 450px;
+    object-fit: contain;
+    border-radius: 15px;
+    border: 3px solid var(--carbone);
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
+}
+
+.carte-photo-placeholder {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5em;
+    background-color: #f0f0f0;
+    border-radius: 15px;
+    border: 3px solid var(--carbone);
+    margin-bottom: 20px;
+}
+
+.carte-section { margin-bottom: 20px; }
+
+.carte-titre {
+    color: var(--carbone);
+    font-size: 1.3em;
+    margin-bottom: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+.info-item, .press-info-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.info-label, .press-info-label {
+    display: block;
+    color: #666;
+    font-size: 0.85em;
+    margin-bottom: 5px;
+}
+
+.info-value, .press-info-value {
+    display: block;
+    color: var(--carbone);
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.description-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.caracteristiques-text {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    line-height: 1.8;
+}
+
+/* --- Restaurations (2 colonnes) --- */
+.restau-grid {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+.colonne {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.restau-photo {
+    width: 100%;
+    display: block;
+    border-bottom: 3px solid var(--carbone);
+}
+
+.restau-item .album-info h3 {
+    font-size: 1.4em;
+    margin: 0;
+}
+
+/* --- Pièces détachées --- */
+.pieces-section { padding: 20px 0; }
+
+.categories-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.categorie-block {
+    background-color: white;
+    border: 3px solid var(--carbone);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.categorie-header {
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.categorie-header:hover { background-color: var(--sepia); }
+
+.categorie-header h3 {
+    font-size: 1.6em;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.arrow, .arrow-small { font-size: 0.7em; }
+
+.badge {
+    margin-left: auto;
+    background-color: var(--beige);
+    color: var(--carbone);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.6em;
+    font-weight: bold;
+}
+
+.categorie-content { padding: 20px; }
+
+.sous-categorie-block {
+    margin-bottom: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.sous-categorie-header {
+    background-color: #e0e0e0;
+    color: var(--carbone);
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sous-categorie-header:hover { background-color: #d0d0d0; }
+
+.sous-categorie-header h4 {
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-small {
+    margin-left: auto;
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.7em;
+}
+
+.sous-categorie-content {
+    padding: 20px;
+    background-color: #fafafa;
+}
+
+.pieces-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 0;
+}
+
+.piece-card {
+    border-width: 2px;
+    border-color: #ddd;
+    border-radius: 10px;
+    cursor: default;
+}
+
+.piece-card img, .no-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    font-size: 4em;
+}
+
+.piece-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.piece-info h5 {
+    color: var(--carbone);
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.piece-description {
+    color: #666;
+    font-size: 0.95em;
+    line-height: 1.4;
+    margin-bottom: 15px;
+    flex: 1;
+}
+
+.piece-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 15px;
+    border-top: 2px solid #eee;
+}
+
+.piece-prix {
+    color: var(--carbone);
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
+.no-pieces {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* --- Logos & Pressbook (grille masonry) --- */
+.masonry-grid {
+    display: block;
+    column-count: 4;
+    column-gap: 20px;
+}
+
+.masonry-item {
+    break-inside: avoid;
+    margin-bottom: 20px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.masonry-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.masonry-item img {
+    width: 100%;
+    display: block;
+    border-radius: 10px;
+    border: 3px solid var(--carbone);
+}
+
+.logos-grid .masonry-item img {
+    background-color: white;
+    padding: 20px;
+}
+
+.no-image-press {
+    width: 100%;
+    height: 200px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4em;
+    border: 3px solid var(--carbone);
+    border-radius: 10px;
+}
+
+.masonry-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7), transparent);
+    color: white;
+    padding: 20px 15px 15px;
+    border-radius: 0 0 10px 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.masonry-item:hover .masonry-overlay { opacity: 1; }
+
+.masonry-overlay h3 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.type-badge {
+    display: inline-block;
+    background-color: var(--beige);
+    color: var(--carbone);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.7em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.item-date { font-size: 0.9em; color: #ddd; margin-bottom: 3px; }
+.item-source { font-size: 0.85em; color: #ccc; font-style: italic; }
+
+/* Modale Logos / Pressbook */
+.press-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin: 0 40px 25px 0;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--carbone);
+    flex-wrap: wrap;
+}
+
+.badge-press {
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.press-image {
+    width: 100%;
+    max-height: 600px;
+    object-fit: contain;
+    border-radius: 15px;
+    border: 3px solid var(--carbone);
+    margin-bottom: 25px;
+}
+
+.logo-image {
+    background-color: white;
+    padding: 30px;
+}
+
+.press-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #f0f0f0;
+    border-radius: 15px;
+    border: 3px solid var(--carbone);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+}
+
+.press-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.press-description p {
+    color: var(--carbone);
+    font-size: 1.05em;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+.press-link { text-align: center; margin-top: 25px; }
+
+.btn-external {
+    display: inline-block;
+    background-color: var(--carbone);
+    color: var(--beige);
+    padding: 14px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-external:hover {
+    background-color: var(--sepia);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   9. MEDIA QUERIES (Responsive)
+   ========================================================================== */
+@media (max-width: 1200px) {
+    .masonry-grid { column-count: 3; }
+}
+
 @media (max-width: 992px) {
     .coord-content { grid-template-columns: 1fr; }
     .head h1, h1 { font-size: 2.5em; }
     body.page-index .presentation .txt_pres { font-size: 1.2em; width: 90%; }
+    .masonry-grid { column-count: 2; }
+}
+
+@media (max-width: 768px) {
+    .restau-grid { flex-direction: column; }
+    .container .hero h2 { font-size: 1.8em; }
+    .categorie-header h3 { font-size: 1.2em; }
+}
+
+@media (max-width: 576px) {
+    .masonry-grid { column-count: 1; }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Texte;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\TexteRepository;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,38 +11,55 @@ use Symfony\Component\Routing\Attribute\Route;
 class ModeleController extends AbstractController
 {
     #[Route('/modeles/liste', name: 'app_modeles_liste')]
-    public function liste(EntityManagerInterface $entityManager): Response
+    public function liste(TexteRepository $texteRepository, Connection $connection): Response
     {
-        // 1. Récupération du texte dynamique (équivalent de la table textes)
-        $texteRepository = $entityManager->getRepository(Texte::class);
-        $texteObj = $texteRepository->findOneBy(['section' => 'album_photos']);
+        $texte = $texteRepository->findOneBy(['section' => 'album_photos']);
 
-        $texteContenu = $texteObj ? $texteObj->getContenu() : 'Découvrez notre collection de motos Bultaco emblématiques à travers des photos et fiches techniques détaillées.';
-
-        // 2. Récupération des modèles depuis la base de données
-        // (Si vous n'avez pas encore d'entité ModeleEmblematique, on utilise directement le PDO de Doctrine)
-        $connection = $entityManager->getConnection();
-        $sql = 'SELECT * FROM modeles_emblematiques ORDER BY ordre ASC';
-        $modeles = $connection->executeQuery($sql)->fetchAllAssociative();
+        // Pas encore d'entité pour cette table : requête SQL directe via DBAL
+        $modeles = $connection
+            ->executeQuery('SELECT * FROM modeles_emblematiques ORDER BY ordre ASC')
+            ->fetchAllAssociative();
 
         return $this->render('modele/liste.html.twig', [
-            'texte_presentation' => $texteContenu,
+            'texte_presentation' => $texte ? $texte->getContenu() : 'Découvrez notre collection de motos Bultaco emblématiques à travers des photos et fiches techniques détaillées.',
             'modeles' => $modeles,
         ]);
     }
 
-
-
     #[Route('/modeles/restaurations', name: 'app_modeles_restaurations')]
-    public function restaurations(): Response
+    public function restaurations(TexteRepository $texteRepository, Connection $connection): Response
     {
-        return $this->render('modele/restaurations.html.twig');
+        $texte = $texteRepository->findOneBy(['section' => 'restauration']);
+
+        $photos = $connection
+            ->executeQuery('SELECT * FROM restauration_photos ORDER BY ordre ASC')
+            ->fetchAllAssociative();
+
+        // Répartition des photos dans les deux colonnes définies en base
+        $colonnes = ['gauche' => [], 'droite' => []];
+        foreach ($photos as $photo) {
+            $colonnes[$photo['colonne'] === 'droite' ? 'droite' : 'gauche'][] = $photo;
+        }
+
+        return $this->render('modele/restaurations.html.twig', [
+            'texte_presentation' => $texte ? $texte->getContenu() : 'Découvrez quelques exemples de restaurations de motos Bultaco réalisées par les membres du club.',
+            'colonnes' => $colonnes,
+            'photos' => $photos,
+        ]);
     }
 
     #[Route('/modeles/pilotes', name: 'app_modeles_pilotes')]
-    public function pilotes(): Response
+    public function pilotes(TexteRepository $texteRepository, Connection $connection): Response
     {
-        return $this->render('modele/pilotes.html.twig');
-    }
+        $texte = $texteRepository->findOneBy(['section' => 'pilotes_legende']);
 
+        $pilotes = $connection
+            ->executeQuery('SELECT * FROM pilotes_emblematiques ORDER BY ordre ASC')
+            ->fetchAllAssociative();
+
+        return $this->render('modele/pilotes.html.twig', [
+            'texte_presentation' => $texte ? $texte->getContenu() : "Découvrez les pilotes légendaires qui ont marqué l'histoire de Bultaco et écrit les plus belles pages du trial et du motocross.",
+            'pilotes' => $pilotes,
+        ]);
+    }
 }
