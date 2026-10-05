@@ -1,10 +1,97 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Pilotes de légende - Club Bultaco{% endblock %}
+
+{% block body_class %}page-pilotes{% endblock %}
+
 {% block body %}
+    <div class='head'>
+        <h1>Pilotes de légende</h1>
+    </div>
 
+    <div class='container'>
+        <section class='hero'>
+            <p>{{ texte_presentation }}</p>
+            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher un pilote...' } %}
+        </section>
+
+        <section class='emblemes-section'>
+            <div class='album-grid'>
+                {% for pilote in pilotes %}
+                    <div class='album-card pilote-item' data-id='{{ pilote.id }}' onclick='openPiloteModal({{ pilote.id }})'>
+                        {% if pilote.image_path %}
+                            <div class='album-photo' style='background-image: url("{{ pilote.image_path }}")'></div>
+                        {% else %}
+                            <div class='album-photo no-photo'>🏆</div>
+                        {% endif %}
+                        <div class='album-info'>
+                            <h3>{{ pilote.prenom }} {{ pilote.nom }}</h3>
+                            <p class='album-type'>{{ pilote.nationalite ?? '' }}</p>
+                            {% if pilote.date_naissance or pilote.date_deces %}
+                                <p class='album-dates'>{{ pilote.date_naissance ?: '?' }}{% if pilote.date_deces %} - {{ pilote.date_deces }}{% endif %}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <p class='no-items'>Aucun pilote pour le moment</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    {% include '_partials/_modal.html.twig' %}
 {% endblock %}
 
-{% block title %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const pilotes = {{ pilotes|json_encode|raw }};
+        const nomComplet = p => [p.prenom, p.nom].filter(Boolean).join(' ');
 
+        window.searchConfig = {
+            data       : pilotes,
+            fields     : ['nationalite', 'description', 'palmares'],
+            labelField : nomComplet,
+            metaFields : p => [p.nationalite, p.date_naissance ? `${p.date_naissance}${p.date_deces ? ' - ' + p.date_deces : ''}` : null],
+            emptyText  : 'Aucun pilote trouvé',
+            onSelect   : item => openPiloteModal(item.id)
+        };
+
+        function openPiloteModal(id) {
+            const pilote = pilotes.find(p => p.id == id);
+            if (!pilote) return;
+
+            openModal(`
+                <div class='carte-identite'>
+                    <div class='carte-header'>
+                        <h2>${escapeHtml(nomComplet(pilote))}</h2>
+                        <span class='badge-modele'>PILOTE</span>
+                    </div>
+                    ${pilote.image_path
+                        ? `<img src='${escapeHtml(pilote.image_path)}' alt='${escapeHtml(nomComplet(pilote))}' class='carte-photo'>`
+                        : `<div class='carte-photo-placeholder'>🏆</div>`}
+                    <div class='carte-section'>
+                        <div class='info-grid'>
+                            <div class='info-item'>
+                                <span class='info-label'>Naissance :</span>
+                                <span class='info-value'>${escapeHtml(pilote.date_naissance || 'N/A')}</span>
+                            </div>
+                            ${pilote.date_deces ? `
+                            <div class='info-item'>
+                                <span class='info-label'>Décès :</span>
+                                <span class='info-value'>${escapeHtml(pilote.date_deces)}</span>
+                            </div>` : ''}
+                            <div class='info-item'>
+                                <span class='info-label'>Nationalité :</span>
+                                <span class='info-value'>${escapeHtml(pilote.nationalite || 'N/A')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    ${pilote.description ? `<div class='carte-section'><p class='description-text'>${nl2br(pilote.description)}</p></div>` : ''}
+                    ${pilote.palmares ? `<div class='carte-section'><h3 class='carte-titre'>Palmarès</h3><div class='caracteristiques-text'>${nl2br(pilote.palmares)}</div></div>` : ''}
+                </div>
+            `);
+        }
+    </script>
+    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}
-

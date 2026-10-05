@@ -1,10 +1,114 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Pièces détachées - Club Bultaco{% endblock %}
+
+{% block body_class %}page-pieces{% endblock %}
+
 {% block body %}
+    <div class='head'>
+        <h1>Pièces détachées</h1>
+    </div>
 
+    <div class='container'>
+        <section class='hero'>
+            <p>{{ texte_presentation }}</p>
+            <h2>CATALOGUE DES PIÈCES</h2>
+            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher une pièce...' } %}
+        </section>
+
+        <section class='pieces-section'>
+            <div class='categories-container'>
+                {% for categorie in categories %}
+                    <div class='categorie-block'>
+                        <div class='categorie-header' onclick="toggleBloc('cat-{{ categorie.id }}')">
+                            <h3>
+                                <span class='arrow' id='arrow-cat-{{ categorie.id }}'>▶</span>
+                                {{ categorie.nom }}
+                                <span class='badge'>{{ categorie.nb_pieces }} pièce(s)</span>
+                            </h3>
+                        </div>
+
+                        <div class='categorie-content' id='cat-{{ categorie.id }}' hidden>
+                            {% for sousCategorie in categorie.sous_categories %}
+                                <div class='sous-categorie-block'>
+                                    <div class='sous-categorie-header' onclick="toggleBloc('sous-cat-{{ sousCategorie.id }}')">
+                                        <h4>
+                                            <span class='arrow-small' id='arrow-sous-cat-{{ sousCategorie.id }}'>▶</span>
+                                            {{ sousCategorie.nom }}
+                                            <span class='badge-small'>{{ sousCategorie.pieces|length }}</span>
+                                        </h4>
+                                    </div>
+
+                                    <div class='sous-categorie-content' id='sous-cat-{{ sousCategorie.id }}' hidden>
+                                        <div class='pieces-grid'>
+                                            {% for piece in sousCategorie.pieces %}
+                                                <div class='piece-card' data-id='{{ piece.id }}'>
+                                                    {% if piece.image_path %}
+                                                        <img src='{{ piece.image_path }}' alt='{{ piece.nom }}' loading='lazy'>
+                                                    {% else %}
+                                                        <div class='no-image'>📦</div>
+                                                    {% endif %}
+                                                    <div class='piece-info'>
+                                                        <h5>{{ piece.nom }}</h5>
+                                                        <p class='piece-description'>{{ piece.description }}</p>
+                                                        <div class='piece-footer'>
+                                                            <span class='piece-prix'>{{ piece.prix|number_format(2, ',', ' ') }} €</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <p class='no-pieces'>Aucune pièce disponible pour le moment</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class='no-pieces'>Aucune sous-catégorie pour le moment</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <p class='no-items'>Aucune pièce pour le moment</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
 {% endblock %}
 
-{% block title %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const pieces = {{ pieces|json_encode|raw }};
+        const formatPrix = prix => parseFloat(prix || 0).toFixed(2).replace('.', ',') + ' €';
 
+        function setBloc(id, ouvert) {
+            const content = document.getElementById(id);
+            const arrow = document.getElementById('arrow-' + id);
+            if (!content) return;
+            content.hidden = !ouvert;
+            if (arrow) arrow.textContent = ouvert ? '▼' : '▶';
+        }
+
+        function toggleBloc(id) {
+            const content = document.getElementById(id);
+            if (content) setBloc(id, content.hidden);
+        }
+
+        window.searchConfig = {
+            data       : pieces,
+            fields     : ['description', 'categorie', 'sous_categorie'],
+            labelField : 'nom',
+            metaFields : p => [`${p.categorie} > ${p.sous_categorie}`, formatPrix(p.prix)],
+            emptyText  : 'Aucune pièce trouvée',
+            onSelect   : function (item) {
+                const card = document.querySelector(`.piece-card[data-id='${item.id}']`);
+                if (!card) return;
+                // Ouverture de la catégorie et de la sous-catégorie contenant la pièce
+                setBloc(card.closest('.categorie-content').id, true);
+                setBloc(card.closest('.sous-categorie-content').id, true);
+                setTimeout(() => scrollAndHighlight(card), 100);
+            }
+        };
+    </script>
+    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}
-

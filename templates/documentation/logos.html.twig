@@ -1,10 +1,95 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Logos - Club Bultaco{% endblock %}
+
+{% block body_class %}page-logos{% endblock %}
+
 {% block body %}
+    <div class='head'>
+        <h1>Logos</h1>
+    </div>
 
+    <div class='container'>
+        <section class='hero'>
+            <p>{{ texte_presentation }}</p>
+            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher un logo...' } %}
+        </section>
+
+        <section class='pressbook-section'>
+            {% if logos is empty %}
+                <p class='no-items'>Aucun logo pour le moment</p>
+            {% else %}
+                <div class='masonry-grid logos-grid'>
+                    {% for logo in logos %}
+                        <div class='masonry-item logo-item' data-id='{{ logo.id }}' onclick='openLogoModal({{ logo.id }})'>
+                            {% if logo.image_path %}
+                                <img src='{{ logo.image_path }}' alt='{{ logo.titre }}' loading='lazy'>
+                            {% else %}
+                                <div class='no-image-press'>🎨</div>
+                            {% endif %}
+                            <div class='masonry-overlay'>
+                                <span class='type-badge logo-badge'>LOGO</span>
+                                <h3>{{ logo.titre }}</h3>
+                                {% if logo.date_publication %}<p class='item-date'>{{ logo.date_publication }}</p>{% endif %}
+                                {% if logo.source %}<p class='item-source'>{{ logo.source }}</p>{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    {% include '_partials/_modal.html.twig' %}
 {% endblock %}
 
-{% block title %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const logos = {{ logos|json_encode|raw }};
 
+        window.searchConfig = {
+            data       : logos,
+            fields     : ['description', 'source', 'date_publication'],
+            labelField : 'titre',
+            metaFields : ['date_publication', 'source'],
+            emptyText  : 'Aucun logo trouvé',
+            onSelect   : item => openLogoModal(item.id)
+        };
+
+        function openLogoModal(id) {
+            const logo = logos.find(l => l.id == id);
+            if (!logo) return;
+
+            openModal(`
+                <div class='press-detail'>
+                    <div class='press-header'>
+                        <h2>${escapeHtml(logo.titre)}</h2>
+                        <span class='badge-press'>Logo</span>
+                    </div>
+                    ${logo.image_path
+                        ? `<img src='${escapeHtml(logo.image_path)}' alt='${escapeHtml(logo.titre)}' class='press-image logo-image'>`
+                        : `<div class='press-image-placeholder'>Aucune image disponible</div>`}
+                    <div class='press-info-grid'>
+                        ${logo.date_publication ? `
+                        <div class='press-info-item'>
+                            <span class='press-info-label'>Période :</span>
+                            <span class='press-info-value'>${escapeHtml(logo.date_publication)}</span>
+                        </div>` : ''}
+                        ${logo.source ? `
+                        <div class='press-info-item'>
+                            <span class='press-info-label'>Source :</span>
+                            <span class='press-info-value'>${escapeHtml(logo.source)}</span>
+                        </div>` : ''}
+                    </div>
+                    ${logo.description ? `<div class='press-description'><p>${nl2br(logo.description)}</p></div>` : ''}
+                    ${logo.lien_externe ? `
+                    <div class='press-link'>
+                        <a href='${escapeHtml(logo.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>🔗 Voir la source originale</a>
+                    </div>` : ''}
+                </div>
+            `);
+        }
+    </script>
+    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}
-
