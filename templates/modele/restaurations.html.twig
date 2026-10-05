@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Restaurations - Club Bultaco{% endblock %}
+{% block meta_description %}Exemples de restaurations de motos Bultaco réalisées par le club.{% endblock %}
 
 {% block body_class %}page-restau{% endblock %}
 
@@ -10,26 +11,30 @@
     </div>
 
     <div class='container'>
-        <section class='hero'>
-            <p>{{ texte_presentation }}</p>
-            <h2>QUELQUES EXEMPLES</h2>
-            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher un modèle...' } %}
-        </section>
+        {% include '_partials/_hero.html.twig' with {
+            texte: texte_presentation,
+            sous_titre: 'Quelques exemples',
+            placeholder: 'Rechercher un modèle...'
+        } %}
 
         <section class='restau-section'>
             {% if photos is empty %}
-                <p class='no-items'>Aucune restauration pour le moment</p>
+                {% include '_partials/_empty.html.twig' with { icone: '🔧', message: 'Aucune restauration pour le moment' } %}
             {% else %}
                 <div class='restau-grid'>
                     {% for colonne in colonnes %}
                         <div class='colonne'>
                             {% for photo in colonne %}
-                                <div class='album-card restau-item' data-id='{{ photo.id }}' onclick='openPhotoModal({{ photo.id }})'>
-                                    <img class='restau-photo' src='{{ photo.image_path }}' alt='{{ photo.nom_modele }}' loading='lazy'>
-                                    <div class='album-info'>
-                                        <h3>{{ photo.nom_modele }}</h3>
+                                <figure class='album-card restau-item' data-id='{{ photo.id }}' role='button' tabindex='0'
+                                        aria-label='Agrandir la photo {{ photo.nom_modele }}' onclick='openPhotoModal({{ photo.id }})'>
+                                    <div class='album-photo-wrap'>
+                                        <img class='restau-photo' src='{{ photo.image_path }}' alt='{{ photo.nom_modele }}' loading='lazy'>
+                                        <span class='zoom-hint' aria-hidden='true'>⤢</span>
                                     </div>
-                                </div>
+                                    <figcaption class='album-info'>
+                                        <h3>{{ photo.nom_modele }}</h3>
+                                    </figcaption>
+                                </figure>
                             {% endfor %}
                         </div>
                     {% endfor %}
@@ -44,7 +49,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const photos = {{ photos|json_encode|raw }};
+        const photos = {{ photos|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
         window.searchConfig = {
             data       : photos,
@@ -62,9 +67,9 @@
                 <div class='carte-identite'>
                     <div class='carte-header'>
                         <h2>${escapeHtml(photo.nom_modele)}</h2>
-                        <span class='badge-modele'>RESTAURATION</span>
+                        <span class='badge-modele'>Restauration</span>
                     </div>
-                    <img src='${escapeHtml(photo.image_path)}' alt='${escapeHtml(photo.nom_modele)}' class='carte-photo'>
+                    <img src='${escapeHtml(photo.image_path)}' alt='${escapeHtml(photo.nom_modele)}' class='carte-photo carte-photo--large'>
                 </div>
             `);
         }

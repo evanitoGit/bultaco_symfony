@@ -37,6 +37,7 @@ class DocumentationController extends AbstractController
         return $this->render('documentation/pressbook.html.twig', [
             'texte_presentation' => $texte ? $texte->getContenu() : 'Articles de presse, magazines, photographies et illustrations : retrouvez toute la mémoire de Bultaco.',
             'items' => $items,
+            'types' => array_values(array_unique(array_column($items, 'type_contenu'))),
         ]);
     }
 }

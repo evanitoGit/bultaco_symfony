@@ -1,41 +1,59 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Pressbook - Club Bultaco{% endblock %}
+{% block meta_description %}Articles de presse, magazines, photographies et illustrations consacrés à Bultaco.{% endblock %}
 
 {% block body_class %}page-press{% endblock %}
 
 {% block body %}
     {% set type_icons = { article: '📰', magazine: '📔', photo: '📸', illustration: '✏️' } %}
+    {% set type_labels = { article: 'Articles', magazine: 'Magazines', photo: 'Photos', illustration: 'Illustrations' } %}
 
     <div class='head'>
         <h1>Pressbook</h1>
     </div>
 
     <div class='container'>
-        <section class='hero'>
-            <p>{{ texte_presentation }}</p>
-            {% include '_partials/_search.html.twig' with { placeholder: 'Rechercher un article, un magazine...' } %}
-        </section>
+        {% include '_partials/_hero.html.twig' with {
+            texte: texte_presentation,
+            compteur: items is empty ? null : items|length ~ (items|length > 1 ? ' documents' : ' document'),
+            placeholder: 'Rechercher un article, un magazine...'
+        } %}
 
         <section class='pressbook-section'>
             {% if items is empty %}
-                <p class='no-items'>Aucun élément pour le moment</p>
+                {% include '_partials/_empty.html.twig' with { icone: '📰', message: 'Aucun élément pour le moment' } %}
             {% else %}
+                {% if types|length > 1 %}
+                    <div class='filtres' role='group' aria-label='Filtrer par type'>
+                        <button type='button' class='filtre active' data-type='tout' aria-pressed='true'>Tout</button>
+                        {% for type in types %}
+                            <button type='button' class='filtre' data-type='{{ type }}' aria-pressed='false'>
+                                {{ type_icons[type] ?? '' }} {{ type_labels[type] ?? type|capitalize }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 <div class='masonry-grid'>
                     {% for item in items %}
-                        <div class='masonry-item' data-id='{{ item.id }}' data-type='{{ item.type_contenu }}' onclick='openItemModal({{ item.id }})'>
-                            {% if item.image_path %}
-                                <img src='{{ item.image_path }}' alt='{{ item.titre }}' loading='lazy'>
-                            {% else %}
-                                <div class='no-image-press'>{{ type_icons[item.type_contenu] ?? '📄' }}</div>
-                            {% endif %}
-                            <div class='masonry-overlay'>
-                                <span class='type-badge'>{{ item.type_contenu|upper }}</span>
-                                <h3>{{ item.titre }}</h3>
-                                {% if item.date_publication %}<p class='item-date'>{{ item.date_publication }}</p>{% endif %}
-                                {% if item.source %}<p class='item-source'>{{ item.source }}</p>{% endif %}
+                        <article class='masonry-item' data-id='{{ item.id }}' data-type='{{ item.type_contenu }}' role='button' tabindex='0'
+                                 aria-label='Voir {{ item.titre }}' onclick='openItemModal({{ item.id }})'>
+                            <div class='masonry-media'>
+                                {% if item.image_path %}
+                                    <img src='{{ item.image_path }}' alt='{{ item.titre }}' loading='lazy'>
+                                {% else %}
+                                    <div class='no-image-press' aria-hidden='true'>{{ type_icons[item.type_contenu] ?? '📄' }}</div>
+                                {% endif %}
+                                <span class='card-tag'>{{ item.type_contenu|upper }}</span>
                             </div>
-                        </div>
+                            <div class='masonry-caption'>
+                                <h3>{{ item.titre }}</h3>
+                                {% if item.date_publication or item.source %}
+                                    <p class='item-meta'>{{ [item.date_publication, item.source]|filter(v => v)|join(' · ') }}</p>
+                                {% endif %}
+                            </div>
+                        </article>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -48,7 +66,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const items = {{ items|json_encode|raw }};
+        const items = {{ items|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
         const typeLabels = {
             article      : 'Article de presse',
@@ -66,35 +84,50 @@
             onSelect   : item => openItemModal(item.id)
         };
 
+        // Filtres par type de document
+        document.querySelectorAll('.filtre').forEach(bouton => {
+            bouton.addEventListener('click', function () {
+                const type = this.dataset.type;
+                document.querySelectorAll('.filtre').forEach(b => {
+                    b.classList.toggle('active', b === this);
+                    b.setAttribute('aria-pressed', b === this);
+                });
+                document.querySelectorAll('.masonry-item').forEach(item => {
+                    item.hidden = type !== 'tout' && item.dataset.type !== type;
+                });
+            });
+        });
+
         function openItemModal(id) {
             const item = items.find(i => i.id == id);
             if (!item) return;
 
             openModal(`
                 <div class='press-detail'>
-                    <div class='press-header'>
+                    <div class='carte-header'>
                         <h2>${escapeHtml(item.titre)}</h2>
-                        <span class='badge-press'>${escapeHtml(typeLabels[item.type_contenu] || item.type_contenu)}</span>
+                        <span class='badge-modele'>${escapeHtml(typeLabels[item.type_contenu] || item.type_contenu)}</span>
                     </div>
                     ${item.image_path
                         ? `<img src='${escapeHtml(item.image_path)}' alt='${escapeHtml(item.titre)}' class='press-image'>`
-                        : `<div class='press-image-placeholder'>Aucune image disponible</div>`}
-                    <div class='press-info-grid'>
+                        : ''}
+                    ${(item.date_publication || item.source) ? `
+                    <div class='info-grid'>
                         ${item.date_publication ? `
-                        <div class='press-info-item'>
-                            <span class='press-info-label'>Date :</span>
-                            <span class='press-info-value'>${escapeHtml(item.date_publication)}</span>
+                        <div class='info-item'>
+                            <span class='info-label'>Date</span>
+                            <span class='info-value'>${escapeHtml(item.date_publication)}</span>
                         </div>` : ''}
                         ${item.source ? `
-                        <div class='press-info-item'>
-                            <span class='press-info-label'>Source :</span>
-                            <span class='press-info-value'>${escapeHtml(item.source)}</span>
+                        <div class='info-item'>
+                            <span class='info-label'>Source</span>
+                            <span class='info-value'>${escapeHtml(item.source)}</span>
                         </div>` : ''}
-                    </div>
+                    </div>` : ''}
                     ${item.description ? `<div class='press-description'><p>${nl2br(item.description)}</p></div>` : ''}
                     ${item.lien_externe ? `
                     <div class='press-link'>
-                        <a href='${escapeHtml(item.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>🔗 Voir la source originale</a>
+                        <a href='${escapeHtml(item.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>Voir la source originale ↗</a>
                     </div>` : ''}
                 </div>
             `);

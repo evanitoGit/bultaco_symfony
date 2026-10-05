@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{% block meta_description %}Club Bultaco France : modèles, restaurations, pilotes de légende, documentation et pièces détachées.{% endblock %}">
     <title>{% block title %}Club Bultaco - Escuyer{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo_rond.png') }}" sizes="50x50">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
@@ -9,37 +11,33 @@
 </head>
 <body class="{% block body_class %}page-default{% endblock %}">
 <header class='nav'>
-    <nav class='header-nav'>
+    <button type='button' class='nav-toggle' aria-label='Ouvrir le menu' aria-expanded='false' aria-controls='mainNav'>
+        <span></span><span></span><span></span>
+    </button>
+    <nav class='header-nav' id='mainNav'>
         <ul>
             <li>
                 <a href="{{ path('app_home') }}">
-                    <img src="{{ asset('img/logo_bultaco.png') }}" alt='logo'>
+                    <img src="{{ asset('img/logo_bultaco.png') }}" alt='Bultaco - Accueil'>
                 </a>
             </li>
 
-            <li class="categorie">
-                <h3 class="main-link">Modèles</h3>
-                <ul>
-                    <li><a href="{{ path('app_modeles_liste') }}">Liste</a></li>
-                    <li><a href="{{ path('app_modeles_restaurations') }}">Restaurations</a></li>
-                    <li><a href="{{ path('app_modeles_pilotes') }}">Pilotes</a></li>
-                </ul>
-            </li>
-
-            <li class="categorie">
-                <h3 class="main-link">Documentation</h3>
-                <ul>
-                    <li><a href="{{ path('app_doc_logos') }}">Logos</a></li>
-                    <li><a href="{{ path('app_doc_pressbook') }}">Pressbook</a></li>
-                </ul>
-            </li>
-
-            <li class="categorie">
-                <h3 class="main-link">Boutique</h3>
-                <ul>
-                    <li><a href="{{ path('app_boutique_pieces') }}">Pièces détachées</a></li>
-                </ul>
-            </li>
+            {% set current_route = app.request.attributes.get('_route') %}
+            {% set menu = {
+                'Modèles': { 'Liste': 'app_modeles_liste', 'Restaurations': 'app_modeles_restaurations', 'Pilotes': 'app_modeles_pilotes' },
+                'Documentation': { 'Logos': 'app_doc_logos', 'Pressbook': 'app_doc_pressbook' },
+                'Boutique': { 'Pièces détachées': 'app_boutique_pieces' }
+            } %}
+            {% for categorie, liens in menu %}
+                <li class="categorie{{ current_route in liens ? ' active' }}">
+                    <h3 class="main-link">{{ categorie }}</h3>
+                    <ul>
+                        {% for label, route in liens %}
+                            <li><a href="{{ path(route) }}"{% if current_route == route %} class="active" aria-current="page"{% endif %}>{{ label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
         </ul>
     </nav>
 </header>
@@ -75,7 +73,7 @@
     <div class='coord-footer'>
         <p>PASSION BULTACO DEPUIS 1958</p>
     </div>
-    <a href="/login" style='cursor: default;'>
+    <a href="{{ path('app_login') }}" class='logorond-link' aria-label='Espace administrateur'>
         <img src="{{ asset('img/logo_rond.png') }}" alt='logorond' class='logorond'>
     </a>
 </section>
