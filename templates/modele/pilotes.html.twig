@@ -24,7 +24,7 @@
                              aria-label='Voir la fiche de {{ nom_complet }}' onclick='openPiloteModal({{ pilote.id }})'>
                         <div class='album-photo-wrap'>
                             {% if pilote.image_path %}
-                                <div class='album-photo' style='background-image: url("{{ pilote.image_path }}")'></div>
+                                <div class='album-photo' style='background-image: url("{{ asset(pilote.image_path) }}")'></div>
                             {% else %}
                                 <div class='album-photo no-photo'>🏆</div>
                             {% endif %}
@@ -74,7 +74,7 @@
                         <span class='badge-modele'>Pilote</span>
                     </div>
                     ${pilote.image_path
-                        ? `<img src='${escapeHtml(pilote.image_path)}' alt='${escapeHtml(nomComplet(pilote))}' class='carte-photo'>`
+                        ? `<img src='${escapeHtml(mediaUrl(pilote.image_path))}' alt='${escapeHtml(nomComplet(pilote))}' class='carte-photo'>`
                         : `<div class='carte-photo-placeholder'>🏆</div>`}
                     <div class='carte-section'>
                         <div class='info-grid'>

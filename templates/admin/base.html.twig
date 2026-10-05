@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}Administration{% endblock %} - Club Bultaco</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo_rond.png') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+</head>
+<body class="admin" data-base-path="{{ app.request.basePath }}">
+{% set current_resource = app.request.attributes.get('resource') %}
+{% set current_route = app.request.attributes.get('_route') %}
+
+<aside class="admin-sidebar" id="adminSidebar">
+    <a href="{{ path('app_admin') }}" class="admin-brand">
+        <img src="{{ asset('img/logo_bultaco.png') }}" alt="Bultaco">
+        <span>Administration</span>
+    </a>
+
+    <nav class="admin-nav" aria-label="Administration">
+        <a href="{{ path('app_admin') }}" class="admin-nav-link{{ current_route == 'app_admin' ? ' active' }}">
+            <span class="admin-nav-icon" aria-hidden="true">🏠</span> Tableau de bord
+        </a>
+        {% for group, resources in groups %}
+            <p class="admin-nav-group">{{ group }}</p>
+            {% for key, item in resources %}
+                <a href="{{ path('app_admin_list', { resource: key }) }}" class="admin-nav-link{{ current_resource == key ? ' active' }}">
+                    <span class="admin-nav-icon" aria-hidden="true">{{ item.icon }}</span> {{ item.label }}
+                </a>
+            {% endfor %}
+        {% endfor %}
+    </nav>
+
+    <div class="admin-sidebar-footer">
+        <a href="{{ path('app_home') }}" class="admin-nav-link" target="_blank" rel="noopener">
+            <span class="admin-nav-icon" aria-hidden="true">↗</span> Voir le site
+        </a>
+    </div>
+</aside>
+
+<div class="admin-main">
+    <header class="admin-topbar">
+        <button type="button" class="admin-menu-toggle" aria-label="Ouvrir le menu" aria-controls="adminSidebar" aria-expanded="false"
+                onclick="const o = document.body.classList.toggle('sidebar-open'); this.setAttribute('aria-expanded', o);">☰</button>
+        <div class="admin-breadcrumb">{% block breadcrumb %}{% endblock %}</div>
+        <div class="admin-user">
+            <span class="admin-user-name">👤 {{ app.user.userIdentifier }}</span>
+            <a href="{{ path('app_logout') }}" class="admin-btn admin-btn--ghost admin-btn--small">Se déconnecter</a>
+        </div>
+    </header>
+
+    <main class="admin-content">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="admin-flash admin-flash--{{ type }}" role="status">
+                    <span>{{ type == 'success' ? '✓' : '⚠' }}</span> {{ message }}
+                    <button type="button" class="admin-flash-close" aria-label="Fermer" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        {% block body %}{% endblock %}
+    </main>
+</div>
+
+<div class="admin-backdrop" onclick="document.body.classList.remove('sidebar-open')"></div>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

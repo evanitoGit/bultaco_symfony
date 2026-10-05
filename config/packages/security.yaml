@@ -8,8 +8,8 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
-                class: App\Entity\User
-                property: email
+                class: App\Entity\Admin
+                property: username
 
     firewalls:
         dev:
@@ -22,8 +22,7 @@ security:
             custom_authenticator: App\Security\AppAuthAuthenticator
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
+                target: app_home
 
             remember_me:
                 secret: '%kernel.secret%'
@@ -41,7 +40,7 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

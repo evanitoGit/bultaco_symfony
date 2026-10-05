@@ -1,0 +1,89 @@
+{% extends 'admin/base.html.twig' %}
+
+{% form_theme form 'admin/_form_theme.html.twig' %}
+
+{% set page_title = is_new ? 'Ajouter ' ~ resource.singular : 'Modifier ' ~ resource.singular %}
+
+{% block title %}{{ page_title }} - {{ resource.label }}{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ path('app_admin') }}">Tableau de bord</a> <span aria-hidden="true">›</span>
+    <a href="{{ path('app_admin_list', { resource: resource.key }) }}">{{ resource.label }}</a> <span aria-hidden="true">›</span>
+    <span>{{ is_new ? 'Ajout' : 'Modification' }}</span>
+{% endblock %}
+
+{% block body %}
+    <div class="admin-page-header">
+        <div>
+            <h1><span aria-hidden="true">{{ resource.icon }}</span> {{ page_title|capitalize }}</h1>
+            {% if not is_new and resource.key == 'textes' %}
+                {% set info = constant('App\\Admin\\ResourceRegistry::TEXT_SECTIONS')[row.section] ?? null %}
+                <p class="admin-page-intro">Page : <strong>{{ info ? info.label : row.section }}</strong>
+                    {% if info %} — <a href="{{ path(info.route) }}" target="_blank" rel="noopener">voir la page ↗</a>{% endif %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {{ form_start(form, { attr: { class: 'admin-form', novalidate: 'novalidate' } }) }}
+        {% if not form.vars.valid %}
+            <div class="admin-flash admin-flash--error" role="alert"><span>⚠</span> Le formulaire contient des erreurs, vérifiez les champs indiqués en rouge.</div>
+        {% endif %}
+        {{ form_errors(form) }}
+
+        <div class="admin-form-card">
+            {% for name, field in resource.fields %}
+                {% if form[name] is defined %}
+                    {% if field.type == 'image' %}
+                        <div class="admin-image-field">
+                            <div class="admin-image-preview" id="preview_{{ name }}">
+                                {% if row[name] ?? null %}
+                                    <img src="{{ asset(row[name]) }}" alt="Image actuelle" onerror="this.onerror = null; this.parentElement.innerHTML = '<span>Fichier introuvable :<br><code>{{ row[name]|e('js') }}</code></span>';">
+                                {% else %}
+                                    <span>Aucune image</span>
+                                {% endif %}
+                            </div>
+                            <div class="admin-image-inputs">
+                                {{ form_row(form[name], { attr: { 'data-preview': 'preview_' ~ name } }) }}
+                                {% if form[name ~ '__remove'] is defined %}{{ form_row(form[name ~ '__remove']) }}{% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        {{ form_row(form[name]) }}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {{ form_rest(form) }}
+
+        <div class="admin-form-actions">
+            <a href="{{ path('app_admin_list', { resource: resource.key }) }}" class="admin-btn admin-btn--ghost">Annuler</a>
+            <button type="submit" class="admin-btn">{{ is_new ? 'Ajouter' : 'Enregistrer les modifications' }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        // Aperçu immédiat de l'image choisie
+        document.querySelectorAll('input[type=file][data-preview]').forEach(input => {
+            input.addEventListener('change', () => {
+                const file = input.files[0];
+                const preview = document.getElementById(input.dataset.preview);
+                if (!file || !file.type.startsWith('image/')) return;
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.alt = 'Nouvelle image';
+                preview.replaceChildren(img);
+                preview.classList.add('is-new');
+            });
+        });
+
+        // Avertit avant de quitter la page avec des modifications non enregistrées
+        const form = document.querySelector('.admin-form');
+        let modifie = false;
+        form.addEventListener('input', () => modifie = true);
+        form.addEventListener('change', () => modifie = true);
+        form.addEventListener('submit', () => modifie = false);
+        window.addEventListener('beforeunload', e => { if (modifie) { e.preventDefault(); e.returnValue = ''; } });
+    </script>
+{% endblock %}

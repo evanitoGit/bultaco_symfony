@@ -1,0 +1,36 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+{% block breadcrumb %}<span>Tableau de bord</span>{% endblock %}
+
+{% block body %}
+    <div class="admin-page-header">
+        <div>
+            <h1>Bonjour {{ app.user.userIdentifier }} 👋</h1>
+            <p class="admin-page-intro">Choisissez ce que vous souhaitez modifier sur le site.</p>
+        </div>
+    </div>
+
+    {% for group, resources in groups %}
+        <section class="admin-group">
+            <h2 class="admin-group-title">{{ group }}</h2>
+            <div class="admin-cards">
+                {% for key, item in resources %}
+                    <article class="admin-card">
+                        <a href="{{ path('app_admin_list', { resource: key }) }}" class="admin-card-main">
+                            <span class="admin-card-icon" aria-hidden="true">{{ item.icon }}</span>
+                            <span class="admin-card-body">
+                                <span class="admin-card-title">{{ item.label }}</span>
+                                <span class="admin-card-count">{{ counts[key] }} élément{{ counts[key] > 1 ? 's' }}</span>
+                            </span>
+                        </a>
+                        <div class="admin-card-actions">
+                            <a href="{{ path('app_admin_list', { resource: key }) }}">Gérer</a>
+                            <a href="{{ path('app_admin_new', { resource: key }) }}">+ Ajouter</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+{% endblock %}

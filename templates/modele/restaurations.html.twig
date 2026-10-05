@@ -28,7 +28,7 @@
                                 <figure class='album-card restau-item' data-id='{{ photo.id }}' role='button' tabindex='0'
                                         aria-label='Agrandir la photo {{ photo.nom_modele }}' onclick='openPhotoModal({{ photo.id }})'>
                                     <div class='album-photo-wrap'>
-                                        <img class='restau-photo' src='{{ photo.image_path }}' alt='{{ photo.nom_modele }}' loading='lazy'>
+                                        <img class='restau-photo' src='{{ asset(photo.image_path) }}' alt='{{ photo.nom_modele }}' loading='lazy'>
                                         <span class='zoom-hint' aria-hidden='true'>⤢</span>
                                     </div>
                                     <figcaption class='album-info'>
@@ -69,7 +69,7 @@
                         <h2>${escapeHtml(photo.nom_modele)}</h2>
                         <span class='badge-modele'>Restauration</span>
                     </div>
-                    <img src='${escapeHtml(photo.image_path)}' alt='${escapeHtml(photo.nom_modele)}' class='carte-photo carte-photo--large'>
+                    <img src='${escapeHtml(mediaUrl(photo.image_path))}' alt='${escapeHtml(photo.nom_modele)}' class='carte-photo carte-photo--large'>
                 </div>
             `);
         }

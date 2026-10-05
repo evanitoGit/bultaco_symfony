@@ -26,7 +26,7 @@
                                  aria-label='Voir le logo {{ logo.titre }}' onclick='openLogoModal({{ logo.id }})'>
                             <div class='masonry-media'>
                                 {% if logo.image_path %}
-                                    <img src='{{ logo.image_path }}' alt='{{ logo.titre }}' loading='lazy'>
+                                    <img src='{{ asset(logo.image_path) }}' alt='{{ logo.titre }}' loading='lazy'>
                                 {% else %}
                                     <div class='no-image-press' aria-hidden='true'>🎨</div>
                                 {% endif %}
@@ -73,7 +73,7 @@
                         <span class='badge-modele'>Logo</span>
                     </div>
                     ${logo.image_path
-                        ? `<img src='${escapeHtml(logo.image_path)}' alt='${escapeHtml(logo.titre)}' class='press-image logo-image'>`
+                        ? `<img src='${escapeHtml(mediaUrl(logo.image_path))}' alt='${escapeHtml(logo.titre)}' class='press-image logo-image'>`
                         : `<div class='carte-photo-placeholder'>🎨</div>`}
                     ${(logo.date_publication || logo.source) ? `
                     <div class='info-grid'>

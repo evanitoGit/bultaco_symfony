@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
-<body class="{% block body_class %}page-default{% endblock %}">
+<body class="{% block body_class %}page-default{% endblock %}" data-base-path="{{ app.request.basePath }}">
 <header class='nav'>
     <button type='button' class='nav-toggle' aria-label='Ouvrir le menu' aria-expanded='false' aria-controls='mainNav'>
         <span></span><span></span><span></span>
@@ -91,6 +91,10 @@
         <img src="{{ asset('img/logo_rond.png') }}" alt='' class='logorond'>
     </a>
 </footer>
+
+{% if is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('app_admin') }}" class='admin-shortcut'>⚙ Administration</a>
+{% endif %}
 
 <script src="{{ asset('js/script.js') }}"></script>
 {% block javascripts %}{% endblock %}
