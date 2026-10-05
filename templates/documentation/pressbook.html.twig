@@ -40,7 +40,7 @@
                                  aria-label='Voir {{ item.titre }}' onclick='openItemModal({{ item.id }})'>
                             <div class='masonry-media'>
                                 {% if item.image_path %}
-                                    <img src='{{ item.image_path }}' alt='{{ item.titre }}' loading='lazy'>
+                                    <img src='{{ asset(item.image_path) }}' alt='{{ item.titre }}' loading='lazy'>
                                 {% else %}
                                     <div class='no-image-press' aria-hidden='true'>{{ type_icons[item.type_contenu] ?? '📄' }}</div>
                                 {% endif %}
@@ -108,7 +108,7 @@
                         <span class='badge-modele'>${escapeHtml(typeLabels[item.type_contenu] || item.type_contenu)}</span>
                     </div>
                     ${item.image_path
-                        ? `<img src='${escapeHtml(item.image_path)}' alt='${escapeHtml(item.titre)}' class='press-image'>`
+                        ? `<img src='${escapeHtml(mediaUrl(item.image_path))}' alt='${escapeHtml(item.titre)}' class='press-image'>`
                         : ''}
                     ${(item.date_publication || item.source) ? `
                     <div class='info-grid'>

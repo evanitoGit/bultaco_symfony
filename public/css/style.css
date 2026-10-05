@@ -1586,6 +1586,161 @@ body.page-restau .restau-section { padding-top: 120px; }
     transform: translateY(-2px);
 }
 
+/* --- Page de connexion --- */
+body.page-login { background-image: url("../img/accueil.png"); }
+body.page-login .head { padding: calc(var(--header-height) + 50px) 3% 50px; }
+body.page-login .head h1 { margin-bottom: 0; font-size: min(4em, 9vw); }
+
+.login-section {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 70px 20px 20px;
+}
+
+/* Raccourci vers l'administration quand un administrateur est connecté */
+.admin-shortcut {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 900;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 2px solid var(--sepia);
+    border-radius: 50px;
+    background-color: var(--carbone);
+    color: var(--beige);
+    font-weight: bold;
+    font-size: 0.9em;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-shortcut:hover { background-color: var(--sepia); color: var(--carbone); transform: translateY(-2px); }
+
+.container .login-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 440px;
+    margin: 0;
+    padding: 60px 40px 36px;
+    background-color: white;
+    border: 3px solid var(--carbone);
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+    color: var(--carbone);
+}
+
+.login-logo {
+    position: absolute;
+    top: -48px;
+    left: 50%;
+    width: 96px;
+    height: 96px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.container .login-box .login-title {
+    color: var(--carbone);
+    -webkit-text-stroke: 0;
+    font-size: 1.8em;
+    letter-spacing: 0.08em;
+    margin: 0;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: #8a7a6a;
+    margin-bottom: 14px;
+}
+
+.login-error {
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    border-left: 4px solid #c0392b;
+    border-radius: 8px;
+    background-color: #fdecea;
+    color: #c0392b;
+    font-weight: bold;
+}
+
+.login-box label { font-weight: bold; margin-top: 8px; }
+
+.login-box input[type=text],
+.login-box input[type=password] {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid #e2d6c8;
+    border-radius: 10px;
+    font-size: 1em;
+    color: var(--carbone);
+    background-color: #fffdfb;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-box input:focus {
+    outline: none;
+    border-color: var(--sepia);
+    box-shadow: 0 0 0 4px rgba(204, 175, 146, 0.3);
+}
+
+.password-field { position: relative; }
+.password-field input { padding-right: 50px !important; }
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 1.1em;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.password-toggle:hover, .password-toggle[aria-pressed="true"] { opacity: 1; background-color: #f3e9de; }
+
+.login-box .login-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.login-remember input { width: 18px; height: 18px; accent-color: var(--carbone); }
+
+.container .login-box .btn-login {
+    margin-top: 16px;
+    padding: 14px;
+    font-size: 1.05em;
+    border: 2px solid var(--carbone);
+}
+
+.container .login-box .btn-login:hover { background-color: var(--sepia); border-color: var(--sepia); color: var(--carbone); }
+
+.login-back {
+    margin-top: 12px;
+    text-align: center;
+    color: #8a7a6a;
+    text-decoration: none;
+}
+
+.login-back:hover { color: var(--carbone); text-decoration: underline; }
+
 /* ==========================================================================
    9. MEDIA QUERIES (Responsive)
    ========================================================================== */

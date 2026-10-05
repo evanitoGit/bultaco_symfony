@@ -1,0 +1,114 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ resource.label }}{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ path('app_admin') }}">Tableau de bord</a> <span aria-hidden="true">›</span> <span>{{ resource.label }}</span>
+{% endblock %}
+
+{% block body %}
+    <div class="admin-page-header">
+        <div>
+            <h1><span aria-hidden="true">{{ resource.icon }}</span> {{ resource.label }}</h1>
+            {% if resource.description is defined %}<p class="admin-page-intro">{{ resource.description }}</p>{% endif %}
+        </div>
+        <div class="admin-page-actions">
+            {% if resource.public_route is defined %}
+                <a href="{{ path(resource.public_route) }}" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Voir la page ↗</a>
+            {% endif %}
+            <a href="{{ path('app_admin_new', { resource: resource.key }) }}" class="admin-btn">+ Ajouter {{ resource.singular }}</a>
+        </div>
+    </div>
+
+    {% if rows is empty %}
+        <div class="admin-empty">
+            <span aria-hidden="true">{{ resource.icon }}</span>
+            <p>Aucun élément pour le moment.</p>
+            <a href="{{ path('app_admin_new', { resource: resource.key }) }}" class="admin-btn">+ Ajouter {{ resource.singular }}</a>
+        </div>
+    {% else %}
+        {% if rows|length > 6 %}
+            <div class="admin-filter">
+                <input type="search" id="adminFilter" placeholder="Filtrer la liste…" aria-label="Filtrer la liste" autocomplete="off">
+            </div>
+        {% endif %}
+
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        {% for column, col in resource.list %}
+                            <th class="{{ col.format ?? '' }}">{{ col.label }}</th>
+                        {% endfor %}
+                        <th class="actions"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for column, col in resource.list %}
+                                {% set value = row[column] ?? null %}
+                                {% set format = col.format ?? 'text' %}
+                                <td class="{{ format }}" data-label="{{ col.label }}">
+                                    {% if format == 'image' %}
+                                        {% if value %}
+                                            <img src="{{ asset(value) }}" alt="" loading="lazy" class="admin-thumb" title="{{ value }}" onerror="this.onerror = null; this.classList.add('is-missing'); this.removeAttribute('src');">
+                                        {% else %}
+                                            <span class="admin-thumb admin-thumb--empty" aria-label="Pas d'image">—</span>
+                                        {% endif %}
+                                    {% elseif format == 'money' %}
+                                        {{ value is not null ? value|number_format(2, ',', ' ') ~ ' €' : '—' }}
+                                    {% elseif format == 'section' %}
+                                        {% set info = constant('App\\Admin\\ResourceRegistry::TEXT_SECTIONS')[value] ?? null %}
+                                        <strong>{{ info ? info.label : value }}</strong>
+                                        {% if not info %}<span class="admin-badge">non utilisé sur le site</span>{% endif %}
+                                    {% elseif format == 'excerpt' %}
+                                        <span class="admin-excerpt">{{ value|length > 110 ? value|slice(0, 110) ~ '…' : value }}</span>
+                                    {% elseif format == 'date' %}
+                                        {{ value ? value|date('d/m/Y à H:i') : '—' }}
+                                    {% elseif format == 'choice' %}
+                                        <span class="admin-badge">{{ choice_labels[column][value] ?? value }}</span>
+                                    {% elseif loop.index0 == 0 or (loop.index0 == 1 and resource.list|keys|first == 'image_path') %}
+                                        <strong>{{ value ?: '—' }}</strong>
+                                    {% else %}
+                                        {{ value is same as(null) or value is same as('') ? '—' : value }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td class="actions">
+                                <a href="{{ path('app_admin_edit', { resource: resource.key, id: row.id }) }}" class="admin-btn admin-btn--small">Modifier</a>
+                                <form method="post" action="{{ path('app_admin_delete', { resource: resource.key, id: row.id }) }}"
+                                      onsubmit="return confirm({{ ('Supprimer définitivement cet élément ?' ~ (resource.delete_warning is defined ? '\n\n' ~ resource.delete_warning : ''))|json_encode }});">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete-' ~ resource.key ~ '-' ~ row.id) }}">
+                                    <button type="submit" class="admin-btn admin-btn--danger admin-btn--small">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="admin-filter-empty" hidden>Aucun élément ne correspond à votre recherche.</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        // Filtre instantané des lignes du tableau
+        const filter = document.getElementById('adminFilter');
+        if (filter) {
+            const rows = document.querySelectorAll('.admin-table tbody tr');
+            const empty = document.querySelector('.admin-filter-empty');
+            const normaliser = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+            filter.addEventListener('input', () => {
+                const q = normaliser(filter.value.trim());
+                let visibles = 0;
+                rows.forEach(row => {
+                    const match = normaliser(row.textContent).includes(q);
+                    row.hidden = !match;
+                    if (match) visibles++;
+                });
+                empty.hidden = visibles > 0;
+            });
+        }
+    </script>
+{% endblock %}

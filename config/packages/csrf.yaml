@@ -1,11 +1,9 @@
-# Enable stateless CSRF protection for forms and logins/logouts
+# Protection CSRF des formulaires, de la connexion et de la déconnexion
 framework:
     form:
         csrf_protection:
             token_id: submit
 
-    csrf_protection:
-        stateless_token_ids:
-            - submit
-            - authenticate
-            - logout
+    # Jetons liés à la session : le site ne charge pas le script Stimulus
+    # nécessaire aux jetons « stateless » (double-submit cookie).
+    csrf_protection: true

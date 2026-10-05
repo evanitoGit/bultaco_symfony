@@ -50,7 +50,7 @@
                                                 <article class='piece-card' data-id='{{ piece.id }}'>
                                                     <div class='piece-media'>
                                                         {% if piece.image_path %}
-                                                            <img src='{{ piece.image_path }}' alt='{{ piece.nom }}' loading='lazy'>
+                                                            <img src='{{ asset(piece.image_path) }}' alt='{{ piece.nom }}' loading='lazy'>
                                                         {% else %}
                                                             <div class='no-image' aria-hidden='true'>📦</div>
                                                         {% endif %}

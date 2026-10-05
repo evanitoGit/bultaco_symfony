@@ -14,6 +14,13 @@ function nl2br(value) {
     return escapeHtml(value).replace(/\r?\n/g, '<br>');
 }
 
+// Chemin d'image enregistré en base (« uploads/... ») -> URL utilisable depuis n'importe quelle page
+function mediaUrl(path) {
+    if (!path) return '';
+    if (/^(https?:)?\/\//.test(path) || path.startsWith('/') || path.startsWith('data:')) return path;
+    return (document.body.dataset.basePath || '') + '/' + path;
+}
+
 function pluriel(nombre, singulier, pluriel) {
     return `${nombre} ${nombre > 1 ? (pluriel || singulier + 's') : singulier}`;
 }
