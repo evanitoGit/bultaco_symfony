@@ -30,12 +30,17 @@
             } %}
             {% for categorie, liens in menu %}
                 <li class="categorie{{ current_route in liens ? ' active' }}">
-                    <h3 class="main-link">{{ categorie }}</h3>
-                    <ul>
-                        {% for label, route in liens %}
-                            <li><a href="{{ path(route) }}"{% if current_route == route %} class="active" aria-current="page"{% endif %}>{{ label }}</a></li>
-                        {% endfor %}
-                    </ul>
+                    <span class="main-link" tabindex="0" aria-haspopup="true">
+                        {{ categorie }}
+                        <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <div class="sous-menu">
+                        <ul>
+                            {% for label, route in liens %}
+                                <li><a href="{{ path(route) }}"{% if current_route == route %} class="active" aria-current="page"{% endif %}>{{ label }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
