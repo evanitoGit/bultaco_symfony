@@ -2,6 +2,7 @@
 
 namespace App\Admin;
 
+use App\Commande\CommandeService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -16,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ResourceRegistry
 {
     /** Pour la contrainte de route (doit lister toutes les clés de RESOURCES). */
-    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|admins';
+    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|commandes|admins';
 
     /** Libellés lisibles des sections de la table `textes`, avec la page qui les affiche. */
     public const TEXT_SECTIONS = [
@@ -267,6 +268,31 @@ final class ResourceRegistry
                 'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4],
                 'image_path' => ['type' => 'image', 'label' => 'Photo', 'dir' => 'pieces'],
             ],
+        ],
+        'commandes' => [
+            'table' => 'commandes',
+            'group' => 'Boutique',
+            'label' => 'Commandes',
+            'singular' => 'une commande',
+            'icon' => '🧾',
+            'can_create' => false, // les commandes viennent du site, pas de l'administration
+            'description' => 'Commandes passées sur la boutique. Ouvrez une commande pour voir le client et changer son statut.',
+            'order' => 'date_commande DESC',
+            'title' => ['reference'],
+            'list_sql' => "SELECT c.*, CONCAT(c.prenom, ' ', c.nom) AS client FROM commandes c ORDER BY c.date_commande DESC, c.id DESC",
+            'list' => [
+                'reference' => ['label' => 'Référence'],
+                'date_commande' => ['label' => 'Date', 'format' => 'date'],
+                'client' => ['label' => 'Client'],
+                'total' => ['label' => 'Total', 'format' => 'money'],
+                'statut' => ['label' => 'Statut', 'format' => 'choice'],
+            ],
+            'fields' => [
+                'statut' => ['type' => 'choice', 'label' => 'Statut de la commande', 'required' => true, 'choices' => CommandeService::STATUTS],
+            ],
+            'detail_template' => 'admin/commandes/_detail.html.twig',
+            'detail_sql' => 'SELECT * FROM commande_lignes WHERE commande_id = :id ORDER BY id',
+            'cascade_sql' => ['DELETE FROM commande_lignes WHERE commande_id = :id'],
         ],
         'admins' => [
             'table' => 'admins',

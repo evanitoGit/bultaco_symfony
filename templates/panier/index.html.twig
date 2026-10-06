@@ -4,6 +4,9 @@
 
 {% block body_class %}page-pieces{% endblock %}
 
+{# Pas de pied de page sur le récapitulatif du panier #}
+{% block footer %}{% endblock %}
+
 {% block body %}
     <div class='head'>
         <h1>Mon panier</h1>
@@ -67,7 +70,7 @@
                         <button type='submit' class='panier-vider'>Vider le panier</button>
                     </form>
                     <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>← Continuer mes achats</a>
-                    <button type='button' class='btn-commander' disabled title='Bientôt disponible'>Passer la commande</button>
+                    <a href='{{ path('app_commande') }}' class='btn-commander'>Passer la commande</a>
                 </div>
             {% endif %}
         </section>

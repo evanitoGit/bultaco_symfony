@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande - Club Bultaco{% endblock %}
+{% block body_class %}page-pieces{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block body %}
+    <div class='head'><h1>Commande</h1></div>
+
+    <div class='container'>
+        <section class='commande'>
+            {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
+                <div class='commande-colonnes'>
+                    <div class='commande-bloc'>
+                        <h2 class='commande-titre'>Vos coordonnées</h2>
+                        <div class='commande-grille'>
+                            {{ form_row(form.prenom) }}
+                            {{ form_row(form.nom) }}
+                            {{ form_row(form.email) }}
+                            {{ form_row(form.telephone) }}
+                        </div>
+
+                        <h2 class='commande-titre'>Adresse de livraison</h2>
+                        {{ form_row(form.adresse) }}
+                        <div class='commande-grille commande-grille--3'>
+                            {{ form_row(form.code_postal) }}
+                            {{ form_row(form.ville) }}
+                            {{ form_row(form.pays) }}
+                        </div>
+
+                        <h2 class='commande-titre'>Paiement</h2>
+                        {{ form_row(form.mode_paiement) }}
+                        <p class='commande-aide'>Aucun paiement n'est demandé en ligne : vous recevrez par e-mail les instructions pour régler votre commande.</p>
+
+                        {{ form_row(form.commentaire) }}
+                        {{ form_row(form.accord) }}
+                    </div>
+
+                    <aside class='commande-recap'>
+                        <h2 class='commande-titre'>Votre commande</h2>
+                        <ul class='commande-lignes'>
+                            {% for ligne in lignes %}
+                                <li>
+                                    <span>{{ ligne.nom }} <small>× {{ ligne.quantite }}</small></span>
+                                    <strong>{{ ligne.sous_total|prix }}</strong>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p class='commande-total'><span>Total</span><strong>{{ total|prix }}</strong></p>
+                        <button type='submit' class='btn-commander'>Valider la commande</button>
+                        <a href='{{ path('app_panier') }}' class='panier-continuer'>← Modifier mon panier</a>
+                    </aside>
+                </div>
+            {{ form_end(form) }}
+        </section>
+    </div>
+{% endblock %}

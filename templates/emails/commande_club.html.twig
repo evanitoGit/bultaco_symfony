@@ -1,0 +1,16 @@
+<div style="font-family: Arial, sans-serif; color: #474747; max-width: 600px;">
+    <h1 style="font-size: 20px;">Nouvelle commande {{ commande.reference }}</h1>
+    <p>
+        <strong>{{ commande.prenom }} {{ commande.nom }}</strong><br>
+        {{ commande.email }}{% if commande.telephone %} — {{ commande.telephone }}{% endif %}<br>
+        {{ commande.adresse }}, {{ commande.code_postal }} {{ commande.ville }} ({{ commande.pays }})
+    </p>
+    <p>Paiement choisi : <strong>{{ commande.mode_paiement == 'virement' ? 'virement bancaire' : 'chèque' }}</strong></p>
+    {% if commande.commentaire %}
+        <p style="background: #FFF2E3; padding: 12px;"><em>« {{ commande.commentaire|nl2br }} »</em></p>
+    {% endif %}
+
+    {% include 'emails/_recap_commande.html.twig' %}
+
+    <p><a href="{{ url('app_admin_edit', { resource: 'commandes', id: commande.id }) }}">Voir la commande dans l'administration</a></p>
+</div>

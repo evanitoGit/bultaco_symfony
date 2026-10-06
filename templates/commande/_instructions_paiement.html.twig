@@ -1,0 +1,18 @@
+{# Partagé par la page de confirmation et l'e-mail au client #}
+{% if commande.mode_paiement == 'virement' %}
+    <h3>Paiement par virement</h3>
+    <p>Merci d'effectuer un virement de <strong>{{ commande.total|number_format(2, ',', ' ') }} €</strong>
+       en indiquant la référence <strong>{{ commande.reference }}</strong> :</p>
+    <p>
+        Titulaire : Bultaco Club France<br>
+        IBAN : FR76 XXXX XXXX XXXX XXXX XXXX XXX<br>
+        BIC : XXXXXXXX
+    </p>
+{% else %}
+    <h3>Paiement par chèque</h3>
+    <p>Merci d'envoyer un chèque de <strong>{{ commande.total|number_format(2, ',', ' ') }} €</strong>
+       à l'ordre de <strong>Bultaco Club France</strong>, en indiquant la référence
+       <strong>{{ commande.reference }}</strong> au dos, à l'adresse :</p>
+    <p>Bultaco Club France<br>4 Chemin du Glais-Malet<br>51220 Merfy</p>
+{% endif %}
+<p>Votre commande sera expédiée dès réception du paiement.</p>

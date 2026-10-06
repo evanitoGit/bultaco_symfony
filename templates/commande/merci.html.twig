@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande confirmée - Club Bultaco{% endblock %}
+{% block body_class %}page-pieces{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block body %}
+    <div class='head'><h1>Merci !</h1></div>
+
+    <div class='container'>
+        <section class='commande commande-merci'>
+            <div class='commande-bloc'>
+                <p class='commande-ok'>✓ Votre commande <strong>{{ commande.reference }}</strong> a bien été enregistrée.</p>
+                <p>Un e-mail de confirmation vient d'être envoyé à <strong>{{ commande.email }}</strong>.</p>
+
+                {% include 'commande/_instructions_paiement.html.twig' %}
+
+                <table class='panier-table'>
+                    <thead><tr><th>Pièce</th><th>Quantité</th><th>Sous-total</th></tr></thead>
+                    <tbody>
+                        {% for ligne in commande.lignes %}
+                            <tr>
+                                <td data-label='Pièce'><strong>{{ ligne.nom_piece }}</strong></td>
+                                <td data-label='Quantité'>{{ ligne.quantite }} × {{ ligne.prix_unitaire|number_format(2, ',', ' ') }} €</td>
+                                <td data-label='Sous-total'>{{ (ligne.prix_unitaire * ligne.quantite)|number_format(2, ',', ' ') }} €</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot><tr><th colspan='2'>Total</th><th>{{ commande.total|number_format(2, ',', ' ') }} €</th></tr></tfoot>
+                </table>
+
+                <p class='panier-actions panier-actions--vide'>
+                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>Retour à la boutique</a>
+                </p>
+            </div>
+        </section>
+    </div>
+{% endblock %}

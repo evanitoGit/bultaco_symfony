@@ -72,6 +72,10 @@ class AdminController extends AbstractController
     {
         $config = $this->registry->get($resource);
 
+        if (($config['can_create'] ?? true) === false) {
+            throw $this->createNotFoundException();
+        }
+
         $data = [];
         foreach ($config['fields'] as $name => $field) {
             if (array_key_exists('default', $field)) {
@@ -186,6 +190,9 @@ class AdminController extends AbstractController
             'row' => $row,
             'is_new' => $isNew,
             'groups' => $this->registry->grouped(),
+            'details' => (!$isNew && isset($config['detail_sql']))
+                ? $this->connection->fetchAllAssociative($config['detail_sql'], ['id' => $id])
+                : [],
         ], new Response(status: $form->isSubmitted() ? 422 : 200));
     }
 

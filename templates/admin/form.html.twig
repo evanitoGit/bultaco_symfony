@@ -23,6 +23,10 @@
         </div>
     </div>
 
+    {% if not is_new and resource.detail_template is defined %}
+        {% include resource.detail_template %}
+    {% endif %}
+
     {{ form_start(form, { attr: { class: 'admin-form', novalidate: 'novalidate' } }) }}
         {% if not form.vars.valid %}
             <div class="admin-flash admin-flash--error" role="alert"><span>⚠</span> Le formulaire contient des erreurs, vérifiez les champs indiqués en rouge.</div>
