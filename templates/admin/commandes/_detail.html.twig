@@ -2,7 +2,12 @@
     <div class="admin-commande-infos">
         <div>
             <h2>Client</h2>
-            <p><strong>{{ row.prenom }} {{ row.nom }}</strong><br>
+            <p><strong>{{ row.prenom }} {{ row.nom }}</strong>
+               {% if row.client_id %}
+                   <a href="{{ path('app_admin_edit', { resource: 'clients', id: row.client_id }) }}" class="admin-badge">compte client</a>
+               {% else %}
+                   <span class="admin-badge">sans compte</span>
+               {% endif %}<br>
                <a href="mailto:{{ row.email }}">{{ row.email }}</a>
                {% if row.telephone %}<br><a href="tel:{{ row.telephone }}">{{ row.telephone }}</a>{% endif %}</p>
         </div>

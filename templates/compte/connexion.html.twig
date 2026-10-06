@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Club Bultaco{% endblock %}
+{% block body_class %}page-login{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <h1>Mon compte</h1>
+    </div>
+
+    <div class='container'>
+        <section class='login-section'>
+            <form method='post' action='{{ path('app_compte_connexion') }}' class='login-box' novalidate>
+                <img src="{{ asset('img/logo_rond.png') }}" alt='' class='login-logo'>
+                <h2 class='login-title'>Connexion</h2>
+                <p class='login-subtitle'>Retrouvez vos commandes et commandez plus vite</p>
+
+                {% if error %}
+                    <div class='login-error' role='alert'>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                <label for='inputEmail'>Adresse e-mail</label>
+                <input type='text' inputmode='email' value='{{ last_username }}' name='email' id='inputEmail' autocomplete='email' required autofocus>
+
+                <label for='inputPassword'>Mot de passe</label>
+                <div class='password-field'>
+                    <input type='password' name='password' id='inputPassword' autocomplete='current-password' required>
+                    <button type='button' class='password-toggle' aria-label='Afficher le mot de passe'
+                            onclick="const i = document.getElementById('inputPassword'); i.type = i.type === 'password' ? 'text' : 'password'; this.setAttribute('aria-pressed', i.type === 'text');">👁</button>
+                </div>
+
+                <input type='hidden' name='_csrf_token' value='{{ csrf_token('authenticate') }}'>
+
+                <label class='login-remember'>
+                    <input type='checkbox' name='_remember_me'> Rester connecté
+                </label>
+
+                <button class='btn-login' type='submit'>Se connecter</button>
+
+                <p class='login-alternative'>
+                    Pas encore de compte ?
+                    <a href='{{ path('app_compte_inscription', app.request.query.get('retour') == 'commande' ? { retour: 'commande' } : {}) }}'>Créer un compte</a>
+                </p>
+                <a href='{{ path('app_home') }}' class='login-back'>← Retour au site</a>
+            </form>
+        </section>
+    </div>
+{% endblock %}

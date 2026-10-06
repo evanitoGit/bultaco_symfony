@@ -29,6 +29,15 @@
                     <tfoot><tr><th colspan='2'>Total</th><th>{{ commande.total|number_format(2, ',', ' ') }} €</th></tr></tfoot>
                 </table>
 
+                {% if is_granted('ROLE_CLIENT') %}
+                    <p class='commande-compte'>Retrouvez cette commande et son suivi dans <a href='{{ path('app_compte') }}'>votre compte</a>.</p>
+                {% else %}
+                    <div class='commande-invitation'>
+                        <p><strong>Suivez vos commandes en ligne</strong><br>Créez un compte pour retrouver vos commandes et commander plus vite la prochaine fois.</p>
+                        <a href='{{ path('app_compte_inscription', { email: commande.email }) }}' class='btn-commander'>Créer un compte</a>
+                    </div>
+                {% endif %}
+
                 <p class='panier-actions panier-actions--vide'>
                     <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>Retour à la boutique</a>
                 </p>

@@ -12,6 +12,19 @@
             {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
                 <div class='commande-colonnes'>
                     <div class='commande-bloc'>
+                        {% if compte %}
+                            <p class='commande-compte'>
+                                Connecté avec <strong>{{ compte.email }}</strong> : la commande sera ajoutée à
+                                <a href='{{ path('app_compte') }}'>votre compte</a>.
+                            </p>
+                        {% else %}
+                            <p class='commande-compte'>
+                                Vous avez un compte ? <a href='{{ path('app_compte_connexion', { retour: 'commande' }) }}'>Connectez-vous</a>
+                                pour retrouver vos informations — ou <a href='{{ path('app_compte_inscription', { retour: 'commande' }) }}'>créez un compte</a>.
+                                Vous pouvez aussi commander sans compte.
+                            </p>
+                        {% endif %}
+
                         <h2 class='commande-titre'>Vos coordonnées</h2>
                         <div class='commande-grille'>
                             {{ form_row(form.prenom) }}

@@ -1,0 +1,14 @@
+{% extends 'compte/_layout.html.twig' %}
+
+{% block title %}Mot de passe - Club Bultaco{% endblock %}
+
+{% block contenu %}
+    <div class='compte-bloc compte-bloc--etroit'>
+        {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
+            <h2 class='compte-titre'>Changer mon mot de passe</h2>
+            {{ form_row(form.actuel) }}
+            {{ form_row(form.nouveau) }}
+            <button type='submit' class='btn-commander compte-enregistrer'>Modifier le mot de passe</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

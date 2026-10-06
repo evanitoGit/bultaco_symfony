@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Cart\Cart;
 use App\Commande\CommandeService;
+use App\Entity\Client;
 use App\Form\CommandeType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,11 +24,27 @@ class CommandeController extends AbstractController
             return $this->redirectToRoute('app_panier');
         }
 
-        $form = $this->createForm(CommandeType::class, ['pays' => 'France', 'mode_paiement' => 'virement']);
+        // Client connecté : formulaire pré-rempli avec les informations de son compte
+        $compte = $this->getUser() instanceof Client ? $this->getUser() : null;
+        $donnees = ['pays' => 'France', 'mode_paiement' => 'virement'];
+        if ($compte !== null) {
+            $donnees = [
+                'prenom' => $compte->getPrenom(),
+                'nom' => $compte->getNom(),
+                'email' => $compte->getEmail(),
+                'telephone' => $compte->getTelephone(),
+                'adresse' => $compte->getAdresse(),
+                'code_postal' => $compte->getCodePostal(),
+                'ville' => $compte->getVille(),
+                'pays' => $compte->getPays() ?: 'France',
+            ] + $donnees;
+        }
+
+        $form = $this->createForm(CommandeType::class, $donnees);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $commande = $commandes->creer($form->getData());
+            $commande = $commandes->creer($form->getData(), $compte);
             // seule cette session pourra afficher la page de confirmation
             $request->getSession()->set('derniere_commande', $commande['id']);
 
@@ -36,6 +53,7 @@ class CommandeController extends AbstractController
 
         return $this->render('commande/index.html.twig', [
             'form' => $form,
+            'compte' => $compte,
             'lignes' => $lignes,
             'total' => $cart->total(),
         ]);

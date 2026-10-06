@@ -44,6 +44,18 @@
                 </li>
             {% endfor %}
 
+            {% set client_connecte = is_granted('ROLE_CLIENT') %}
+            <li class='compte-lien'>
+                <a href='{{ path(client_connecte ? 'app_compte' : 'app_compte_connexion') }}' class='compte-bouton{{ client_connecte ? ' connecte' }}'
+                   aria-label='{{ client_connecte ? 'Mon compte (' ~ app.user.prenom ~ ')' : 'Se connecter à mon compte' }}'
+                   title='{{ client_connecte ? 'Mon compte' : 'Se connecter' }}'>
+                    <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'
+                         stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                        <circle cx='12' cy='8' r='4'/><path d='M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8'/>
+                    </svg>
+                </a>
+            </li>
+
             <li class='panier-lien'>
                 <button type='button' class='panier-bouton' aria-label='Mon panier' aria-expanded='false'
                         aria-controls='miniPanier' data-apercu-url='{{ path('app_panier_apercu') }}'>

@@ -2062,6 +2062,148 @@ body.page-login .head h1 { margin-bottom: 0; font-size: min(4em, 9vw); }
 .commande-merci p { line-height: 1.6; }
 .commande-merci .panier-table { margin-top: 24px; }
 
+/* --- Compte client --- */
+.compte-lien {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-left: 14px;
+}
+
+.compte-bouton {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: var(--beige);
+    transition: color 0.25s ease, background-color 0.25s ease;
+}
+
+.compte-bouton:hover { color: var(--sepia); background-color: rgba(204, 175, 146, 0.15); }
+
+/* Client connecté : petite pastille verte */
+.compte-bouton.connecte::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #5cb85c;
+    box-shadow: 0 0 0 2px var(--carbone);
+}
+
+.panier-lien { margin-left: 4px; }
+
+.login-alternative { margin-top: 14px; text-align: center; }
+.login-alternative a { color: var(--carbone); font-weight: bold; }
+.login-box .admin-field-help, .login-box p[id$=_help] { font-size: 0.85em; color: #8a7a6a; margin: -10px 0 12px; }
+.container .login-box.commande-form { max-width: 520px; }
+.commande-form input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e2d6c8;
+    border-radius: 10px;
+    font: inherit;
+    background-color: #fffdfb;
+}
+.commande-form input[type=password]:focus { outline: none; border-color: var(--sepia); box-shadow: 0 0 0 4px rgba(204, 175, 146, 0.3); }
+.commande-form p[id$=_help] { font-size: 0.85em; color: #8a7a6a; margin-top: 4px; }
+
+.compte { width: 100%; max-width: 1000px; padding: 40px 20px; }
+
+.compte-onglets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.compte-onglets a {
+    padding: 10px 18px;
+    border: 2px solid var(--carbone);
+    border-radius: 50px;
+    color: var(--carbone);
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.compte-onglets a:hover { background-color: #f3e9de; }
+.compte-onglets a.actif { background-color: var(--carbone); color: var(--beige); }
+.compte-onglets .compte-deconnexion { margin-left: auto; border-color: transparent; color: #c0392b; }
+.compte-onglets .compte-deconnexion:hover { background-color: #fdecea; }
+
+.compte-bloc {
+    margin-bottom: 24px;
+    padding: 28px;
+    background-color: white;
+    border: 3px solid var(--carbone);
+    border-radius: 15px;
+}
+
+.compte-bloc--etroit { max-width: 560px; }
+
+.container .compte-titre {
+    margin: 0 0 12px;
+    color: var(--carbone);
+    -webkit-text-stroke: 0;
+    font-size: 1.3em;
+    letter-spacing: 0.05em;
+    text-align: left;
+}
+
+.compte-bloc .compte-titre:not(:first-child) { margin-top: 26px; }
+.compte-intro { color: #6b6b6b; margin-bottom: 18px; line-height: 1.6; }
+.compte-intro a, .commande-compte a { color: var(--carbone); font-weight: bold; }
+.compte-entete { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.compte-entete .compte-titre { margin: 0; }
+.compte-colonnes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 10px; }
+.compte-col-detail a { color: var(--carbone); font-weight: bold; white-space: nowrap; }
+.compte-enregistrer { margin-top: 10px; padding: 12px 28px; border: none; font-size: 1em; cursor: pointer; }
+
+.statut {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.statut--en_attente { background-color: #fff3cd; color: #8a6d1b; }
+.statut--payee { background-color: #e3f1e6; color: #2e7d4f; }
+.statut--expediee { background-color: #e1ecf7; color: #2b5d8a; }
+.statut--annulee { background-color: #f3e5e5; color: #a94442; }
+
+.commande-compte {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-left: 4px solid var(--sepia);
+    border-radius: 8px;
+    background-color: #fdfaf6;
+    line-height: 1.6;
+}
+
+.commande-invitation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 18px 20px;
+    border: 2px dashed var(--sepia);
+    border-radius: 12px;
+    background-color: #fdfaf6;
+}
+
+.commande-invitation .btn-commander { padding: 12px 22px; text-decoration: none; }
+
 /* ==========================================================================
    9. MEDIA QUERIES (Responsive)
    ========================================================================== */
@@ -2088,6 +2230,7 @@ body.page-login .head h1 { margin-bottom: 0; font-size: min(4em, 9vw); }
 @media (max-width: 900px) {
     /* icône panier à gauche du bouton ☰, popup en pleine largeur */
     .panier-lien { position: absolute; top: 0; right: 64px; height: var(--header-height); margin: 0; }
+    .compte-lien { position: absolute; top: 0; right: 110px; height: var(--header-height); margin: 0; }
     .mini-panier { position: fixed; top: var(--header-height); left: 0; right: 0; width: auto; padding: 0; }
 
     header, header.nav { padding: 0 4%; }
@@ -2096,7 +2239,7 @@ body.page-login .head h1 { margin-bottom: 0; font-size: min(4em, 9vw); }
 
     .header-nav > ul { flex-wrap: wrap; align-content: flex-start; }
     /* le logo laisse la place au panier et au bouton ☰ */
-    .header-nav > ul > li:first-child { width: 100%; padding-right: 112px; margin-left: 0; }
+    .header-nav > ul > li:first-child { width: 100%; padding-right: 160px; margin-left: 0; }
     .header-nav > ul > li:first-child a img { max-width: 100%; height: auto; max-height: 30px; }
     .header-nav > ul > li.categorie { display: none; }
 
@@ -2164,6 +2307,11 @@ body.page-login .head h1 { margin-bottom: 0; font-size: min(4em, 9vw); }
 }
 
 @media (max-width: 768px) {
+    .compte { padding: 20px 16px; }
+    .compte-bloc { padding: 20px; }
+    .compte-onglets a { padding: 8px 14px; font-size: 0.9em; }
+    .compte-onglets .compte-deconnexion { margin-left: 0; }
+
     .commande { padding: 20px 16px; }
     .commande-colonnes, .commande-grille, .commande-grille--3 { grid-template-columns: 1fr; }
     .commande-recap { position: static; }
