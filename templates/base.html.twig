@@ -65,10 +65,10 @@
                                 <small class='menu-compte-email'>{{ app.user.email }}</small>
                             </p>
                             <ul class='menu-compte-liens' role='menu'>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte') }}'><span aria-hidden='true'>🧾</span>Mes commandes</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'><span aria-hidden='true'>👤</span>Mes informations</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'><span aria-hidden='true'>🔒</span>Mot de passe</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_donnees') }}'><span aria-hidden='true'>📁</span>Mes données</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte') }}'>Mes commandes</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'>Mes informations</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'>Mot de passe</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_donnees') }}'>Mes données</a></li>
                                 <li role='none' class='menu-compte-separation'><a role='menuitem' href='{{ path('app_logout') }}' class='menu-compte-deconnexion'><span aria-hidden='true'>↪</span>Se déconnecter</a></li>
                             </ul>
                         {% else %}
@@ -78,8 +78,8 @@
                             </p>
                             <a href='{{ path('app_compte_connexion') }}' class='mini-panier-lien'>Se connecter</a>
                             <ul class='menu-compte-liens' role='menu'>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_inscription') }}'><span aria-hidden='true'>✚</span>Créer un compte</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe_oublie') }}'><span aria-hidden='true'>🔑</span>Mot de passe oublié</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_inscription') }}'>Créer un compte</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe_oublie') }}'>>Mot de passe oublié</a></li>
                             </ul>
                         {% endif %}
                     </div>

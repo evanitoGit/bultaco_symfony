@@ -1588,8 +1588,8 @@ body.page-restau .restau-section { padding-top: 120px; }
 
 /* --- Page de connexion --- */
 body.page-login { background-image: url("../img/accueil.png"); }
-body.page-login .head { padding: calc(var(--header-height) + 50px) 3% 50px; }
-body.page-login .head h1 { margin-bottom: 0; font-size: min(4em, 9vw); }
+body.page-login:not(.page-compte) .head { padding: calc(var(--header-height) + 50px) 3% 50px; }
+body.page-login:not(.page-compte) .head h1 { margin-bottom: 0; font-size: min(4em, 9vw); }
 
 .login-section {
     display: flex;
@@ -2238,8 +2238,6 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
     border: 3px solid var(--carbone);
     border-radius: 15px;
 }
-
-.compte-bloc--etroit { max-width: 560px; }
 
 .container .compte-titre {
     margin: 0 0 12px;

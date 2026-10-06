@@ -25,7 +25,7 @@
         {{ form_end(form) }}
     </div>
 
-    <div class='compte-bloc compte-bloc--etroit' id='email'>
+    <div class='compte-bloc' id='email'>
         {{ form_start(form_email, { action: path('app_compte_informations') ~ '#email', attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
             <h2 class='compte-titre'>Adresse e-mail</h2>
             <p class='compte-intro'>
@@ -43,3 +43,4 @@
         {{ form_end(form_email) }}
     </div>
 {% endblock %}
+{% block footer %} {% endblock %}

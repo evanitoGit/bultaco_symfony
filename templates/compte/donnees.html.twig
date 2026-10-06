@@ -12,7 +12,7 @@
         <a href='{{ path('app_compte_export') }}' class='btn-commander compte-enregistrer' download>Télécharger mes données</a>
     </div>
 
-    <div class='compte-bloc compte-bloc--etroit compte-bloc--danger' id='suppression'>
+    <div class='compte-bloc compte-bloc--danger' id='suppression'>
         {{ form_start(form, { action: path('app_compte_donnees') ~ '#suppression', attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
             <h2 class='compte-titre'>Supprimer mon compte</h2>
             <p class='compte-intro'>
@@ -25,3 +25,4 @@
         {{ form_end(form) }}
     </div>
 {% endblock %}
+{% block footer %} {% endblock %}

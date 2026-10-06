@@ -3,7 +3,7 @@
 {% block title %}Mot de passe - Club Bultaco{% endblock %}
 
 {% block contenu %}
-    <div class='compte-bloc compte-bloc--etroit'>
+    <div class='compte-bloc'>
         {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
             <h2 class='compte-titre'>Changer mon mot de passe</h2>
             {{ form_row(form.actuel) }}
@@ -12,3 +12,4 @@
         {{ form_end(form) }}
     </div>
 {% endblock %}
+{% block footer %} {% endblock %}
