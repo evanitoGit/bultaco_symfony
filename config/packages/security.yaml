@@ -32,6 +32,10 @@ security:
                 - App\Security\AppAuthAuthenticator
                 - App\Security\ClientAuthenticator
             entry_point: App\Security\LoginEntryPoint
+            # 5 essais ratés (par identifiant et adresse IP) -> blocage de 15 minutes
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             logout:
                 path: app_logout
                 target: app_home
@@ -53,7 +57,7 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/compte/(connexion|inscription), roles: PUBLIC_ACCESS }
+        - { path: ^/compte/(connexion|inscription|verifier-email|mot-de-passe-oublie|reinitialiser), roles: PUBLIC_ACCESS }
         - { path: ^/compte, roles: ROLE_CLIENT }
         # - { path: ^/profile, roles: ROLE_USER }
 

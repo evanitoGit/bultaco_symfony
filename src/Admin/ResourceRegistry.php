@@ -307,6 +307,7 @@ final class ResourceRegistry
             'list_sql' => 'SELECT c.*, (SELECT COUNT(*) FROM commandes o WHERE o.client_id = c.id) AS nb_commandes FROM clients c ORDER BY c.date_creation DESC, c.id DESC',
             'list' => [
                 'email' => ['label' => 'E-mail'],
+                'email_verifie' => ['label' => 'E-mail', 'format' => 'bool', 'oui' => 'confirmé', 'non' => 'à confirmer'],
                 'prenom' => ['label' => 'Prénom'],
                 'nom' => ['label' => 'Nom'],
                 'ville' => ['label' => 'Ville'],

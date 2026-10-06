@@ -1,0 +1,13 @@
+# Limites anti-abus de l'espace client
+framework:
+    rate_limiter:
+        # renvoi du lien de confirmation de l'adresse e-mail (par client)
+        renvoi_verification:
+            policy: 'fixed_window'
+            limit: 3
+            interval: '1 hour'
+        # demandes « mot de passe oublié » (par adresse IP)
+        mot_de_passe_oublie:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '1 hour'

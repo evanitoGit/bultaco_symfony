@@ -10,6 +10,10 @@
             {% if not client.hasAdresse %}
                 <br><a href='{{ path('app_compte_informations') }}'>Ajoutez votre adresse</a> pour commander plus vite.
             {% endif %}
+            {% if sans_compte > 0 %}
+                <br>{{ sans_compte > 1 ? sans_compte ~ ' commandes passées' : 'Une commande passée' }} sans compte avec cette adresse
+                {{ sans_compte > 1 ? 'apparaîtront' : 'apparaîtra' }} ici dès que vous l'aurez confirmée.
+            {% endif %}
         </p>
     </div>
 

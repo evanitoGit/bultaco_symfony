@@ -1,0 +1,7 @@
+{# Messages de l'espace client : informations et alertes #}
+{% for message in app.flashes('compte') %}
+    <p class='panier-message' role='status'>{{ message }}</p>
+{% endfor %}
+{% for message in app.flashes('compte_alerte') %}
+    <p class='panier-message compte-alerte' role='alert'>{{ message }}</p>
+{% endfor %}

@@ -2,12 +2,16 @@
 
 namespace App\Cart;
 
+use App\Entity\Client;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Panier stocké en session : [id de la pièce => quantité].
+ * Panier : [id de la pièce => quantité].
+ * - visiteur : stocké en session ;
+ * - client connecté : stocké en base (table client_panier), donc retrouvé sur tous ses appareils.
  * Les prix sont toujours relus en base et calculés en centimes.
  */
 final class Cart
@@ -18,6 +22,7 @@ final class Cart
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
+        private readonly Security $security,
     ) {
     }
 
@@ -31,6 +36,9 @@ final class Cart
     public function setQuantite(int $pieceId, int $quantite): void
     {
         $lignes = $this->raw();
+        if (!isset($lignes[$pieceId])) {
+            return; // on ne modifie que les lignes déjà présentes (add() vérifie l'existence de la pièce)
+        }
         if ($quantite <= 0) {
             unset($lignes[$pieceId]);
         } else {
@@ -46,7 +54,33 @@ final class Cart
 
     public function clear(): void
     {
+        if ($client = $this->client()) {
+            $this->connection->executeStatement('DELETE FROM client_panier WHERE client_id = ?', [$client->getId()]);
+
+            return;
+        }
         $this->requestStack->getSession()->remove(self::SESSION_KEY);
+    }
+
+    /**
+     * À la connexion : les articles ajoutés en tant que visiteur rejoignent le panier du compte
+     * (les quantités s'additionnent), puis le panier de session est vidé.
+     */
+    public function fusionnerDansCompte(Client $client): void
+    {
+        $session = $this->requestStack->getSession();
+        $panier = $session->get(self::SESSION_KEY, []);
+        $session->remove(self::SESSION_KEY);
+
+        foreach ($panier as $pieceId => $quantite) {
+            // INSERT ... SELECT : ignore les pièces supprimées entre-temps
+            $this->connection->executeStatement(
+                'INSERT INTO client_panier (client_id, piece_id, quantite)
+                 SELECT ?, id, ? FROM pieces_detachees WHERE id = ?
+                 ON DUPLICATE KEY UPDATE quantite = LEAST(?, quantite + VALUES(quantite))',
+                [$client->getId(), min(self::MAX_QUANTITE, (int) $quantite), (int) $pieceId, self::MAX_QUANTITE]
+            );
+        }
     }
 
     /** Nombre total d'articles (pour la pastille du header). */
@@ -103,6 +137,13 @@ final class Cart
     /** @return array<int, int> */
     private function raw(): array
     {
+        if ($client = $this->client()) {
+            return array_map('intval', $this->connection->fetchAllKeyValue(
+                'SELECT piece_id, quantite FROM client_panier WHERE client_id = ? ORDER BY date_ajout, piece_id',
+                [$client->getId()]
+            ));
+        }
+
         $request = $this->requestStack->getCurrentRequest();
         // Ne démarre pas de session pour un visiteur qui n'a jamais rien ajouté
         if (!$request || (!$request->hasPreviousSession() && !$request->getSession()->isStarted())) {
@@ -114,6 +155,33 @@ final class Cart
 
     private function save(array $lignes): void
     {
+        if ($client = $this->client()) {
+            $this->connection->transactional(function (Connection $connection) use ($client, $lignes): void {
+                // on garde la date d'ajout des pièces déjà présentes (ordre d'affichage)
+                $connection->executeStatement(
+                    'DELETE FROM client_panier WHERE client_id = ? AND piece_id NOT IN (?)',
+                    [$client->getId(), array_keys($lignes) ?: [0]],
+                    [1 => ArrayParameterType::INTEGER]
+                );
+                foreach ($lignes as $pieceId => $quantite) {
+                    $connection->executeStatement(
+                        'INSERT INTO client_panier (client_id, piece_id, quantite) VALUES (?, ?, ?)
+                         ON DUPLICATE KEY UPDATE quantite = VALUES(quantite)',
+                        [$client->getId(), $pieceId, $quantite]
+                    );
+                }
+            });
+
+            return;
+        }
+
         $this->requestStack->getSession()->set(self::SESSION_KEY, $lignes);
+    }
+
+    private function client(): ?Client
+    {
+        $user = $this->security->getUser();
+
+        return $user instanceof Client && $user->getId() !== null ? $user : null;
     }
 }

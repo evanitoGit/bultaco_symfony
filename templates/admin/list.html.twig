@@ -69,6 +69,8 @@
                                         <span class="admin-excerpt">{{ value|length > 110 ? value|slice(0, 110) ~ '…' : value }}</span>
                                     {% elseif format == 'date' %}
                                         {{ value ? value|date('d/m/Y à H:i') : '—' }}
+                                    {% elseif format == 'bool' %}
+                                        <span class="admin-badge {{ value ? 'admin-badge--ok' : 'admin-badge--attente' }}">{{ value ? (col.oui ?? 'Oui') : (col.non ?? 'Non') }}</span>
                                     {% elseif format == 'choice' %}
                                         <span class="admin-badge">{{ choice_labels[column][value] ?? value }}</span>
                                     {% elseif loop.index0 == 0 or (loop.index0 == 1 and resource.list|keys|first == 'image_path') %}

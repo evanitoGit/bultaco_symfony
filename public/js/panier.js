@@ -24,11 +24,11 @@ function fermerPanier() {
     panierBouton?.setAttribute('aria-expanded', 'false');
 }
 
-panierBouton?.addEventListener('click', e => {
-    e.stopPropagation();
+panierBouton?.addEventListener('click', () => {
     miniPanier.classList.contains('ouvert') ? fermerPanier() : ouvrirPanier();
 });
-document.addEventListener('click', e => { if (miniPanier && !miniPanier.contains(e.target)) fermerPanier(); });
+// un clic ailleurs (y compris sur le menu du compte) ferme la popup
+document.addEventListener('click', e => { if (miniPanier && !e.target.closest('.panier-lien')) fermerPanier(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fermerPanier(); });
 
 // ---------- Ajout au panier sans recharger la page ----------

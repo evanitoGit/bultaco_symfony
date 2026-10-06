@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Informations personnelles et adresse de livraison par défaut du client.
- * (L'adresse e-mail n'est pas modifiable ici : elle devra être revérifiée à l'étape 2.)
+ * (L'adresse e-mail se change avec ChangementEmailType : elle doit être revérifiée.)
  */
 class ProfilType extends AbstractType
 {

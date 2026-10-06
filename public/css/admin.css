@@ -411,6 +411,9 @@ a { color: inherit; }
     font-weight: bold;
 }
 
+.admin-badge--ok { background-color: #e3f1e6; color: #2e7d4f; }
+.admin-badge--attente { background-color: #fff3cd; color: #8a6d1b; }
+
 .admin-filter-empty, .admin-empty {
     padding: 30px;
     text-align: center;

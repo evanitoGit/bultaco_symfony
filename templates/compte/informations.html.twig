@@ -6,7 +6,6 @@
     <div class='compte-bloc'>
         {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
             <h2 class='compte-titre'>Mes informations</h2>
-            <p class='compte-intro'>Adresse e-mail du compte : <strong>{{ client.email }}</strong></p>
             <div class='commande-grille'>
                 {{ form_row(form.prenom) }}
                 {{ form_row(form.nom) }}
@@ -24,5 +23,23 @@
 
             <button type='submit' class='btn-commander compte-enregistrer'>Enregistrer</button>
         {{ form_end(form) }}
+    </div>
+
+    <div class='compte-bloc compte-bloc--etroit' id='email'>
+        {{ form_start(form_email, { action: path('app_compte_informations') ~ '#email', attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
+            <h2 class='compte-titre'>Adresse e-mail</h2>
+            <p class='compte-intro'>
+                Adresse actuelle : <strong>{{ client.email }}</strong>
+                {% if client.emailVerifie %}
+                    <span class='statut statut--payee'>confirmée</span>
+                {% else %}
+                    <span class='statut statut--en_attente'>à confirmer</span>
+                {% endif %}
+                <br>Vous recevrez un lien de confirmation à la nouvelle adresse.
+            </p>
+            {{ form_row(form_email.email) }}
+            {{ form_row(form_email.motDePasse) }}
+            <button type='submit' class='btn-commander compte-enregistrer'>Changer d'adresse</button>
+        {{ form_end(form_email) }}
     </div>
 {% endblock %}

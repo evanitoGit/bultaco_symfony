@@ -15,6 +15,8 @@
                 <h2 class='login-title'>Connexion</h2>
                 <p class='login-subtitle'>Retrouvez vos commandes et commandez plus vite</p>
 
+                {% include 'compte/_flashes.html.twig' %}
+
                 {% if error %}
                     <div class='login-error' role='alert'>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
@@ -31,9 +33,12 @@
 
                 <input type='hidden' name='_csrf_token' value='{{ csrf_token('authenticate') }}'>
 
-                <label class='login-remember'>
-                    <input type='checkbox' name='_remember_me'> Rester connecté
-                </label>
+                <div class='login-options'>
+                    <label class='login-remember'>
+                        <input type='checkbox' name='_remember_me'> Rester connecté
+                    </label>
+                    <a href='{{ path('app_compte_mot_de_passe_oublie') }}' class='login-oubli'>Mot de passe oublié ?</a>
+                </div>
 
                 <button class='btn-login' type='submit'>Se connecter</button>
 
