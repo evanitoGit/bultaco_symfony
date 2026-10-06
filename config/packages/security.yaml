@@ -6,10 +6,18 @@ security:
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
+        # Deux tables distinctes : les administrateurs et les clients de la boutique
+        admin_provider:
             entity:
                 class: App\Entity\Admin
                 property: username
+        client_provider:
+            entity:
+                class: App\Entity\Client
+                property: email
+        app_user_provider:
+            chain:
+                providers: ['admin_provider', 'client_provider']
 
     firewalls:
         dev:
@@ -19,7 +27,15 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\AppAuthAuthenticator
+            # /login pour les administrateurs, /compte/connexion pour les clients
+            custom_authenticators:
+                - App\Security\AppAuthAuthenticator
+                - App\Security\ClientAuthenticator
+            entry_point: App\Security\LoginEntryPoint
+            # 5 essais ratés (par identifiant et adresse IP) -> blocage de 15 minutes
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             logout:
                 path: app_logout
                 target: app_home
@@ -41,6 +57,8 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/compte/(connexion|inscription|verifier-email|mot-de-passe-oublie|reinitialiser), roles: PUBLIC_ACCESS }
+        - { path: ^/compte, roles: ROLE_CLIENT }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

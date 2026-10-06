@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Repository\AdminRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,8 +23,10 @@ class AppAuthAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private AdminRepository $admins,
+    ) {
     }
 
     public function authenticate(Request $request): Passport
@@ -33,7 +36,8 @@ class AppAuthAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
 
         return new Passport(
-            new UserBadge($username),
+            // cherche uniquement dans la table `admins` (jamais dans les comptes clients)
+            new UserBadge($username, fn (string $identifiant) => $this->admins->findOneBy(['username' => $identifiant])),
             new PasswordCredentials($request->getPayload()->getString('password')),
             [
                 new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
@@ -44,7 +48,9 @@ class AppAuthAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+        // On ne revient que vers une page d'administration mémorisée
+        $targetPath = $this->getTargetPath($request->getSession(), $firewallName);
+        if ($targetPath && str_starts_with(parse_url($targetPath, PHP_URL_PATH) ?? '', '/admin')) {
             return new RedirectResponse($targetPath);
         }
 

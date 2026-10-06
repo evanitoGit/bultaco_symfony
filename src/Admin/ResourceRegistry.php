@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ResourceRegistry
 {
     /** Pour la contrainte de route (doit lister toutes les clés de RESOURCES). */
-    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|commandes|admins';
+    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|commandes|clients|admins';
 
     /** Libellés lisibles des sections de la table `textes`, avec la page qui les affiche. */
     public const TEXT_SECTIONS = [
@@ -293,6 +293,38 @@ final class ResourceRegistry
             'detail_template' => 'admin/commandes/_detail.html.twig',
             'detail_sql' => 'SELECT * FROM commande_lignes WHERE commande_id = :id ORDER BY id',
             'cascade_sql' => ['DELETE FROM commande_lignes WHERE commande_id = :id'],
+        ],
+        'clients' => [
+            'table' => 'clients',
+            'group' => 'Boutique',
+            'label' => 'Clients',
+            'singular' => 'un client',
+            'icon' => '👥',
+            'can_create' => false, // les comptes sont créés par les clients eux-mêmes
+            'description' => 'Comptes créés sur la boutique. Supprimer un client conserve ses commandes (sans compte).',
+            'order' => 'date_creation DESC',
+            'title' => ['prenom', 'nom'],
+            'list_sql' => 'SELECT c.*, (SELECT COUNT(*) FROM commandes o WHERE o.client_id = c.id) AS nb_commandes FROM clients c ORDER BY c.date_creation DESC, c.id DESC',
+            'list' => [
+                'email' => ['label' => 'E-mail'],
+                'email_verifie' => ['label' => 'E-mail', 'format' => 'bool', 'oui' => 'confirmé', 'non' => 'à confirmer'],
+                'prenom' => ['label' => 'Prénom'],
+                'nom' => ['label' => 'Nom'],
+                'ville' => ['label' => 'Ville'],
+                'nb_commandes' => ['label' => 'Commandes'],
+                'date_creation' => ['label' => 'Inscrit le', 'format' => 'date'],
+            ],
+            'fields' => [
+                'prenom' => ['type' => 'text', 'label' => 'Prénom', 'required' => true, 'max' => 100],
+                'nom' => ['type' => 'text', 'label' => 'Nom', 'required' => true, 'max' => 100],
+                'telephone' => ['type' => 'text', 'label' => 'Téléphone', 'max' => 30],
+                'adresse' => ['type' => 'text', 'label' => 'Adresse', 'max' => 255],
+                'code_postal' => ['type' => 'text', 'label' => 'Code postal', 'max' => 10],
+                'ville' => ['type' => 'text', 'label' => 'Ville', 'max' => 100],
+                'pays' => ['type' => 'text', 'label' => 'Pays', 'max' => 100],
+            ],
+            'delete_warning' => 'Ses commandes sont conservées, mais ne seront plus rattachées à un compte.',
+            'cascade_sql' => ['UPDATE commandes SET client_id = NULL WHERE client_id = :id'],
         ],
         'admins' => [
             'table' => 'admins',

@@ -44,6 +44,48 @@
                 </li>
             {% endfor %}
 
+            {% set client_connecte = is_granted('ROLE_CLIENT') %}
+            <li class='compte-lien'>
+                {# Sans JavaScript, le bouton reste un lien vers l'espace client #}
+                <a href='{{ path(client_connecte ? 'app_compte' : 'app_compte_connexion') }}' class='compte-bouton{{ client_connecte ? ' connecte' }}'
+                   role='button' aria-haspopup='menu' aria-expanded='false' aria-controls='menuCompte'
+                   aria-label='{{ client_connecte ? 'Mon compte (' ~ app.user.prenom ~ ')' : 'Mon compte' }}'
+                   title='Mon compte'>
+                    <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'
+                         stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                        <circle cx='12' cy='8' r='4'/><path d='M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8'/>
+                    </svg>
+                </a>
+
+                <div class='mini-panier menu-compte' id='menuCompte'>
+                    <div class='mini-panier-contenu'>
+                        {% if client_connecte %}
+                            <p class='menu-compte-entete'>
+                                <span>Bonjour <strong>{{ app.user.prenom }}</strong></span>
+                                <small class='menu-compte-email'>{{ app.user.email }}</small>
+                            </p>
+                            <ul class='menu-compte-liens' role='menu'>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte') }}'><span aria-hidden='true'>🧾</span>Mes commandes</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'><span aria-hidden='true'>👤</span>Mes informations</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'><span aria-hidden='true'>🔒</span>Mot de passe</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_donnees') }}'><span aria-hidden='true'>📁</span>Mes données</a></li>
+                                <li role='none' class='menu-compte-separation'><a role='menuitem' href='{{ path('app_logout') }}' class='menu-compte-deconnexion'><span aria-hidden='true'>↪</span>Se déconnecter</a></li>
+                            </ul>
+                        {% else %}
+                            <p class='menu-compte-entete'>
+                                <strong>Mon compte</strong>
+                                <small>Suivez vos commandes et commandez plus vite</small>
+                            </p>
+                            <a href='{{ path('app_compte_connexion') }}' class='mini-panier-lien'>Se connecter</a>
+                            <ul class='menu-compte-liens' role='menu'>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_inscription') }}'><span aria-hidden='true'>✚</span>Créer un compte</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe_oublie') }}'><span aria-hidden='true'>🔑</span>Mot de passe oublié</a></li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+
             <li class='panier-lien'>
                 <button type='button' class='panier-bouton' aria-label='Mon panier' aria-expanded='false'
                         aria-controls='miniPanier' data-apercu-url='{{ path('app_panier_apercu') }}'>
@@ -116,6 +158,7 @@
 
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/panier.js') }}"></script>
+<script src="{{ asset('js/compte.js') }}"></script>
 {% block javascripts %}{% endblock %}
 </body>
 </html>

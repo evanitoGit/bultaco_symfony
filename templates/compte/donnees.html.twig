@@ -1,0 +1,27 @@
+{% extends 'compte/_layout.html.twig' %}
+
+{% block title %}Mes données - Club Bultaco{% endblock %}
+
+{% block contenu %}
+    <div class='compte-bloc'>
+        <h2 class='compte-titre'>Télécharger mes données</h2>
+        <p class='compte-intro'>
+            Récupérez en un fichier (format JSON) toutes les informations que le club conserve sur vous :
+            votre compte, vos adresses, vos commandes et votre panier.
+        </p>
+        <a href='{{ path('app_compte_export') }}' class='btn-commander compte-enregistrer' download>Télécharger mes données</a>
+    </div>
+
+    <div class='compte-bloc compte-bloc--etroit compte-bloc--danger' id='suppression'>
+        {{ form_start(form, { action: path('app_compte_donnees') ~ '#suppression', attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
+            <h2 class='compte-titre'>Supprimer mon compte</h2>
+            <p class='compte-intro'>
+                Votre compte, votre panier et vos informations personnelles seront effacés.
+                Les commandes déjà passées sont conservées par le club pour sa comptabilité, sans être rattachées à un compte.
+            </p>
+            {{ form_row(form.motDePasse) }}
+            {{ form_row(form.confirmation) }}
+            <button type='submit' class='btn-commander compte-enregistrer compte-supprimer'>Supprimer définitivement mon compte</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

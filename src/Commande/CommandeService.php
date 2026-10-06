@@ -3,6 +3,7 @@
 namespace App\Commande;
 
 use App\Cart\Cart;
+use App\Entity\Client;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -41,11 +42,12 @@ final class CommandeService
     }
 
     /**
-     * @param array $client données validées du formulaire de commande
+     * @param array       $client données validées du formulaire de commande
+     * @param Client|null $compte compte du client connecté (null = commande sans compte)
      *
      * @return array la commande enregistrée, avec ses lignes
      */
-    public function creer(array $client): array
+    public function creer(array $client, ?Client $compte = null): array
     {
         // Prix relus en base au moment de la validation, jamais ceux du navigateur
         $lignes = $this->cart->lignes();
@@ -56,8 +58,9 @@ final class CommandeService
         $total = array_sum(array_column($lignes, 'sous_total'));
         $reference = 'BCF-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3))); // ex. BCF-261006-4F2A9C
 
-        $id = $this->connection->transactional(function (Connection $connection) use ($client, $lignes, $total, $reference): int {
+        $id = $this->connection->transactional(function (Connection $connection) use ($client, $compte, $lignes, $total, $reference): int {
             $connection->insert('commandes', [
+                'client_id' => $compte?->getId(),
                 'reference' => $reference,
                 'prenom' => $client['prenom'],
                 'nom' => $client['nom'],
@@ -83,6 +86,17 @@ final class CommandeService
                 ]);
             }
 
+            // Première commande : l'adresse de livraison devient l'adresse du compte
+            if ($compte !== null && !$compte->hasAdresse()) {
+                $connection->update('clients', [
+                    'telephone' => $client['telephone'] ?: $compte->getTelephone(),
+                    'adresse' => $client['adresse'],
+                    'code_postal' => $client['code_postal'],
+                    'ville' => $client['ville'],
+                    'pays' => $client['pays'],
+                ], ['id' => $compte->getId()]);
+            }
+
             return $id;
         });
 
@@ -106,6 +120,37 @@ final class CommandeService
         );
 
         return $commande;
+    }
+
+    /**
+     * Commandes d'un client, de la plus récente à la plus ancienne.
+     */
+    public function commandesDuClient(int $clientId): array
+    {
+        return $this->connection->fetchAllAssociative(
+            'SELECT c.*, (SELECT SUM(l.quantite) FROM commande_lignes l WHERE l.commande_id = c.id) AS nb_articles
+             FROM commandes c WHERE c.client_id = ? ORDER BY c.date_commande DESC, c.id DESC',
+            [$clientId]
+        );
+    }
+
+    /**
+     * Une commande du client (null si elle n'existe pas ou appartient à quelqu'un d'autre).
+     */
+    public function trouverPourClient(string $reference, int $clientId): ?array
+    {
+        $id = $this->connection->fetchOne(
+            'SELECT id FROM commandes WHERE reference = ? AND client_id = ?',
+            [$reference, $clientId]
+        );
+
+        return $id === false ? null : $this->trouver((int) $id);
+    }
+
+    /** @return array<string, string> statut en base => libellé */
+    public static function libellesStatuts(): array
+    {
+        return array_flip(self::STATUTS);
     }
 
     private function envoyerEmails(array $commande): void

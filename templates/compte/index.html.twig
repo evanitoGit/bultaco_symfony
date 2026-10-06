@@ -1,0 +1,48 @@
+{% extends 'compte/_layout.html.twig' %}
+
+{% block title %}Mes commandes - Club Bultaco{% endblock %}
+
+{% block contenu %}
+    <div class='compte-bloc'>
+        <h2 class='compte-titre'>Bonjour {{ client.prenom }} 👋</h2>
+        <p class='compte-intro'>
+            Connecté avec <strong>{{ client.email }}</strong> — client depuis le {{ client.dateCreation|date('d/m/Y') }}.
+            {% if not client.hasAdresse %}
+                <br><a href='{{ path('app_compte_informations') }}'>Ajoutez votre adresse</a> pour commander plus vite.
+            {% endif %}
+            {% if sans_compte > 0 %}
+                <br>{{ sans_compte > 1 ? sans_compte ~ ' commandes passées' : 'Une commande passée' }} sans compte avec cette adresse
+                {{ sans_compte > 1 ? 'apparaîtront' : 'apparaîtra' }} ici dès que vous l'aurez confirmée.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class='compte-bloc'>
+        <h2 class='compte-titre'>Mes commandes</h2>
+
+        {% if commandes is empty %}
+            {% include '_partials/_empty.html.twig' with { icone: '🧾', message: 'Vous n\'avez pas encore passé de commande' } %}
+            <p class='panier-actions panier-actions--vide'>
+                <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>Voir les pièces détachées</a>
+            </p>
+        {% else %}
+            <table class='panier-table compte-commandes'>
+                <thead>
+                    <tr><th>Référence</th><th>Date</th><th>Articles</th><th>Total</th><th>Statut</th><th><span class='sr-only'>Détail</span></th></tr>
+                </thead>
+                <tbody>
+                    {% for commande in commandes %}
+                        <tr>
+                            <td data-label='Référence'><strong>{{ commande.reference }}</strong></td>
+                            <td data-label='Date'>{{ commande.date_commande|date('d/m/Y') }}</td>
+                            <td data-label='Articles'>{{ commande.nb_articles }}</td>
+                            <td data-label='Total'><strong>{{ commande.total|number_format(2, ',', ' ') }} €</strong></td>
+                            <td data-label='Statut'><span class='statut statut--{{ commande.statut }}'>{{ statuts[commande.statut] ?? commande.statut }}</span></td>
+                            <td class='compte-col-detail'><a href='{{ path('app_compte_commande', { reference: commande.reference }) }}'>Voir le détail →</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'compte/_layout.html.twig' %}
+
+{% block title %}Mes informations - Club Bultaco{% endblock %}
+
+{% block contenu %}
+    <div class='compte-bloc'>
+        {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
+            <h2 class='compte-titre'>Mes informations</h2>
+            <div class='commande-grille'>
+                {{ form_row(form.prenom) }}
+                {{ form_row(form.nom) }}
+                {{ form_row(form.telephone) }}
+            </div>
+
+            <h2 class='compte-titre'>Adresse de livraison</h2>
+            <p class='compte-intro'>Elle sera proposée automatiquement lors de vos commandes.</p>
+            {{ form_row(form.adresse) }}
+            <div class='commande-grille commande-grille--3'>
+                {{ form_row(form.codePostal) }}
+                {{ form_row(form.ville) }}
+                {{ form_row(form.pays) }}
+            </div>
+
+            <button type='submit' class='btn-commander compte-enregistrer'>Enregistrer</button>
+        {{ form_end(form) }}
+    </div>
+
+    <div class='compte-bloc compte-bloc--etroit' id='email'>
+        {{ form_start(form_email, { action: path('app_compte_informations') ~ '#email', attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
+            <h2 class='compte-titre'>Adresse e-mail</h2>
+            <p class='compte-intro'>
+                Adresse actuelle : <strong>{{ client.email }}</strong>
+                {% if client.emailVerifie %}
+                    <span class='statut statut--payee'>confirmée</span>
+                {% else %}
+                    <span class='statut statut--en_attente'>à confirmer</span>
+                {% endif %}
+                <br>Vous recevrez un lien de confirmation à la nouvelle adresse.
+            </p>
+            {{ form_row(form_email.email) }}
+            {{ form_row(form_email.motDePasse) }}
+            <button type='submit' class='btn-commander compte-enregistrer'>Changer d'adresse</button>
+        {{ form_end(form_email) }}
+    </div>
+{% endblock %}

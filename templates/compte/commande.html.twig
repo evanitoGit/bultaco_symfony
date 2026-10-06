@@ -1,0 +1,41 @@
+{% extends 'compte/_layout.html.twig' %}
+
+{% block title %}Commande {{ commande.reference }} - Club Bultaco{% endblock %}
+
+{% block contenu %}
+    <p><a href='{{ path('app_compte') }}' class='panier-continuer'>← Toutes mes commandes</a></p>
+
+    <div class='compte-bloc commande-merci'>
+        <div class='compte-entete'>
+            <h2 class='compte-titre'>Commande {{ commande.reference }}</h2>
+            <span class='statut statut--{{ commande.statut }}'>{{ statuts[commande.statut] ?? commande.statut }}</span>
+        </div>
+        <p class='compte-intro'>Passée le {{ commande.date_commande|date('d/m/Y à H:i') }} — paiement par {{ commande.mode_paiement == 'virement' ? 'virement bancaire' : 'chèque' }}.</p>
+
+        <table class='panier-table'>
+            <thead><tr><th>Pièce</th><th>Quantité</th><th>Sous-total</th></tr></thead>
+            <tbody>
+                {% for ligne in commande.lignes %}
+                    <tr>
+                        <td data-label='Pièce'><strong>{{ ligne.nom_piece }}</strong></td>
+                        <td data-label='Quantité'>{{ ligne.quantite }} × {{ ligne.prix_unitaire|number_format(2, ',', ' ') }} €</td>
+                        <td data-label='Sous-total'>{{ (ligne.prix_unitaire * ligne.quantite)|number_format(2, ',', ' ') }} €</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot><tr><th colspan='2'>Total</th><th>{{ commande.total|number_format(2, ',', ' ') }} €</th></tr></tfoot>
+        </table>
+
+        <div class='compte-colonnes'>
+            <div>
+                <h3>Livraison</h3>
+                <p>{{ commande.prenom }} {{ commande.nom }}<br>{{ commande.adresse }}<br>{{ commande.code_postal }} {{ commande.ville }}<br>{{ commande.pays }}</p>
+            </div>
+            {% if commande.statut == 'en_attente' %}
+                <div>
+                    {% include 'commande/_instructions_paiement.html.twig' %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
