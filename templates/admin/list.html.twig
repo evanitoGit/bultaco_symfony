@@ -15,7 +15,9 @@
             {% if resource.public_route is defined %}
                 <a href="{{ path(resource.public_route) }}" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Voir la page ↗</a>
             {% endif %}
-            <a href="{{ path('app_admin_new', { resource: resource.key }) }}" class="admin-btn">+ Ajouter {{ resource.singular }}</a>
+            {% if resource.can_create ?? true %}
+                <a href="{{ path('app_admin_new', { resource: resource.key }) }}" class="admin-btn">+ Ajouter {{ resource.singular }}</a>
+            {% endif %}
         </div>
     </div>
 
@@ -23,7 +25,9 @@
         <div class="admin-empty">
             <span aria-hidden="true">{{ resource.icon }}</span>
             <p>Aucun élément pour le moment.</p>
-            <a href="{{ path('app_admin_new', { resource: resource.key }) }}" class="admin-btn">+ Ajouter {{ resource.singular }}</a>
+            {% if resource.can_create ?? true %}
+                <a href="{{ path('app_admin_new', { resource: resource.key }) }}" class="admin-btn">+ Ajouter {{ resource.singular }}</a>
+            {% endif %}
         </div>
     {% else %}
         {% if rows|length > 6 %}

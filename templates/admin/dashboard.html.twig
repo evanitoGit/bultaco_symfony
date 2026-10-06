@@ -26,7 +26,9 @@
                         </a>
                         <div class="admin-card-actions">
                             <a href="{{ path('app_admin_list', { resource: key }) }}">Gérer</a>
-                            <a href="{{ path('app_admin_new', { resource: key }) }}">+ Ajouter</a>
+                            {% if item.can_create ?? true %}
+                                <a href="{{ path('app_admin_new', { resource: key }) }}">+ Ajouter</a>
+                            {% endif %}
                         </div>
                     </article>
                 {% endfor %}

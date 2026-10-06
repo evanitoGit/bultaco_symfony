@@ -1,0 +1,40 @@
+<div class="admin-form-card admin-commande">
+    <div class="admin-commande-infos">
+        <div>
+            <h2>Client</h2>
+            <p><strong>{{ row.prenom }} {{ row.nom }}</strong><br>
+               <a href="mailto:{{ row.email }}">{{ row.email }}</a>
+               {% if row.telephone %}<br><a href="tel:{{ row.telephone }}">{{ row.telephone }}</a>{% endif %}</p>
+        </div>
+        <div>
+            <h2>Livraison</h2>
+            <p>{{ row.adresse }}<br>{{ row.code_postal }} {{ row.ville }}<br>{{ row.pays }}</p>
+        </div>
+        <div>
+            <h2>Paiement</h2>
+            <p><strong>{{ row.mode_paiement == 'virement' ? 'Virement' : 'Chèque' }}</strong><br>
+               Commande du {{ row.date_commande|date('d/m/Y à H:i') }}</p>
+        </div>
+    </div>
+
+    {% if row.commentaire %}
+        <blockquote class="admin-commande-commentaire">{{ row.commentaire|nl2br }}</blockquote>
+    {% endif %}
+
+    <table class="admin-table">
+        <thead><tr><th>Pièce</th><th>Prix unitaire</th><th>Qté</th><th>Sous-total</th></tr></thead>
+        <tbody>
+            {% for ligne in details %}
+                <tr>
+                    <td data-label="Pièce">{{ ligne.nom_piece }}</td>
+                    <td data-label="Prix unitaire">{{ ligne.prix_unitaire|number_format(2, ',', ' ') }} €</td>
+                    <td data-label="Qté">{{ ligne.quantite }}</td>
+                    <td data-label="Sous-total"><strong>{{ (ligne.prix_unitaire * ligne.quantite)|number_format(2, ',', ' ') }} €</strong></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr><th colspan="3">Total</th><th>{{ row.total|number_format(2, ',', ' ') }} €</th></tr>
+        </tfoot>
+    </table>
+</div>

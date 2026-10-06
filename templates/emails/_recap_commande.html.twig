@@ -1,0 +1,16 @@
+<table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 20px 0;">
+    <tr style="background: #474747; color: #FFF2E3;">
+        <th align="left">Pièce</th><th align="center">Qté</th><th align="right">Sous-total</th>
+    </tr>
+    {% for ligne in commande.lignes %}
+        <tr style="border-bottom: 1px solid #eee;">
+            <td>{{ ligne.nom_piece }}<br><small style="color: #888;">{{ ligne.prix_unitaire|number_format(2, ',', ' ') }} € l'unité</small></td>
+            <td align="center">{{ ligne.quantite }}</td>
+            <td align="right">{{ (ligne.prix_unitaire * ligne.quantite)|number_format(2, ',', ' ') }} €</td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="2" align="right"><strong>Total</strong></td>
+        <td align="right"><strong>{{ commande.total|number_format(2, ',', ' ') }} €</strong></td>
+    </tr>
+</table>

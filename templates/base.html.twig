@@ -65,6 +65,7 @@
 
 {% block body %}{% endblock %}
 
+{% block footer %}
 <footer class='coordonnees'>
     <div class='coord-header'>
         <h2>BULTACO CLUB FRANCE</h2>
@@ -107,6 +108,7 @@
         <img src="{{ asset('img/logo_rond.png') }}" alt='' class='logorond'>
     </a>
 </footer>
+{% endblock %}
 
 {% if is_granted('ROLE_ADMIN') %}
     <a href="{{ path('app_admin') }}" class='admin-shortcut'>⚙ Administration</a>

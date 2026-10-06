@@ -1,0 +1,21 @@
+<div style="font-family: Arial, sans-serif; color: #474747; max-width: 600px; margin: 0 auto;">
+    <div style="background: #474747; border-bottom: 3px solid #ccaf92; padding: 20px; text-align: center;">
+        <span style="color: #ccaf92; font-size: 22px; font-weight: bold; letter-spacing: 3px;">BULTACO CLUB FRANCE</span>
+    </div>
+    <div style="padding: 24px;">
+        <h1 style="font-size: 22px;">Merci pour votre commande !</h1>
+        <p>Bonjour {{ commande.prenom }},</p>
+        <p>Nous avons bien reçu votre commande <strong>{{ commande.reference }}</strong> du {{ commande.date_commande|date('d/m/Y') }}.</p>
+
+        {% include 'emails/_recap_commande.html.twig' %}
+        {% include 'commande/_instructions_paiement.html.twig' %}
+
+        <p><strong>Livraison :</strong><br>
+            {{ commande.prenom }} {{ commande.nom }}<br>
+            {{ commande.adresse }}<br>
+            {{ commande.code_postal }} {{ commande.ville }} — {{ commande.pays }}
+        </p>
+        <p>Une question ? Répondez simplement à cet e-mail ou appelez-nous au 06 75 06 83 20.</p>
+        <p>À bientôt,<br>Le Bultaco Club France</p>
+    </div>
+</div>
