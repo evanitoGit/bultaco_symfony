@@ -1,0 +1,28 @@
+{% if lignes is empty %}
+    <p class='mini-panier-vide'>Votre panier est vide.</p>
+    <a href='{{ path('app_boutique_pieces') }}' class='mini-panier-lien'>Voir les pièces détachées</a>
+{% else %}
+    <ul class='mini-panier-lignes'>
+        {% for ligne in lignes|slice(0, 4) %}
+            <li>
+                {% if ligne.image_path %}
+                    <img src='{{ asset(ligne.image_path) }}' alt='' onerror="this.replaceWith(Object.assign(document.createElement('span'), { className: 'mini-panier-img', textContent: '📦' }))">
+                {% else %}
+                    <span class='mini-panier-img' aria-hidden='true'>📦</span>
+                {% endif %}
+                <span class='mini-panier-nom'>
+                    {{ ligne.nom }}
+                    <small>{{ ligne.quantite }} × {{ ligne.prix_unitaire|prix }}</small>
+                </span>
+                <strong>{{ ligne.sous_total|prix }}</strong>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if lignes|length > 4 %}
+        <p class='mini-panier-plus'>+ {{ lignes|length - 4 }} autre{{ lignes|length - 4 > 1 ? 's' }} article{{ lignes|length - 4 > 1 ? 's' }}</p>
+    {% endif %}
+
+    <p class='mini-panier-total'><span>Total</span><strong>{{ total|prix }}</strong></p>
+    <a href='{{ path('app_panier') }}' class='mini-panier-lien'>Voir mon panier</a>
+{% endif %}

@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon panier - Club Bultaco{% endblock %}
+
+{% block body_class %}page-pieces{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <h1>Mon panier</h1>
+    </div>
+
+    <div class='container'>
+        <section class='panier'>
+            {% for message in app.flashes('panier') %}
+                <p class='panier-message' role='status'>{{ message }}</p>
+            {% endfor %}
+
+            {% if lignes is empty %}
+                {% include '_partials/_empty.html.twig' with { icone: '🛒', message: 'Votre panier est vide' } %}
+                <p class='panier-actions panier-actions--vide'>
+                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>Voir les pièces détachées</a>
+                </p>
+            {% else %}
+                <table class='panier-table'>
+                    <thead>
+                        <tr><th>Pièce</th><th>Prix unitaire</th><th>Quantité</th><th>Sous-total</th><th><span class='sr-only'>Retirer</span></th></tr>
+                    </thead>
+                    <tbody>
+                        {% for ligne in lignes %}
+                            <tr>
+                                <td data-label='Pièce'>
+                                    <span class='panier-piece'>
+                                        {% if ligne.image_path %}
+                                            <img src='{{ asset(ligne.image_path) }}' alt='' onerror="this.replaceWith(Object.assign(document.createElement('span'), { className: 'panier-piece-img', textContent: '📦' }))">
+                                        {% else %}
+                                            <span class='panier-piece-img' aria-hidden='true'>📦</span>
+                                        {% endif %}
+                                        {{ ligne.nom }}
+                                    </span>
+                                </td>
+                                <td data-label='Prix unitaire'>{{ ligne.prix_unitaire|prix }}</td>
+                                <td data-label='Quantité'>
+                                    <form method='post' action='{{ path('app_panier_quantite', { id: ligne.id }) }}'>
+                                        <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                                        <input type='number' name='quantite' value='{{ ligne.quantite }}' min='0' max='99'
+                                               aria-label='Quantité de {{ ligne.nom }}' onchange='this.form.submit()'>
+                                    </form>
+                                </td>
+                                <td data-label='Sous-total'><strong>{{ ligne.sous_total|prix }}</strong></td>
+                                <td class='panier-col-retirer'>
+                                    <form method='post' action='{{ path('app_panier_retirer', { id: ligne.id }) }}'>
+                                        <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                                        <button type='submit' class='panier-retirer' aria-label='Retirer {{ ligne.nom }}' title='Retirer'>✕</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr><th colspan='3'>Total</th><th colspan='2'>{{ total|prix }}</th></tr>
+                    </tfoot>
+                </table>
+
+                <div class='panier-actions'>
+                    <form method='post' action='{{ path('app_panier_vider') }}' onsubmit="return confirm('Vider le panier ?');">
+                        <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                        <button type='submit' class='panier-vider'>Vider le panier</button>
+                    </form>
+                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>← Continuer mes achats</a>
+                    <button type='button' class='btn-commander' disabled title='Bientôt disponible'>Passer la commande</button>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}
