@@ -19,6 +19,10 @@
             placeholder: 'Rechercher une pièce...'
         } %}
 
+        {% for message in app.flashes('panier') %}
+            <p class='panier-message' role='status'>{{ message }}</p>
+        {% endfor %}
+
         <section class='pieces-section'>
             <div class='categories-container'>
                 {% for categorie in categories %}
@@ -62,10 +66,10 @@
                                                         {% endif %}
                                                         <div class='piece-footer'>
                                                             <span class='piece-prix'>{{ piece.prix|number_format(2, ',', ' ') }} €</span>
-                                                            <a class='btn-commander'
-                                                               href='mailto:{{ email_commande }}?subject={{ ('Commande : ' ~ piece.nom)|url_encode }}&body={{ ("Bonjour,\n\nJe souhaite commander la pièce suivante :\n- " ~ piece.nom ~ ' (' ~ piece.prix|number_format(2, ',', ' ') ~ " €)\n\nMerci.")|url_encode }}'>
-                                                                Commander
-                                                            </a>
+                                                            <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
+                                                                <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                                                                <button type='submit' class='btn-commander'>Ajouter au panier</button>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </article>

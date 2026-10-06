@@ -43,6 +43,22 @@
                     </div>
                 </li>
             {% endfor %}
+
+            <li class='panier-lien'>
+                <button type='button' class='panier-bouton' aria-label='Mon panier' aria-expanded='false'
+                        aria-controls='miniPanier' data-apercu-url='{{ path('app_panier_apercu') }}'>
+                    <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'
+                         stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                        <circle cx='9' cy='20' r='1.5'/><circle cx='18' cy='20' r='1.5'/>
+                        <path d='M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H6'/>
+                    </svg>
+                    <span class='panier-badge' data-panier-nombre {{ panier_nombre() == 0 ? 'hidden' }}>{{ panier_nombre() }}</span>
+                </button>
+
+                <div class='mini-panier' id='miniPanier' role='dialog' aria-label='Récapitulatif du panier'>
+                    <div class='mini-panier-contenu' data-mini-panier>Chargement…</div>
+                </div>
+            </li>
         </ul>
     </nav>
 </header>
@@ -97,6 +113,7 @@
 {% endif %}
 
 <script src="{{ asset('js/script.js') }}"></script>
+<script src="{{ asset('js/panier.js') }}"></script>
 {% block javascripts %}{% endblock %}
 </body>
 </html>
