@@ -10,14 +10,21 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Panier : [id de la pièce => quantité].
+ * Les quantités sont limitées au stock des pièces (stock NULL = non suivi, toujours disponible).
  * - visiteur : stocké en session ;
  * - client connecté : stocké en base (table client_panier), donc retrouvé sur tous ses appareils.
  * Les prix sont toujours relus en base et calculés en centimes.
  */
 final class Cart
 {
+    /** En dessous de ce stock, la boutique affiche « Plus que N en stock » */
+    public const STOCK_FAIBLE = 3;
+
     private const SESSION_KEY = 'panier';
     private const MAX_QUANTITE = 99;
+
+    /** @var list<string> quantités corrigées pendant cette requête (stock en baisse) */
+    private array $ajustements = [];
 
     public function __construct(
         private readonly RequestStack $requestStack,
@@ -26,25 +33,39 @@ final class Cart
     ) {
     }
 
-    public function add(int $pieceId, int $quantite = 1): void
+    /**
+     * @return int quantité de la pièce dans le panier après l'ajout (limitée au stock)
+     */
+    public function add(int $pieceId, int $quantite = 1): int
     {
         $lignes = $this->raw();
-        $lignes[$pieceId] = min(self::MAX_QUANTITE, ($lignes[$pieceId] ?? 0) + max(1, $quantite));
+        $lignes[$pieceId] = min($this->maximum($pieceId), ($lignes[$pieceId] ?? 0) + max(1, $quantite));
+        if ($lignes[$pieceId] <= 0) {
+            unset($lignes[$pieceId]);
+        }
         $this->save($lignes);
+
+        return $lignes[$pieceId] ?? 0;
     }
 
-    public function setQuantite(int $pieceId, int $quantite): void
+    /**
+     * @return int quantité réellement enregistrée (limitée au stock)
+     */
+    public function setQuantite(int $pieceId, int $quantite): int
     {
         $lignes = $this->raw();
         if (!isset($lignes[$pieceId])) {
-            return; // on ne modifie que les lignes déjà présentes (add() vérifie l'existence de la pièce)
+            return 0; // on ne modifie que les lignes déjà présentes (add() vérifie l'existence de la pièce)
         }
+        $quantite = min($this->maximum($pieceId), $quantite);
         if ($quantite <= 0) {
             unset($lignes[$pieceId]);
         } else {
-            $lignes[$pieceId] = min(self::MAX_QUANTITE, $quantite);
+            $lignes[$pieceId] = $quantite;
         }
         $this->save($lignes);
+
+        return max(0, $quantite);
     }
 
     public function remove(int $pieceId): void
@@ -83,6 +104,12 @@ final class Cart
         }
     }
 
+    /** Quantité d'une pièce déjà dans le panier. */
+    public function quantite(int $pieceId): int
+    {
+        return $this->raw()[$pieceId] ?? 0;
+    }
+
     /** Nombre total d'articles (pour la pastille du header). */
     public function count(): int
     {
@@ -91,8 +118,9 @@ final class Cart
 
     /**
      * Lignes détaillées, avec les prix actuels de la base.
+     * Si le stock a baissé depuis l'ajout, la quantité est corrigée et le client prévenu.
      *
-     * @return list<array{id:int, nom:string, image_path:?string, quantite:int, prix_unitaire:int, sous_total:int}>
+     * @return list<array{id:int, nom:string, image_path:?string, quantite:int, stock:?int, prix_unitaire:int, sous_total:int}>
      */
     public function lignes(): array
     {
@@ -102,7 +130,7 @@ final class Cart
         }
 
         $pieces = $this->connection->fetchAllAssociativeIndexed(
-            'SELECT id, nom, prix, image_path FROM pieces_detachees WHERE id IN (?)',
+            'SELECT id, nom, prix, stock, image_path FROM pieces_detachees WHERE id IN (?)',
             [array_keys($panier)],
             [ArrayParameterType::INTEGER]
         );
@@ -114,18 +142,50 @@ final class Cart
                 $this->remove($id);
                 continue;
             }
+            $stock = $pieces[$id]['stock'] === null ? null : (int) $pieces[$id]['stock'];
+            if ($stock !== null && $quantite > $stock) {
+                $quantite = $this->setQuantite($id, $stock);
+                $this->signaler($quantite === 0
+                    ? sprintf('« %s » n\'est plus disponible et a été retiré de votre panier.', $pieces[$id]['nom'])
+                    : sprintf('Il ne reste que %d « %s » en stock : la quantité de votre panier a été ajustée.', $stock, $pieces[$id]['nom']));
+                if ($quantite === 0) {
+                    continue;
+                }
+            }
             $prixUnitaire = (int) round((float) $pieces[$id]['prix'] * 100);
             $lignes[] = [
                 'id' => $id,
                 'nom' => $pieces[$id]['nom'],
                 'image_path' => $pieces[$id]['image_path'],
                 'quantite' => $quantite,
+                'stock' => $stock,
                 'prix_unitaire' => $prixUnitaire,
                 'sous_total' => $prixUnitaire * $quantite,
             ];
         }
 
         return $lignes;
+    }
+
+    /**
+     * Quantités corrigées pendant cette requête (stock en baisse depuis l'ajout).
+     *
+     * @return list<string>
+     */
+    public function ajustements(): array
+    {
+        return $this->ajustements;
+    }
+
+    /**
+     * Quantité maximale autorisée pour une pièce : son stock (s'il est suivi), 99 au plus.
+     * 0 si la pièce n'existe plus ou est en rupture.
+     */
+    public function maximum(int $pieceId): int
+    {
+        $stock = $this->connection->fetchOne('SELECT IFNULL(stock, ?) FROM pieces_detachees WHERE id = ?', [self::MAX_QUANTITE, $pieceId]);
+
+        return $stock === false ? 0 : min(self::MAX_QUANTITE, (int) $stock);
     }
 
     /** Total du panier en centimes. */
@@ -176,6 +236,12 @@ final class Cart
         }
 
         $this->requestStack->getSession()->set(self::SESSION_KEY, $lignes);
+    }
+
+    private function signaler(string $message): void
+    {
+        $this->ajustements[] = $message;
+        $this->requestStack->getSession()->getFlashBag()->add('panier', $message);
     }
 
     private function client(): ?Client

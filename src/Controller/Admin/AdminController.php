@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Admin\ImageUploader;
 use App\Admin\ResourceRegistry;
+use App\Commande\CommandeService;
 use App\Entity\Admin;
 use App\Form\AdminResourceType;
 use Doctrine\DBAL\Connection;
@@ -29,6 +30,7 @@ class AdminController extends AbstractController
         private readonly Connection $connection,
         private readonly ImageUploader $uploader,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly CommandeService $commandes,
     ) {
     }
 
@@ -174,6 +176,9 @@ class AdminController extends AbstractController
 
             if ($isNew) {
                 $this->connection->insert($config['table'], $values + ($config['fixed'] ?? []));
+            } elseif ($config['key'] === 'commandes') {
+                // le changement de statut met aussi le stock à jour (annulation)
+                $this->commandes->changerStatut($id, $values['statut']);
             } else {
                 $this->connection->update($config['table'], $values, ['id' => $id]);
             }

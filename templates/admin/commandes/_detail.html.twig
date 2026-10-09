@@ -19,6 +19,9 @@
             <h2>Paiement</h2>
             <p><strong>{{ row.mode_paiement == 'virement' ? 'Virement' : 'Chèque' }}</strong><br>
                Commande du {{ row.date_commande|date('d/m/Y à H:i') }}</p>
+            {% if row.stock_restitue ?? false %}
+                <p><span class="admin-badge admin-badge--attente">Pièces remises en stock</span></p>
+            {% endif %}
         </div>
     </div>
 

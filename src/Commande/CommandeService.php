@@ -46,6 +46,8 @@ final class CommandeService
      * @param Client|null $compte compte du client connecté (null = commande sans compte)
      *
      * @return array la commande enregistrée, avec ses lignes
+     *
+     * @throws StockInsuffisantException si une pièce a été commandée par quelqu'un d'autre entre-temps
      */
     public function creer(array $client, ?Client $compte = null): array
     {
@@ -59,6 +61,8 @@ final class CommandeService
         $reference = 'BCF-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3))); // ex. BCF-261006-4F2A9C
 
         $id = $this->connection->transactional(function (Connection $connection) use ($client, $compte, $lignes, $total, $reference): int {
+            $this->retirerDuStock($connection, $lignes);
+
             $connection->insert('commandes', [
                 'client_id' => $compte?->getId(),
                 'reference' => $reference,
@@ -105,6 +109,56 @@ final class CommandeService
         $this->envoyerEmails($commande);
 
         return $commande;
+    }
+
+    /**
+     * Change le statut d'une commande (administration).
+     * Annuler une commande remet ses pièces en stock, une seule fois ; la réactiver les retire à nouveau.
+     */
+    public function changerStatut(int $id, string $statut): void
+    {
+        $this->connection->transactional(function (Connection $connection) use ($id, $statut): void {
+            $restitue = (bool) $connection->fetchOne('SELECT stock_restitue FROM commandes WHERE id = ? FOR UPDATE', [$id]);
+            $annulee = $statut === 'annulee';
+
+            if ($annulee !== $restitue) {
+                $lignes = $connection->fetchAllAssociative(
+                    'SELECT piece_id, quantite FROM commande_lignes WHERE commande_id = ? AND piece_id IS NOT NULL',
+                    [$id]
+                );
+                foreach ($lignes as $ligne) {
+                    // GREATEST : le stock ne descend jamais sous zéro (colonne non signée)
+                    $connection->executeStatement(
+                        $annulee
+                            ? 'UPDATE pieces_detachees SET stock = stock + ? WHERE id = ? AND stock IS NOT NULL'
+                            : 'UPDATE pieces_detachees SET stock = GREATEST(stock, ?) - ? WHERE id = ? AND stock IS NOT NULL',
+                        $annulee
+                            ? [$ligne['quantite'], $ligne['piece_id']]
+                            : [$ligne['quantite'], $ligne['quantite'], $ligne['piece_id']]
+                    );
+                }
+            }
+
+            $connection->update('commandes', ['statut' => $statut, 'stock_restitue' => (int) $annulee], ['id' => $id]);
+        });
+    }
+
+    /**
+     * Décrémente le stock des pièces commandées. Les lignes sont verrouillées (FOR UPDATE) :
+     * deux commandes simultanées de la dernière pièce ne peuvent pas passer toutes les deux.
+     */
+    private function retirerDuStock(Connection $connection, array $lignes): void
+    {
+        foreach ($lignes as $ligne) {
+            $stock = $connection->fetchOne('SELECT stock FROM pieces_detachees WHERE id = ? FOR UPDATE', [$ligne['id']]);
+            if ($stock === null) {
+                continue; // stock non suivi
+            }
+            if ($stock === false || (int) $stock < $ligne['quantite']) {
+                throw new StockInsuffisantException($ligne['nom'], max(0, (int) $stock));
+            }
+            $connection->executeStatement('UPDATE pieces_detachees SET stock = stock - ? WHERE id = ?', [$ligne['quantite'], $ligne['id']]);
+        }
     }
 
     public function trouver(int $id): ?array
