@@ -1,19 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pilotes de légende - Club Bultaco{% endblock %}
-{% block meta_description %}Les pilotes de légende qui ont écrit l'histoire de Bultaco en trial et en motocross.{% endblock %}
+{% block title %}{{ 'nav.pilotes_legende'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ 'pilotes.meta'|trans }}{% endblock %}
 
 {% block body_class %}page-pilotes{% endblock %}
 
 {% block body %}
     <div class='head'>
-        <h1>Pilotes de légende</h1>
+        <h1>{{ 'nav.pilotes_legende'|trans }}</h1>
     </div>
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            placeholder: 'Rechercher un pilote...'
+            placeholder: 'pilotes.recherche'|trans
         } %}
 
         <section class='emblemes-section'>
@@ -21,7 +21,7 @@
                 {% for pilote in pilotes %}
                     {% set nom_complet = (pilote.prenom ~ ' ' ~ pilote.nom)|trim %}
                     <article class='album-card pilote-item' data-id='{{ pilote.id }}' role='button' tabindex='0'
-                             aria-label='Voir la fiche de {{ nom_complet }}' onclick='openPiloteModal({{ pilote.id }})'>
+                             aria-label='{{ 'pilotes.voir_fiche'|trans({ nom: nom_complet }) }}' onclick='openPiloteModal({{ pilote.id }})'>
                         <div class='album-photo-wrap'>
                             {% if pilote.image_path %}
                                 <div class='album-photo' style='background-image: url("{{ asset(pilote.image_path) }}")'></div>
@@ -38,7 +38,7 @@
                         </div>
                     </article>
                 {% else %}
-                    {% include '_partials/_empty.html.twig' with { icone: '🏆', message: 'Aucun pilote pour le moment' } %}
+                    {% include '_partials/_empty.html.twig' with { icone: '🏆', message: 'pilotes.aucun'|trans } %}
                 {% endfor %}
             </div>
         </section>
@@ -59,7 +59,7 @@
             fields     : ['nationalite', 'description', 'palmares'],
             labelField : nomComplet,
             metaFields : p => [p.nationalite, periode(p)],
-            emptyText  : 'Aucun pilote trouvé',
+            emptyText  : {{ 'pilotes.aucun_trouve'|trans|json_encode|raw }},
             onSelect   : item => openPiloteModal(item.id)
         };
 
@@ -71,7 +71,7 @@
                 <div class='carte-identite'>
                     <div class='carte-header'>
                         <h2>${escapeHtml(nomComplet(pilote))}</h2>
-                        <span class='badge-modele'>Pilote</span>
+                        <span class='badge-modele'>{{ 'pilotes.badge'|trans }}</span>
                     </div>
                     ${pilote.image_path
                         ? `<img src='${escapeHtml(mediaUrl(pilote.image_path))}' alt='${escapeHtml(nomComplet(pilote))}' class='carte-photo'>`
@@ -79,22 +79,22 @@
                     <div class='carte-section'>
                         <div class='info-grid'>
                             <div class='info-item'>
-                                <span class='info-label'>Naissance</span>
-                                <span class='info-value'>${escapeHtml(pilote.date_naissance || 'N/A')}</span>
+                                <span class='info-label'>{{ 'pilotes.naissance'|trans }}</span>
+                                <span class='info-value'>${escapeHtml(pilote.date_naissance || {{ 'commun.non_renseigne'|trans|json_encode|raw }})}</span>
                             </div>
                             ${pilote.date_deces ? `
                             <div class='info-item'>
-                                <span class='info-label'>Décès</span>
+                                <span class='info-label'>{{ 'pilotes.deces'|trans }}</span>
                                 <span class='info-value'>${escapeHtml(pilote.date_deces)}</span>
                             </div>` : ''}
                             <div class='info-item'>
-                                <span class='info-label'>Nationalité</span>
-                                <span class='info-value'>${escapeHtml(pilote.nationalite || 'N/A')}</span>
+                                <span class='info-label'>{{ 'pilotes.nationalite'|trans }}</span>
+                                <span class='info-value'>${escapeHtml(pilote.nationalite || {{ 'commun.non_renseigne'|trans|json_encode|raw }})}</span>
                             </div>
                         </div>
                     </div>
                     ${pilote.description ? `<div class='carte-section'><p class='description-text'>${nl2br(pilote.description)}</p></div>` : ''}
-                    ${pilote.palmares ? `<div class='carte-section'><h3 class='carte-titre'>🏆 Palmarès</h3><div class='caracteristiques-text'>${nl2br(pilote.palmares)}</div></div>` : ''}
+                    ${pilote.palmares ? `<div class='carte-section'><h3 class='carte-titre'>🏆 {{ 'pilotes.palmares'|trans }}</h3><div class='caracteristiques-text'>${nl2br(pilote.palmares)}</div></div>` : ''}
                 </div>
             `);
         }

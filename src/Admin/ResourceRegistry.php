@@ -3,6 +3,7 @@
 namespace App\Admin;
 
 use App\Commande\CommandeService;
+use App\I18n\Contenu;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -13,6 +14,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * modifiable, il suffit de l'ajouter ici.
  *
  * Types de champs : text, textarea, integer, money, choice, relation, url, image, password.
+ *
+ * 'traduire' => true : le champ est affiché sur le site en anglais et en espagnol.
+ * Les champs « _en » et « _es » (colonnes de la base) sont ajoutés automatiquement au formulaire.
  */
 final class ResourceRegistry
 {
@@ -54,7 +58,7 @@ final class ResourceRegistry
             ],
             'fields' => [
                 'section' => ['type' => 'choice', 'label' => 'Page concernée', 'required' => true, 'create_only' => true, 'choices' => 'text_sections'],
-                'contenu' => ['type' => 'textarea', 'label' => 'Texte', 'required' => true, 'rows' => 8],
+                'contenu' => ['type' => 'textarea', 'label' => 'Texte', 'required' => true, 'rows' => 8, 'traduire' => true],
             ],
             'touch' => 'date_modification',
         ],
@@ -77,12 +81,12 @@ final class ResourceRegistry
             ],
             'fields' => [
                 'nom' => ['type' => 'text', 'label' => 'Nom du modèle', 'required' => true, 'max' => 100],
-                'type_moto' => ['type' => 'text', 'label' => 'Type (trial, cross, route…)', 'max' => 100],
+                'type_moto' => ['type' => 'text', 'label' => 'Type (trial, cross, route…)', 'max' => 100, 'traduire' => true],
                 'cylindree' => ['type' => 'text', 'label' => 'Cylindrée', 'max' => 50, 'help' => 'Ex. : 250cc / 350cc'],
                 'annee_debut' => ['type' => 'text', 'label' => 'Année de début', 'max' => 20],
                 'annee_fin' => ['type' => 'text', 'label' => 'Année de fin', 'max' => 20],
-                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 5],
-                'caracteristiques' => ['type' => 'textarea', 'label' => 'Caractéristiques techniques', 'rows' => 5, 'help' => 'Une caractéristique par ligne.'],
+                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 5, 'traduire' => true],
+                'caracteristiques' => ['type' => 'textarea', 'label' => 'Caractéristiques techniques', 'rows' => 5, 'help' => 'Une caractéristique par ligne.', 'traduire' => true],
                 'image_path' => ['type' => 'image', 'label' => 'Photo', 'dir' => 'modeles'],
                 'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0, 'help' => 'Les plus petits nombres apparaissent en premier.'],
             ],
@@ -106,11 +110,11 @@ final class ResourceRegistry
             'fields' => [
                 'prenom' => ['type' => 'text', 'label' => 'Prénom', 'required' => true, 'max' => 100],
                 'nom' => ['type' => 'text', 'label' => 'Nom', 'required' => true, 'max' => 100],
-                'nationalite' => ['type' => 'text', 'label' => 'Nationalité', 'max' => 50],
-                'date_naissance' => ['type' => 'text', 'label' => 'Date de naissance', 'max' => 50, 'help' => 'Texte libre, ex. : 24 mars 1930'],
-                'date_deces' => ['type' => 'text', 'label' => 'Date de décès', 'max' => 50],
-                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 5],
-                'palmares' => ['type' => 'textarea', 'label' => 'Palmarès', 'rows' => 5, 'help' => 'Un titre par ligne.'],
+                'nationalite' => ['type' => 'text', 'label' => 'Nationalité', 'max' => 50, 'traduire' => true],
+                'date_naissance' => ['type' => 'text', 'label' => 'Date de naissance', 'max' => 50, 'help' => 'Texte libre, ex. : 24 mars 1930', 'traduire' => true],
+                'date_deces' => ['type' => 'text', 'label' => 'Date de décès', 'max' => 50, 'traduire' => true],
+                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 5, 'traduire' => true],
+                'palmares' => ['type' => 'textarea', 'label' => 'Palmarès', 'rows' => 5, 'help' => 'Un titre par ligne.', 'traduire' => true],
                 'image_path' => ['type' => 'image', 'label' => 'Photo', 'dir' => 'pilotes'],
                 'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0],
             ],
@@ -131,7 +135,7 @@ final class ResourceRegistry
                 'ordre' => ['label' => 'Ordre'],
             ],
             'fields' => [
-                'nom_modele' => ['type' => 'text', 'label' => 'Légende', 'required' => true, 'max' => 100, 'help' => 'Ex. : Bultaco Sherpa T10 - Avant'],
+                'nom_modele' => ['type' => 'text', 'label' => 'Légende', 'required' => true, 'max' => 100, 'help' => 'Ex. : Bultaco Sherpa T10 - Avant', 'traduire' => true],
                 'image_path' => ['type' => 'image', 'label' => 'Photo', 'dir' => 'restaurations', 'required' => true],
                 'colonne' => ['type' => 'choice', 'label' => 'Colonne', 'required' => true, 'choices' => ['Gauche (avant)' => 'gauche', 'Droite (après)' => 'droite'], 'expanded' => true, 'default' => 'gauche'],
                 'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0, 'help' => 'Une photo « avant » et sa photo « après » doivent avoir le même ordre.'],
@@ -155,10 +159,10 @@ final class ResourceRegistry
                 'source' => ['label' => 'Source'],
             ],
             'fields' => [
-                'titre' => ['type' => 'text', 'label' => 'Titre', 'required' => true, 'max' => 200],
-                'date_publication' => ['type' => 'text', 'label' => 'Période / date', 'max' => 50, 'help' => 'Ex. : 1958, années 70…'],
+                'titre' => ['type' => 'text', 'label' => 'Titre', 'required' => true, 'max' => 200, 'traduire' => true],
+                'date_publication' => ['type' => 'text', 'label' => 'Période / date', 'max' => 50, 'help' => 'Ex. : 1958, années 70…', 'traduire' => true],
                 'source' => ['type' => 'text', 'label' => 'Source', 'max' => 150],
-                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4],
+                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4, 'traduire' => true],
                 'image_path' => ['type' => 'image', 'label' => 'Image du logo', 'dir' => 'logos', 'required' => true],
                 'lien_externe' => ['type' => 'url', 'label' => 'Lien externe', 'max' => 255],
             ],
@@ -181,11 +185,11 @@ final class ResourceRegistry
                 'source' => ['label' => 'Source'],
             ],
             'fields' => [
-                'titre' => ['type' => 'text', 'label' => 'Titre', 'required' => true, 'max' => 200],
+                'titre' => ['type' => 'text', 'label' => 'Titre', 'required' => true, 'max' => 200, 'traduire' => true],
                 'type_contenu' => ['type' => 'choice', 'label' => 'Type de document', 'required' => true, 'choices' => self::PRESS_TYPES, 'default' => 'article'],
-                'date_publication' => ['type' => 'text', 'label' => 'Date de publication', 'max' => 50],
+                'date_publication' => ['type' => 'text', 'label' => 'Date de publication', 'max' => 50, 'traduire' => true],
                 'source' => ['type' => 'text', 'label' => 'Source', 'max' => 150, 'help' => 'Ex. : Moto Verte, Trial Classic…'],
-                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4],
+                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4, 'traduire' => true],
                 'image_path' => ['type' => 'image', 'label' => 'Image', 'dir' => 'pressbook', 'required' => true],
                 'lien_externe' => ['type' => 'url', 'label' => 'Lien vers la source originale', 'max' => 255],
             ],
@@ -206,7 +210,7 @@ final class ResourceRegistry
                 'ordre' => ['label' => 'Ordre'],
             ],
             'fields' => [
-                'nom' => ['type' => 'text', 'label' => 'Nom', 'required' => true, 'max' => 100],
+                'nom' => ['type' => 'text', 'label' => 'Nom', 'required' => true, 'max' => 100, 'traduire' => true],
                 'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0],
             ],
             'delete_warning' => 'Ses sous-catégories et toutes leurs pièces seront aussi supprimées.',
@@ -234,7 +238,7 @@ final class ResourceRegistry
                 'ordre' => ['label' => 'Ordre'],
             ],
             'fields' => [
-                'nom' => ['type' => 'text', 'label' => 'Nom', 'required' => true, 'max' => 100],
+                'nom' => ['type' => 'text', 'label' => 'Nom', 'required' => true, 'max' => 100, 'traduire' => true],
                 'categorie_id' => ['type' => 'relation', 'label' => 'Catégorie', 'required' => true, 'choices' => 'categories'],
                 'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0],
             ],
@@ -263,12 +267,12 @@ final class ResourceRegistry
                 'stock' => ['label' => 'Stock', 'format' => 'stock'],
             ],
             'fields' => [
-                'nom' => ['type' => 'text', 'label' => 'Nom de la pièce', 'required' => true, 'max' => 150],
+                'nom' => ['type' => 'text', 'label' => 'Nom de la pièce', 'required' => true, 'max' => 150, 'traduire' => true],
                 'sous_categorie_id' => ['type' => 'relation', 'label' => 'Catégorie', 'required' => true, 'choices' => 'sous_categories'],
                 'prix' => ['type' => 'money', 'label' => 'Prix', 'required' => true],
                 'stock' => ['type' => 'integer', 'label' => 'Stock', 'min' => 0, 'max_value' => 100000,
                     'help' => 'Nombre d\'exemplaires disponibles. Laissez vide pour ne pas suivre le stock (pièce toujours disponible). Il diminue à chaque commande et remonte si une commande est annulée.'],
-                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4],
+                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4, 'traduire' => true],
                 'image_path' => ['type' => 'image', 'label' => 'Photo', 'dir' => 'pieces'],
             ],
         ],
@@ -354,7 +358,7 @@ final class ResourceRegistry
      */
     public function all(): array
     {
-        return self::RESOURCES;
+        return array_map(self::avecTraductions(...), self::RESOURCES);
     }
 
     /**
@@ -363,7 +367,7 @@ final class ResourceRegistry
     public function grouped(): array
     {
         $groups = [];
-        foreach (self::RESOURCES as $key => $resource) {
+        foreach ($this->all() as $key => $resource) {
             $groups[$resource['group']][$key] = $resource;
         }
 
@@ -376,6 +380,33 @@ final class ResourceRegistry
             throw new NotFoundHttpException(sprintf('Ressource d\'administration inconnue : "%s".', $key));
         }
 
-        return self::RESOURCES[$key] + ['key' => $key];
+        return self::avecTraductions(self::RESOURCES[$key]) + ['key' => $key];
+    }
+
+    /**
+     * Ajoute après chaque champ traduisible ses versions anglaise et espagnole (facultatives).
+     */
+    private static function avecTraductions(array $resource): array
+    {
+        $fields = [];
+        foreach ($resource['fields'] as $name => $field) {
+            $fields[$name] = $field;
+            if (!($field['traduire'] ?? false)) {
+                continue;
+            }
+            foreach (Contenu::TRADUCTIONS as $langue => $nomLangue) {
+                $fields[$name . '_' . $langue] = [
+                    'type' => $field['type'],
+                    'label' => sprintf('%s (%s)', $field['label'], $nomLangue),
+                    'max' => $field['max'] ?? null,
+                    'rows' => $field['rows'] ?? null,
+                    'traduction_de' => $name,
+                    'langue' => $langue,
+                ];
+            }
+        }
+        $resource['fields'] = $fields;
+
+        return $resource;
     }
 }

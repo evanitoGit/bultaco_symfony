@@ -1,43 +1,48 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app.request.locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{% block meta_description %}Club Bultaco France : modèles, restaurations, pilotes de légende, documentation et pièces détachées.{% endblock %}">
+    <meta name="description" content="{% block meta_description %}{{ 'meta.description'|trans }}{% endblock %}">
     <title>{% block title %}Club Bultaco - Escuyer{% endblock %}</title>
+    {# Même page dans les autres langues (moteurs de recherche) #}
+    {% for code, nom in langues() %}
+        <link rel="alternate" hreflang="{{ code }}" href="{{ absolute_url(url_langue(code)) }}">
+    {% endfor %}
     <link rel="icon" type="image/png" href="{{ asset('img/logo_rond.png') }}" sizes="50x50">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
 <body class="{% block body_class %}page-default{% endblock %}" data-base-path="{{ app.request.basePath }}">
 <header class='nav'>
-    <button type='button' class='nav-toggle' aria-label='Ouvrir le menu' aria-expanded='false' aria-controls='mainNav'>
+    <button type='button' class='nav-toggle' aria-label='{{ 'nav.ouvrir_menu'|trans }}' aria-expanded='false' aria-controls='mainNav'>
         <span></span><span></span><span></span>
     </button>
     <nav class='header-nav' id='mainNav'>
         <ul>
             <li>
                 <a href="{{ path('app_home') }}">
-                    <img src="{{ asset('img/logo_bultaco.png') }}" alt='Bultaco - Accueil'>
+                    <img src="{{ asset('img/logo_bultaco.png') }}" alt='{{ 'nav.logo_accueil'|trans }}'>
                 </a>
             </li>
 
-            {% set current_route = app.request.attributes.get('_route') %}
+            {% set current_route = route_courante() %}
+            {# clés de traduction : catégorie => { lien => route } #}
             {% set menu = {
-                'Modèles': { 'Liste': 'app_modeles_liste', 'Restaurations': 'app_modeles_restaurations', 'Pilotes': 'app_modeles_pilotes' },
-                'Documentation': { 'Logos': 'app_doc_logos', 'Pressbook': 'app_doc_pressbook' },
-                'Boutique': { 'Pièces détachées': 'app_boutique_pieces' }
+                'nav.modeles': { 'nav.liste': 'app_modeles_liste', 'nav.restaurations': 'app_modeles_restaurations', 'nav.pilotes': 'app_modeles_pilotes' },
+                'nav.documentation': { 'nav.logos': 'app_doc_logos', 'nav.pressbook': 'app_doc_pressbook' },
+                'nav.boutique': { 'nav.pieces_detachees': 'app_boutique_pieces' }
             } %}
             {% for categorie, liens in menu %}
                 <li class="categorie{{ current_route in liens ? ' active' }}">
                     <span class="main-link" tabindex="0" aria-haspopup="true">
-                        {{ categorie }}
+                        {{ categorie|trans }}
                         <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </span>
                     <div class="sous-menu">
                         <ul>
                             {% for label, route in liens %}
-                                <li><a href="{{ path(route) }}"{% if current_route == route %} class="active" aria-current="page"{% endif %}>{{ label }}</a></li>
+                                <li><a href="{{ path(route) }}"{% if current_route == route %} class="active" aria-current="page"{% endif %}>{{ label|trans }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -49,8 +54,8 @@
                 {# Sans JavaScript, le bouton reste un lien vers l'espace client #}
                 <a href='{{ path(client_connecte ? 'app_compte' : 'app_compte_connexion') }}' class='compte-bouton{{ client_connecte ? ' connecte' }}'
                    role='button' aria-haspopup='menu' aria-expanded='false' aria-controls='menuCompte'
-                   aria-label='{{ client_connecte ? 'Mon compte (' ~ app.user.prenom ~ ')' : 'Mon compte' }}'
-                   title='Mon compte'>
+                   aria-label='{{ client_connecte ? 'compte.menu.mon_compte_de'|trans({ prenom: app.user.prenom }) : 'compte.menu.mon_compte'|trans }}'
+                   title='{{ 'compte.menu.mon_compte'|trans }}'>
                     <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'
                          stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                         <circle cx='12' cy='8' r='4'/><path d='M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8'/>
@@ -61,25 +66,25 @@
                     <div class='mini-panier-contenu'>
                         {% if client_connecte %}
                             <p class='menu-compte-entete'>
-                                <span>Bonjour <strong>{{ app.user.prenom }}</strong></span>
+                                <span>{{ 'compte.menu.bonjour'|trans({ prenom: '<strong>' ~ app.user.prenom|e ~ '</strong>' })|raw }}</span>
                                 <small class='menu-compte-email'>{{ app.user.email }}</small>
                             </p>
                             <ul class='menu-compte-liens' role='menu'>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte') }}'>Mes commandes</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'>Mes informations</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'>Mot de passe</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_donnees') }}'>Mes données</a></li>
-                                <li role='none' class='menu-compte-separation'><a role='menuitem' href='{{ path('app_logout') }}' class='menu-compte-deconnexion'><span aria-hidden='true'>↪</span>Se déconnecter</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte') }}'>{{ 'compte.onglet.commandes'|trans }}</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'>{{ 'compte.onglet.informations'|trans }}</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'>{{ 'compte.onglet.mot_de_passe'|trans }}</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_donnees') }}'>{{ 'compte.onglet.donnees'|trans }}</a></li>
+                                <li role='none' class='menu-compte-separation'><a role='menuitem' href='{{ path('app_logout') }}' class='menu-compte-deconnexion'><span aria-hidden='true'>↪</span>{{ 'compte.onglet.deconnexion'|trans }}</a></li>
                             </ul>
                         {% else %}
                             <p class='menu-compte-entete'>
-                                <strong>Mon compte</strong>
-                                <small>Suivez vos commandes et commandez plus vite</small>
+                                <strong>{{ 'compte.menu.mon_compte'|trans }}</strong>
+                                <small>{{ 'compte.menu.accroche'|trans }}</small>
                             </p>
-                            <a href='{{ path('app_compte_connexion') }}' class='mini-panier-lien'>Se connecter</a>
+                            <a href='{{ path('app_compte_connexion') }}' class='mini-panier-lien'>{{ 'compte.menu.se_connecter'|trans }}</a>
                             <ul class='menu-compte-liens' role='menu'>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_inscription') }}'>Créer un compte</a></li>
-                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe_oublie') }}'>>Mot de passe oublié</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_inscription') }}'>{{ 'compte.menu.creer_compte'|trans }}</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe_oublie') }}'>{{ 'compte.menu.mot_de_passe_oublie'|trans }}</a></li>
                             </ul>
                         {% endif %}
                     </div>
@@ -87,7 +92,7 @@
             </li>
 
             <li class='panier-lien'>
-                <button type='button' class='panier-bouton' aria-label='Mon panier' aria-expanded='false'
+                <button type='button' class='panier-bouton' aria-label='{{ 'panier.mon_panier'|trans }}' aria-expanded='false'
                         aria-controls='miniPanier' data-apercu-url='{{ path('app_panier_apercu') }}'>
                     <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'
                          stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
@@ -97,9 +102,24 @@
                     <span class='panier-badge' data-panier-nombre {{ panier_nombre() == 0 ? 'hidden' }}>{{ panier_nombre() }}</span>
                 </button>
 
-                <div class='mini-panier' id='miniPanier' role='dialog' aria-label='Récapitulatif du panier'>
-                    <div class='mini-panier-contenu' data-mini-panier>Chargement…</div>
+                <div class='mini-panier' id='miniPanier' role='dialog' aria-label='{{ 'panier.recapitulatif'|trans }}'>
+                    <div class='mini-panier-contenu' data-mini-panier>{{ 'commun.chargement'|trans }}</div>
                 </div>
+            </li>
+
+            {# Langues : drapeaux empilés à droite du panier (dans le menu ☰ sur mobile) #}
+            <li class='langues'>
+                <ul class='langues-liste' aria-label='{{ 'nav.langue'|trans }}'>
+                    {% for code, nom in langues() %}
+                        <li>
+                            <a href='{{ url_langue(code) }}' hreflang='{{ code }}' lang='{{ code }}' title='{{ nom }}'
+                               class='langue{{ code == app.request.locale ? ' active' }}'{% if code == app.request.locale %} aria-current='true'{% endif %}>
+                                <img src='{{ asset('img/drapeaux/' ~ code ~ '.svg') }}' alt='{{ nom }}' width='24' height='16'>
+                                <span class='langue-nom'>{{ nom }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </li>
         </ul>
     </nav>
@@ -116,20 +136,20 @@
 
     <div class='coord-content'>
         <div class='coord-bloc adresse'>
-            <h3>ADRESSE</h3>
+            <h3>{{ 'pied.adresse'|trans }}</h3>
             <p>4 Chemin du Glais-Malet</p>
             <p>51220 Merfy</p>
-            <p>France</p>
+            <p>{{ 'pied.pays'|trans }}</p>
         </div>
 
         <div class='coord-bloc contact'>
-            <h3>CONTACT</h3>
+            <h3>{{ 'pied.contact'|trans }}</h3>
             <p><a href='tel:+33675068320'>06 75 06 83 20</a></p>
             <p><a href='mailto:bultaco.club.france@gmail.com'>bultaco.club.france@gmail.com</a></p>
         </div>
 
         <div class='coord-bloc reseaux-bloc'>
-            <h3>RÉSEAUX SOCIAUX</h3>
+            <h3>{{ 'pied.reseaux'|trans }}</h3>
             <div class='reseaux-links'>
                 <a href="https://www.instagram.com/bultaco_club_france/" class='reseau-item' target='_blank' rel='noopener'>
                     <img src="{{ asset('img/sociale.png') }}" alt='Instagram'>
@@ -137,16 +157,16 @@
                 </a>
                 <a href="https://www.facebook.com/share/g/1Ak8gYsypU/" class='reseau-item' target='_blank' rel='noopener'>
                     <img src="{{ asset('img/facebook.png') }}" alt='Facebook'>
-                    <span>Groupe Bultaco Club France</span>
+                    <span>{{ 'pied.groupe_facebook'|trans }}</span>
                 </a>
             </div>
         </div>
     </div>
 
     <div class='coord-footer'>
-        <p>Passion Bultaco depuis 1958</p>
+        <p>{{ 'pied.slogan'|trans }}</p>
     </div>
-    <a href="{{ path('app_login') }}" class='logorond-link' aria-label='Espace administrateur'>
+    <a href="{{ path('app_login') }}" class='logorond-link' aria-label='{{ 'pied.espace_admin'|trans }}'>
         <img src="{{ asset('img/logo_rond.png') }}" alt='' class='logorond'>
     </a>
 </footer>
@@ -156,6 +176,17 @@
     <a href="{{ path('app_admin') }}" class='admin-shortcut'>⚙ Administration</a>
 {% endif %}
 
+{# Textes utilisés par le JavaScript #}
+<script>
+    window.I18N = {{ {
+        ouvrirMenu: 'nav.ouvrir_menu'|trans,
+        fermerMenu: 'nav.fermer_menu'|trans,
+        ajoute: 'panier.js.ajoute'|trans,
+        erreurPanier: 'panier.js.erreur_chargement'|trans,
+        aucunResultat: 'commun.aucun_resultat'|trans,
+        locale: { fr: 'fr-FR', en: 'en-GB', es: 'es-ES' }[app.request.locale] ?? 'fr-FR'
+    }|json_encode(constant('JSON_HEX_TAG'))|raw }};
+</script>
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/panier.js') }}"></script>
 <script src="{{ asset('js/compte.js') }}"></script>

@@ -4,20 +4,20 @@
 {% block body_class %}page-login page-compte{% endblock %}
 
 {% block body %}
-    {% set onglet = app.request.attributes.get('_route') %}
+    {% set onglet = route_courante() %}
 
     <div class='head'>
-        <h1>Mon compte</h1>
+        <h1>{{ 'compte.menu.mon_compte'|trans }}</h1>
     </div>
 
     <div class='container'>
         <section class='compte'>
-            <nav class='compte-onglets' aria-label='Mon compte'>
-                <a href='{{ path('app_compte') }}' class='{{ onglet in ['app_compte', 'app_compte_commande'] ? 'actif' }}'>Mes commandes</a>
-                <a href='{{ path('app_compte_informations') }}' class='{{ onglet == 'app_compte_informations' ? 'actif' }}'>Mes informations</a>
-                <a href='{{ path('app_compte_mot_de_passe') }}' class='{{ onglet == 'app_compte_mot_de_passe' ? 'actif' }}'>Mot de passe</a>
-                <a href='{{ path('app_compte_donnees') }}' class='{{ onglet == 'app_compte_donnees' ? 'actif' }}'>Mes données</a>
-                <a href='{{ path('app_logout') }}' class='compte-deconnexion'>Se déconnecter</a>
+            <nav class='compte-onglets' aria-label='{{ 'compte.menu.mon_compte'|trans }}'>
+                <a href='{{ path('app_compte') }}' class='{{ onglet in ['app_compte', 'app_compte_commande'] ? 'actif' }}'>{{ 'compte.onglet.commandes'|trans }}</a>
+                <a href='{{ path('app_compte_informations') }}' class='{{ onglet == 'app_compte_informations' ? 'actif' }}'>{{ 'compte.onglet.informations'|trans }}</a>
+                <a href='{{ path('app_compte_mot_de_passe') }}' class='{{ onglet == 'app_compte_mot_de_passe' ? 'actif' }}'>{{ 'compte.onglet.mot_de_passe'|trans }}</a>
+                <a href='{{ path('app_compte_donnees') }}' class='{{ onglet == 'app_compte_donnees' ? 'actif' }}'>{{ 'compte.onglet.donnees'|trans }}</a>
+                <a href='{{ path('app_logout') }}' class='compte-deconnexion'>{{ 'compte.onglet.deconnexion'|trans }}</a>
             </nav>
 
             {% include 'compte/_flashes.html.twig' %}
@@ -25,13 +25,12 @@
             {% if not app.user.emailVerifie %}
                 <div class='compte-verification' role='note'>
                     <p>
-                        <strong>Confirmez votre adresse e-mail.</strong>
-                        Nous avons envoyé un lien à {{ app.user.email }}. Il permet de sécuriser votre compte
-                        et d'y retrouver vos commandes passées sans compte.
+                        <strong>{{ 'compte.verification.titre'|trans }}</strong>
+                        {{ 'compte.verification.texte'|trans({ email: app.user.email }) }}
                     </p>
                     <form method='post' action='{{ path('app_compte_renvoyer_verification') }}'>
                         <input type='hidden' name='_token' value='{{ csrf_token('renvoyer_verification') }}'>
-                        <button type='submit' class='compte-bouton-secondaire'>Renvoyer l'e-mail</button>
+                        <button type='submit' class='compte-bouton-secondaire'>{{ 'compte.verification.renvoyer'|trans }}</button>
                     </form>
                 </div>
             {% endif %}

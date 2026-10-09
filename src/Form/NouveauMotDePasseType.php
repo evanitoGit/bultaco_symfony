@@ -17,8 +17,8 @@ class NouveauMotDePasseType extends AbstractType
         $builder->add('nouveau', RepeatedType::class, [
             'type' => PasswordType::class,
             'invalid_message' => 'Les deux mots de passe ne correspondent pas.',
-            'first_options' => ['label' => 'Nouveau mot de passe', 'help' => '8 caractères minimum.', 'attr' => ['autocomplete' => 'new-password', 'autofocus' => true]],
-            'second_options' => ['label' => 'Confirmer le mot de passe', 'attr' => ['autocomplete' => 'new-password']],
+            'first_options' => ['label' => 'form.nouveau_mot_de_passe', 'help' => 'form.mot_de_passe_aide', 'attr' => ['autocomplete' => 'new-password', 'autofocus' => true]],
+            'second_options' => ['label' => 'form.confirmer_mot_de_passe', 'attr' => ['autocomplete' => 'new-password']],
             'constraints' => [
                 new Assert\NotBlank(message: 'Choisissez un mot de passe.'),
                 new Assert\Length(min: 8, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.', max: 4096),

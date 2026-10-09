@@ -57,6 +57,7 @@ class ClientAuthenticator extends AbstractLoginFormAuthenticator
         $client = $token->getUser();
         if ($client instanceof Client) {
             $client->setDerniereConnexion(new \DateTimeImmutable());
+            $client->setLangue($request->getLocale());
             $this->entityManager->flush();
         }
 

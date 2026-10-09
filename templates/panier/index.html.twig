@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon panier - Club Bultaco{% endblock %}
+{% block title %}{{ 'panier.mon_panier'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
 
 {% block body_class %}page-pieces{% endblock %}
 
@@ -9,7 +9,7 @@
 
 {% block body %}
     <div class='head'>
-        <h1>Mon panier</h1>
+        <h1>{{ 'panier.mon_panier'|trans }}</h1>
     </div>
 
     <div class='container'>
@@ -19,19 +19,19 @@
             {% endfor %}
 
             {% if lignes is empty %}
-                {% include '_partials/_empty.html.twig' with { icone: '🛒', message: 'Votre panier est vide' } %}
+                {% include '_partials/_empty.html.twig' with { icone: '🛒', message: 'panier.vide'|trans } %}
                 <p class='panier-actions panier-actions--vide'>
-                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>Voir les pièces détachées</a>
+                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>{{ 'panier.voir_pieces'|trans }}</a>
                 </p>
             {% else %}
                 <table class='panier-table'>
                     <thead>
-                        <tr><th>Pièce</th><th>Prix unitaire</th><th>Quantité</th><th>Sous-total</th><th><span class='sr-only'>Retirer</span></th></tr>
+                        <tr><th>{{ 'panier.col.piece'|trans }}</th><th>{{ 'panier.col.prix_unitaire'|trans }}</th><th>{{ 'panier.col.quantite'|trans }}</th><th>{{ 'panier.col.sous_total'|trans }}</th><th><span class='sr-only'>{{ 'panier.retirer'|trans }}</span></th></tr>
                     </thead>
                     <tbody>
                         {% for ligne in lignes %}
                             <tr>
-                                <td data-label='Pièce'>
+                                <td data-label='{{ 'panier.col.piece'|trans }}'>
                                     <span class='panier-piece'>
                                         {% if ligne.image_path %}
                                             <img src='{{ asset(ligne.image_path) }}' alt='' onerror="this.replaceWith(Object.assign(document.createElement('span'), { className: 'panier-piece-img', textContent: '📦' }))">
@@ -41,41 +41,41 @@
                                         <span>
                                             {{ ligne.nom }}
                                             {% if ligne.stock is not null and ligne.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
-                                                <small class='piece-stock piece-stock--faible'>{{ ligne.stock > 1 ? 'Plus que ' ~ ligne.stock ~ ' en stock' : 'Dernier exemplaire' }}</small>
+                                                <small class='piece-stock piece-stock--faible'>{{ 'boutique.plus_que'|trans({ n: ligne.stock }) }}</small>
                                             {% endif %}
                                         </span>
                                     </span>
                                 </td>
-                                <td data-label='Prix unitaire'>{{ ligne.prix_unitaire|prix }}</td>
-                                <td data-label='Quantité'>
+                                <td data-label='{{ 'panier.col.prix_unitaire'|trans }}'>{{ ligne.prix_unitaire|prix }}</td>
+                                <td data-label='{{ 'panier.col.quantite'|trans }}'>
                                     <form method='post' action='{{ path('app_panier_quantite', { id: ligne.id }) }}'>
                                         <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
                                         <input type='number' name='quantite' value='{{ ligne.quantite }}' min='0' max='{{ ligne.stock is null ? 99 : min(99, ligne.stock) }}'
-                                               aria-label='Quantité de {{ ligne.nom }}' onchange='this.form.submit()'>
+                                               aria-label='{{ 'panier.quantite_de'|trans({ nom: ligne.nom }) }}' onchange='this.form.submit()'>
                                     </form>
                                 </td>
-                                <td data-label='Sous-total'><strong>{{ ligne.sous_total|prix }}</strong></td>
+                                <td data-label='{{ 'panier.col.sous_total'|trans }}'><strong>{{ ligne.sous_total|prix }}</strong></td>
                                 <td class='panier-col-retirer'>
                                     <form method='post' action='{{ path('app_panier_retirer', { id: ligne.id }) }}'>
                                         <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
-                                        <button type='submit' class='panier-retirer' aria-label='Retirer {{ ligne.nom }}' title='Retirer'>✕</button>
+                                        <button type='submit' class='panier-retirer' aria-label='{{ 'panier.retirer_de'|trans({ nom: ligne.nom }) }}' title='{{ 'panier.retirer'|trans }}'>✕</button>
                                     </form>
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                     <tfoot>
-                        <tr><th colspan='3'>Total</th><th colspan='2'>{{ total|prix }}</th></tr>
+                        <tr><th colspan='3'>{{ 'commun.total'|trans }}</th><th colspan='2'>{{ total|prix }}</th></tr>
                     </tfoot>
                 </table>
 
                 <div class='panier-actions'>
-                    <form method='post' action='{{ path('app_panier_vider') }}' onsubmit="return confirm('Vider le panier ?');">
+                    <form method='post' action='{{ path('app_panier_vider') }}' onsubmit='return confirm({{ 'panier.confirmer_vider'|trans|json_encode }});'>
                         <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
-                        <button type='submit' class='panier-vider'>Vider le panier</button>
+                        <button type='submit' class='panier-vider'>{{ 'panier.vider'|trans }}</button>
                     </form>
-                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>← Continuer mes achats</a>
-                    <a href='{{ path('app_commande') }}' class='btn-commander'>Passer la commande</a>
+                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ 'panier.continuer'|trans }}</a>
+                    <a href='{{ path('app_commande') }}' class='btn-commander'>{{ 'panier.passer_commande'|trans }}</a>
                 </div>
             {% endif %}
         </section>

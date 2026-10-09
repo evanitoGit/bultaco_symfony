@@ -1,31 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pressbook - Club Bultaco{% endblock %}
-{% block meta_description %}Articles de presse, magazines, photographies et illustrations consacrés à Bultaco.{% endblock %}
+{% block title %}{{ 'nav.pressbook'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ 'pressbook.meta'|trans }}{% endblock %}
 
 {% block body_class %}page-press{% endblock %}
 
 {% block body %}
     {% set type_icons = { article: '📰', magazine: '📔', photo: '📸', illustration: '✏️' } %}
-    {% set type_labels = { article: 'Articles', magazine: 'Magazines', photo: 'Photos', illustration: 'Illustrations' } %}
+    {% set type_labels = { article: 'pressbook.filtre.article'|trans, magazine: 'pressbook.filtre.magazine'|trans, photo: 'pressbook.filtre.photo'|trans, illustration: 'pressbook.filtre.illustration'|trans } %}
+    {% set type_badges = { article: 'pressbook.type.article'|trans, magazine: 'pressbook.type.magazine'|trans, photo: 'pressbook.type.photo'|trans, illustration: 'pressbook.type.illustration'|trans } %}
 
     <div class='head'>
-        <h1>Pressbook</h1>
+        <h1>{{ 'nav.pressbook'|trans }}</h1>
     </div>
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            placeholder: 'Rechercher un article, un magazine...'
+            placeholder: 'pressbook.recherche'|trans
         } %}
 
         <section class='pressbook-section'>
             {% if items is empty %}
-                {% include '_partials/_empty.html.twig' with { icone: '📰', message: 'Aucun élément pour le moment' } %}
+                {% include '_partials/_empty.html.twig' with { icone: '📰', message: 'pressbook.aucun'|trans } %}
             {% else %}
                 {% if types|length > 1 %}
-                    <div class='filtres' role='group' aria-label='Filtrer par type'>
-                        <button type='button' class='filtre active' data-type='tout' aria-pressed='true'>Tout</button>
+                    <div class='filtres' role='group' aria-label='{{ 'pressbook.filtrer'|trans }}'>
+                        <button type='button' class='filtre active' data-type='tout' aria-pressed='true'>{{ 'pressbook.tout'|trans }}</button>
                         {% for type in types %}
                             <button type='button' class='filtre' data-type='{{ type }}' aria-pressed='false'>
                                 {{ type_icons[type] ?? '' }} {{ type_labels[type] ?? type|capitalize }}
@@ -37,7 +38,7 @@
                 <div class='masonry-grid'>
                     {% for item in items %}
                         <article class='masonry-item' data-id='{{ item.id }}' data-type='{{ item.type_contenu }}' role='button' tabindex='0'
-                                 aria-label='Voir {{ item.titre }}' onclick='openItemModal({{ item.id }})'>
+                                 aria-label='{{ 'pressbook.voir'|trans({ nom: item.titre }) }}' onclick='openItemModal({{ item.id }})'>
                             <div class='masonry-media'>
                                 {% if item.image_path %}
                                     <img src='{{ asset(item.image_path) }}' alt='{{ item.titre }}' loading='lazy'>
@@ -46,7 +47,7 @@
                                 {% endif %}
                             </div>
                             <div class='masonry-caption'>
-                                <span class='type-badge'>{{ item.type_contenu|upper }}</span>
+                                <span class='type-badge'>{{ (type_badges[item.type_contenu] ?? item.type_contenu)|upper }}</span>
                                 <h3>{{ item.titre }}</h3>
                                 {% if item.date_publication or item.source %}
                                     <p class='item-meta'>{{ [item.date_publication, item.source]|filter(v => v)|join(' · ') }}</p>
@@ -67,19 +68,19 @@
     <script>
         const items = {{ items|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
-        const typeLabels = {
-            article      : 'Article de presse',
-            magazine     : 'Magazine',
-            photo        : 'Photographie',
-            illustration : 'Illustration'
-        };
+        const typeLabels = {{ {
+            article      : 'pressbook.libelle.article'|trans,
+            magazine     : 'pressbook.libelle.magazine'|trans,
+            photo        : 'pressbook.libelle.photo'|trans,
+            illustration : 'pressbook.libelle.illustration'|trans
+        }|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
         window.searchConfig = {
             data       : items,
             fields     : ['description', 'source', 'date_publication', 'type_contenu'],
             labelField : 'titre',
             metaFields : i => [typeLabels[i.type_contenu] || i.type_contenu, i.date_publication, i.source],
-            emptyText  : 'Aucun résultat trouvé',
+            emptyText  : {{ 'commun.aucun_resultat'|trans|json_encode|raw }},
             onSelect   : item => openItemModal(item.id)
         };
 
@@ -114,19 +115,19 @@
                     <div class='info-grid'>
                         ${item.date_publication ? `
                         <div class='info-item'>
-                            <span class='info-label'>Date</span>
+                            <span class='info-label'>{{ 'pressbook.date'|trans }}</span>
                             <span class='info-value'>${escapeHtml(item.date_publication)}</span>
                         </div>` : ''}
                         ${item.source ? `
                         <div class='info-item'>
-                            <span class='info-label'>Source</span>
+                            <span class='info-label'>{{ 'pressbook.source'|trans }}</span>
                             <span class='info-value'>${escapeHtml(item.source)}</span>
                         </div>` : ''}
                     </div>` : ''}
                     ${item.description ? `<div class='press-description'><p>${nl2br(item.description)}</p></div>` : ''}
                     ${item.lien_externe ? `
                     <div class='press-link'>
-                        <a href='${escapeHtml(item.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>Voir la source originale ↗</a>
+                        <a href='${escapeHtml(item.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>{{ 'commun.voir_source'|trans }}</a>
                     </div>` : ''}
                 </div>
             `);

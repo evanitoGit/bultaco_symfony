@@ -1,22 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% set email_commande = 'bultaco.club.france@gmail.com' %}
-
-{% block title %}Pièces détachées - Club Bultaco{% endblock %}
-{% block meta_description %}Catalogue de pièces détachées pour motos Bultaco : moteur, cadre, électricité...{% endblock %}
+{% block title %}{{ 'nav.pieces_detachees'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ 'boutique.meta'|trans }}{% endblock %}
 
 {% block body_class %}page-pieces{% endblock %}
 
 {% block body %}
     <div class='head'>
-        <h1>Pièces détachées</h1>
+        <h1>{{ 'nav.pieces_detachees'|trans }}</h1>
     </div>
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            sous_titre: 'Catalogue des pièces',
-            placeholder: 'Rechercher une pièce...'
+            sous_titre: 'boutique.catalogue'|trans,
+            placeholder: 'boutique.recherche'|trans
         } %}
 
         {% for message in app.flashes('panier') %}
@@ -32,7 +30,7 @@
                             <h3>
                                 <span class='arrow' aria-hidden='true'>▶</span>
                                 {{ categorie.nom }}
-                                <span class='badge'>{{ categorie.nb_pieces }} pièce{{ categorie.nb_pieces > 1 ? 's' }}</span>
+                                <span class='badge'>{{ 'boutique.nb_pieces'|trans({ n: categorie.nb_pieces }) }}</span>
                             </h3>
                         </div>
 
@@ -66,36 +64,36 @@
                                                             <p class='piece-description'>{{ piece.description }}</p>
                                                         {% endif %}
                                                         {% if rupture %}
-                                                            <p class='piece-stock piece-stock--rupture'>Rupture de stock</p>
+                                                            <p class='piece-stock piece-stock--rupture'>{{ 'boutique.rupture'|trans }}</p>
                                                         {% elseif piece.stock is not null and piece.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
-                                                            <p class='piece-stock piece-stock--faible'>Plus que {{ piece.stock }} en stock</p>
+                                                            <p class='piece-stock piece-stock--faible'>{{ 'boutique.plus_que'|trans({ n: piece.stock }) }}</p>
                                                         {% endif %}
                                                         <div class='piece-footer'>
-                                                            <span class='piece-prix'>{{ piece.prix|number_format(2, ',', ' ') }} €</span>
+                                                            <span class='piece-prix'>{{ piece.prix|euros }}</span>
                                                             <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
                                                                 <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
                                                                 {% if rupture %}
-                                                                    <button type='submit' class='btn-commander' disabled>Indisponible</button>
+                                                                    <button type='submit' class='btn-commander' disabled>{{ 'boutique.indisponible'|trans }}</button>
                                                                 {% else %}
-                                                                    <button type='submit' class='btn-commander'>Ajouter au panier</button>
+                                                                    <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
                                                                 {% endif %}
                                                             </form>
                                                         </div>
                                                     </div>
                                                 </article>
                                             {% else %}
-                                                <p class='no-pieces'>Aucune pièce disponible pour le moment</p>
+                                                <p class='no-pieces'>{{ 'boutique.aucune_piece_sous_categorie'|trans }}</p>
                                             {% endfor %}
                                         </div>
                                     </div>
                                 </div>
                             {% else %}
-                                <p class='no-pieces'>Aucune pièce dans cette catégorie pour le moment</p>
+                                <p class='no-pieces'>{{ 'boutique.aucune_piece_categorie'|trans }}</p>
                             {% endfor %}
                         </div>
                     </div>
                 {% else %}
-                    {% include '_partials/_empty.html.twig' with { icone: '📦', message: 'Aucune pièce pour le moment' } %}
+                    {% include '_partials/_empty.html.twig' with { icone: '📦', message: 'boutique.aucune_piece'|trans } %}
                 {% endfor %}
             </div>
         </section>
@@ -106,7 +104,7 @@
     {{ parent() }}
     <script>
         const pieces = {{ pieces|json_encode(constant('JSON_HEX_TAG'))|raw }};
-        const formatPrix = prix => parseFloat(prix || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        const formatPrix = prix => parseFloat(prix || 0).toLocaleString(window.I18N.locale, { style: 'currency', currency: 'EUR' });
 
         function setBloc(id, ouvert) {
             const content = document.getElementById(id);
@@ -126,7 +124,7 @@
             fields     : ['description', 'categorie', 'sous_categorie'],
             labelField : 'nom',
             metaFields : p => [`${p.categorie} › ${p.sous_categorie}`, formatPrix(p.prix)],
-            emptyText  : 'Aucune pièce trouvée',
+            emptyText  : {{ 'boutique.aucune_trouvee'|trans|json_encode|raw }},
             onSelect   : function (item) {
                 const card = document.querySelector(`.piece-card[data-id='${item.id}']`);
                 if (!card) return;

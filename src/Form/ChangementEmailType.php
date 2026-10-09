@@ -17,7 +17,7 @@ class ChangementEmailType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'label' => 'Nouvelle adresse e-mail',
+                'label' => 'form.nouvel_email',
                 'attr' => ['autocomplete' => 'email'],
                 'constraints' => [
                     new Assert\NotBlank(message: 'Indiquez votre nouvelle adresse e-mail.'),
@@ -26,7 +26,7 @@ class ChangementEmailType extends AbstractType
                 ],
             ])
             ->add('motDePasse', PasswordType::class, [
-                'label' => 'Mot de passe actuel',
+                'label' => 'form.mot_de_passe_actuel',
                 'attr' => ['autocomplete' => 'current-password'],
                 'constraints' => [
                     new Assert\NotBlank(message: 'Ce champ est obligatoire.'),

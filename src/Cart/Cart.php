@@ -3,10 +3,12 @@
 namespace App\Cart;
 
 use App\Entity\Client;
+use App\I18n\Contenu;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Panier : [id de la pièce => quantité].
@@ -30,6 +32,8 @@ final class Cart
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
         private readonly Security $security,
+        private readonly Contenu $contenu,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -120,7 +124,7 @@ final class Cart
      * Lignes détaillées, avec les prix actuels de la base.
      * Si le stock a baissé depuis l'ajout, la quantité est corrigée et le client prévenu.
      *
-     * @return list<array{id:int, nom:string, image_path:?string, quantite:int, stock:?int, prix_unitaire:int, sous_total:int}>
+     * @return list<array{id:int, nom:string, nom_fr:string, image_path:?string, quantite:int, stock:?int, prix_unitaire:int, sous_total:int}>
      */
     public function lignes(): array
     {
@@ -130,7 +134,7 @@ final class Cart
         }
 
         $pieces = $this->connection->fetchAllAssociativeIndexed(
-            'SELECT id, nom, prix, stock, image_path FROM pieces_detachees WHERE id IN (?)',
+            'SELECT id, nom, nom_en, nom_es, prix, stock, image_path FROM pieces_detachees WHERE id IN (?)',
             [array_keys($panier)],
             [ArrayParameterType::INTEGER]
         );
@@ -142,21 +146,23 @@ final class Cart
                 $this->remove($id);
                 continue;
             }
-            $stock = $pieces[$id]['stock'] === null ? null : (int) $pieces[$id]['stock'];
+            $piece = $this->contenu->traduire($pieces[$id], ['nom']);
+            $stock = $piece['stock'] === null ? null : (int) $piece['stock'];
             if ($stock !== null && $quantite > $stock) {
                 $quantite = $this->setQuantite($id, $stock);
                 $this->signaler($quantite === 0
-                    ? sprintf('« %s » n\'est plus disponible et a été retiré de votre panier.', $pieces[$id]['nom'])
-                    : sprintf('Il ne reste que %d « %s » en stock : la quantité de votre panier a été ajustée.', $stock, $pieces[$id]['nom']));
+                    ? $this->translator->trans('panier.flash.plus_disponible', ['nom' => $piece['nom']])
+                    : $this->translator->trans('panier.flash.stock_ajuste', ['nom' => $piece['nom'], 'stock' => $stock]));
                 if ($quantite === 0) {
                     continue;
                 }
             }
-            $prixUnitaire = (int) round((float) $pieces[$id]['prix'] * 100);
+            $prixUnitaire = (int) round((float) $piece['prix'] * 100);
             $lignes[] = [
                 'id' => $id,
-                'nom' => $pieces[$id]['nom'],
-                'image_path' => $pieces[$id]['image_path'],
+                'nom' => $piece['nom'],
+                'nom_fr' => $pieces[$id]['nom'], // enregistré sur la commande (lu par le club)
+                'image_path' => $piece['image_path'],
                 'quantite' => $quantite,
                 'stock' => $stock,
                 'prix_unitaire' => $prixUnitaire,

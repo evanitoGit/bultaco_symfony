@@ -63,6 +63,10 @@ class Client implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 100)]
     private ?string $pays = 'France';
 
+    /** Langue du site lors de la dernière connexion (fr, en, es) */
+    #[ORM\Column(length: 2, options: ['default' => 'fr'])]
+    private string $langue = 'fr';
+
     /** Utilisé à l'étape 2 (lien de confirmation envoyé par e-mail) */
     #[ORM\Column(name: 'email_verifie', type: Types::BOOLEAN)]
     private bool $emailVerifie = false;
@@ -203,6 +207,18 @@ class Client implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPays(?string $pays): static
     {
         $this->pays = $pays;
+
+        return $this;
+    }
+
+    public function getLangue(): string
+    {
+        return $this->langue;
+    }
+
+    public function setLangue(string $langue): static
+    {
+        $this->langue = $langue;
 
         return $this;
     }

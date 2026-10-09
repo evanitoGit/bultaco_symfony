@@ -17,20 +17,20 @@ class InscriptionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('prenom', TextType::class, ['label' => 'Prénom', 'attr' => ['autocomplete' => 'given-name']])
-            ->add('nom', TextType::class, ['label' => 'Nom', 'attr' => ['autocomplete' => 'family-name']])
-            ->add('email', EmailType::class, ['label' => 'Adresse e-mail', 'attr' => ['autocomplete' => 'email']])
+            ->add('prenom', TextType::class, ['label' => 'form.prenom', 'attr' => ['autocomplete' => 'given-name']])
+            ->add('nom', TextType::class, ['label' => 'form.nom', 'attr' => ['autocomplete' => 'family-name']])
+            ->add('email', EmailType::class, ['label' => 'form.email', 'attr' => ['autocomplete' => 'email']])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,
                 'invalid_message' => 'Les deux mots de passe ne correspondent pas.',
                 'first_options' => [
-                    'label' => 'Mot de passe',
-                    'help' => '8 caractères minimum.',
+                    'label' => 'form.mot_de_passe',
+                    'help' => 'form.mot_de_passe_aide',
                     'attr' => ['autocomplete' => 'new-password'],
                 ],
                 'second_options' => [
-                    'label' => 'Confirmer le mot de passe',
+                    'label' => 'form.confirmer_mot_de_passe',
                     'attr' => ['autocomplete' => 'new-password'],
                 ],
                 'constraints' => [

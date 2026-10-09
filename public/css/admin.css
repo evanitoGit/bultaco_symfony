@@ -619,3 +619,18 @@ a { color: inherit; }
 .admin-commande h2 { font-size: 0.75em; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
 .admin-commande-commentaire { padding: 12px 16px; border-left: 4px solid var(--sepia); background: var(--sepia-light); border-radius: 8px; }
 .admin-commande tfoot th { text-align: left; padding: 12px 16px; font-size: 1.1em; }
+
+/* --- Traductions anglais / espagnol sous un champ --- */
+.admin-traductions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px 18px;
+    margin: -8px 0 22px;
+    padding: 14px 16px;
+    border-left: 3px solid var(--sepia-light);
+    border-radius: 0 10px 10px 0;
+    background-color: #fbf7f2;
+}
+.admin-field.admin-traduction { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.admin-traduction .admin-traduction-label { font-size: 0.85em; font-weight: bold; color: var(--muted); }
+.admin-traduction .admin-field-errors { margin: 0; }

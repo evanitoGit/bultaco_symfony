@@ -1,29 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Logos - Club Bultaco{% endblock %}
-{% block meta_description %}L'évolution des logos Bultaco à travers les décennies.{% endblock %}
+{% block title %}{{ 'nav.logos'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ 'logos.meta'|trans }}{% endblock %}
 
 {% block body_class %}page-logos{% endblock %}
 
 {% block body %}
     <div class='head'>
-        <h1>Logos</h1>
+        <h1>{{ 'nav.logos'|trans }}</h1>
     </div>
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            placeholder: 'Rechercher un logo...'
+            placeholder: 'logos.recherche'|trans
         } %}
 
         <section class='pressbook-section'>
             {% if logos is empty %}
-                {% include '_partials/_empty.html.twig' with { icone: '🎨', message: 'Aucun logo pour le moment' } %}
+                {% include '_partials/_empty.html.twig' with { icone: '🎨', message: 'logos.aucun'|trans } %}
             {% else %}
                 <div class='masonry-grid logos-grid'>
                     {% for logo in logos %}
                         <article class='masonry-item logo-item' data-id='{{ logo.id }}' role='button' tabindex='0'
-                                 aria-label='Voir le logo {{ logo.titre }}' onclick='openLogoModal({{ logo.id }})'>
+                                 aria-label='{{ 'logos.voir'|trans({ nom: logo.titre }) }}' onclick='openLogoModal({{ logo.id }})'>
                             <div class='masonry-media'>
                                 {% if logo.image_path %}
                                     <img src='{{ asset(logo.image_path) }}' alt='{{ logo.titre }}' loading='lazy'>
@@ -32,7 +32,7 @@
                                 {% endif %}
                             </div>
                             <div class='masonry-caption'>
-                                <span class='type-badge'>LOGO</span>
+                                <span class='type-badge'>{{ 'logos.badge'|trans|upper }}</span>
                                 <h3>{{ logo.titre }}</h3>
                                 {% if logo.date_publication or logo.source %}
                                     <p class='item-meta'>{{ [logo.date_publication, logo.source]|filter(v => v)|join(' · ') }}</p>
@@ -58,7 +58,7 @@
             fields     : ['description', 'source', 'date_publication'],
             labelField : 'titre',
             metaFields : ['date_publication', 'source'],
-            emptyText  : 'Aucun logo trouvé',
+            emptyText  : {{ 'logos.aucun_trouve'|trans|json_encode|raw }},
             onSelect   : item => openLogoModal(item.id)
         };
 
@@ -70,7 +70,7 @@
                 <div class='press-detail'>
                     <div class='carte-header'>
                         <h2>${escapeHtml(logo.titre)}</h2>
-                        <span class='badge-modele'>Logo</span>
+                        <span class='badge-modele'>{{ 'logos.badge'|trans }}</span>
                     </div>
                     ${logo.image_path
                         ? `<img src='${escapeHtml(mediaUrl(logo.image_path))}' alt='${escapeHtml(logo.titre)}' class='press-image logo-image'>`
@@ -79,19 +79,19 @@
                     <div class='info-grid'>
                         ${logo.date_publication ? `
                         <div class='info-item'>
-                            <span class='info-label'>Période</span>
+                            <span class='info-label'>{{ 'modeles.periode'|trans }}</span>
                             <span class='info-value'>${escapeHtml(logo.date_publication)}</span>
                         </div>` : ''}
                         ${logo.source ? `
                         <div class='info-item'>
-                            <span class='info-label'>Source</span>
+                            <span class='info-label'>{{ 'pressbook.source'|trans }}</span>
                             <span class='info-value'>${escapeHtml(logo.source)}</span>
                         </div>` : ''}
                     </div>` : ''}
                     ${logo.description ? `<div class='press-description'><p>${nl2br(logo.description)}</p></div>` : ''}
                     ${logo.lien_externe ? `
                     <div class='press-link'>
-                        <a href='${escapeHtml(logo.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>Voir la source originale ↗</a>
+                        <a href='${escapeHtml(logo.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>{{ 'commun.voir_source'|trans }}</a>
                     </div>` : ''}
                 </div>
             `);

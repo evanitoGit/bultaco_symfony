@@ -84,7 +84,7 @@
         searchInput.setAttribute('aria-expanded', 'true');
 
         if (resultats.length === 0) {
-            searchResults.innerHTML = `<div class="no-results">${escapeHtml(config.emptyText || 'Aucun résultat trouvé')}</div>`;
+            searchResults.innerHTML = `<div class="no-results">${escapeHtml(config.emptyText || window.I18N?.aucunResultat || 'Aucun résultat trouvé')}</div>`;
             return;
         }
 

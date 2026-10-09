@@ -2,36 +2,41 @@
 
 namespace App\Controller;
 
-use App\Repository\TexteRepository;
+use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BoutiqueController extends AbstractController
 {
     #[Route('/boutique/pieces', name: 'app_boutique_pieces')]
-    public function pieces(TexteRepository $texteRepository, Connection $connection): Response
+    public function pieces(Contenu $contenu, Connection $connection, TranslatorInterface $translator): Response
     {
-        $texte = $texteRepository->findOneBy(['section' => 'pieces_detachees']);
-
-        $categories = $connection
+        $categories = $contenu->traduireTout($connection
             ->executeQuery('SELECT * FROM categories ORDER BY ordre ASC')
-            ->fetchAllAssociative();
+            ->fetchAllAssociative(), ['nom']);
 
-        $sousCategories = $connection
+        $sousCategories = $contenu->traduireTout($connection
             ->executeQuery('SELECT * FROM sous_categories ORDER BY ordre ASC')
-            ->fetchAllAssociative();
+            ->fetchAllAssociative(), ['nom']);
 
         $pieces = $connection
             ->executeQuery('
-                SELECT p.*, sc.nom AS sous_categorie, c.nom AS categorie
+                SELECT p.*,
+                       sc.nom AS sous_categorie, sc.nom_en AS sous_categorie_en, sc.nom_es AS sous_categorie_es,
+                       c.nom AS categorie, c.nom_en AS categorie_en, c.nom_es AS categorie_es
                 FROM pieces_detachees p
                 INNER JOIN sous_categories sc ON p.sous_categorie_id = sc.id
                 INNER JOIN categories c ON sc.categorie_id = c.id
                 ORDER BY p.nom ASC
             ')
             ->fetchAllAssociative();
+        $pieces = $contenu->traduireTout($pieces, ['nom', 'description', 'sous_categorie', 'categorie']);
+        // tri alphabétique dans la langue de la page (les noms traduits n'ont pas le même ordre)
+        $collator = new \Collator($contenu->langue());
+        usort($pieces, fn (array $a, array $b) => $collator->compare($a['nom'], $b['nom']));
 
         // Construction de l'arborescence catégorie > sous-catégorie > pièces
         $piecesParSousCategorie = [];
@@ -55,7 +60,7 @@ class BoutiqueController extends AbstractController
         unset($categorie);
 
         return $this->render('boutique/pieces.html.twig', [
-            'texte_presentation' => $texte ? $texte->getContenu() : 'Retrouvez notre catalogue de pièces détachées pour motos Bultaco.',
+            'texte_presentation' => $contenu->texte('pieces_detachees', $translator->trans('boutique.texte_defaut')),
             'categories' => $categories,
             'pieces' => $pieces,
         ]);

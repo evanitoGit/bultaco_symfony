@@ -2107,6 +2107,41 @@ body.page-login:not(.page-compte) .head h1 { margin-bottom: 0; font-size: min(4e
 
 .panier-lien { margin-left: 4px; }
 
+/* --- Langues : drapeaux empilés à droite du panier --- */
+.langues { display: flex; align-items: center; height: 100%; margin-left: 10px; }
+
+.header-nav .langues-liste {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: auto;
+    height: auto;
+}
+
+.langue {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: opacity 0.2s ease, transform 0.2s var(--ease), box-shadow 0.2s ease;
+}
+
+.langue:hover, .langue:focus-visible { opacity: 1; transform: scale(1.1); outline: none; }
+.langue.active { opacity: 1; box-shadow: 0 0 0 2px var(--sepia); }
+
+.header-nav .langue img {
+    display: block;
+    width: 20px;
+    height: 13px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.langue-nom { display: none; }
+
 /* --- Menu déroulant du compte (même style que la popup du panier) --- */
 .compte-lien { position: relative; }
 .compte-bouton[aria-expanded="true"] { color: var(--sepia); background-color: rgba(204, 175, 146, 0.15); }
@@ -2332,6 +2367,22 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
     .compte-lien { position: absolute; top: 0; right: 110px; height: var(--header-height); margin: 0; }
     .mini-panier { position: fixed; top: var(--header-height); left: 0; right: 0; width: auto; padding: 0; }
     .menu-compte .mini-panier-contenu { border-radius: 0 0 12px 12px; }
+
+    /* drapeaux : dans le menu ☰, en ligne avec le nom de la langue */
+    .langues { display: none; }
+    header.menu-open .langues {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0;
+        padding: 14px 12px 4px;
+        border-top: 1px solid rgba(204, 175, 146, 0.25);
+        animation: navIn 0.3s var(--ease) both;
+    }
+    header.menu-open .header-nav .langues-liste { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    header.menu-open .langue { gap: 6px; padding: 6px 10px; border: 1px solid rgba(204, 175, 146, 0.35); border-radius: 50px; color: var(--beige); text-decoration: none; font-weight: bold; font-size: 0.9em; }
+    header.menu-open .langue.active { border-color: var(--sepia); box-shadow: none; color: var(--sepia); }
+    header.menu-open .langue-nom { display: inline; }
 
     header, header.nav { padding: 0 4%; }
     .header-nav > ul > li:first-child { height: var(--header-height); }

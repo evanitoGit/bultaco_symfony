@@ -1,15 +1,15 @@
 <div style="font-family: Arial, sans-serif; color: #474747; max-width: 600px; margin: 0 auto;">
     {% include 'emails/_entete.html.twig' %}
     <div style="padding: 24px;">
-        <h1 style="font-size: 22px;">Confirmez votre adresse e-mail</h1>
-        <p>Bonjour {{ client.prenom }},</p>
-        <p>Pour confirmer l'adresse <strong>{{ client.email }}</strong> de votre compte Bultaco Club France, cliquez sur le bouton ci-dessous :</p>
+        <h1 style="font-size: 22px;">{{ 'email.verification.titre'|trans }}</h1>
+        <p>{{ 'email.bonjour'|trans({ prenom: client.prenom }) }}</p>
+        <p>{{ 'email.verification.texte'|trans({ email: '<strong>' ~ client.email|e ~ '</strong>' })|raw }}</p>
         <p style="text-align: center; margin: 28px 0;">
-            <a href="{{ url }}" style="display: inline-block; padding: 12px 28px; border-radius: 50px; background: #474747; color: #fff2e3; font-weight: bold; text-decoration: none;">Confirmer mon adresse</a>
+            <a href="{{ url }}" style="display: inline-block; padding: 12px 28px; border-radius: 50px; background: #474747; color: #fff2e3; font-weight: bold; text-decoration: none;">{{ 'email.verification.bouton'|trans }}</a>
         </p>
-        <p>Les commandes que vous avez passées sans compte avec cette adresse seront alors ajoutées à votre historique.</p>
-        <p style="font-size: 13px; color: #8a7a6a;">Ce lien est valable 24 heures. Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail.<br>
-            Lien direct : <a href="{{ url }}" style="color: #8a7a6a; word-break: break-all;">{{ url }}</a></p>
-        <p>À bientôt,<br>Le Bultaco Club France</p>
+        <p>{{ 'email.verification.commandes'|trans }}</p>
+        <p style="font-size: 13px; color: #8a7a6a;">{{ 'email.verification.validite'|trans }}<br>
+            {{ 'email.lien_direct'|trans }} : <a href="{{ url }}" style="color: #8a7a6a; word-break: break-all;">{{ url }}</a></p>
+        <p>{{ 'email.a_bientot'|trans }}<br>Le Bultaco Club France</p>
     </div>
 </div>
