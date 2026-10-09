@@ -42,14 +42,21 @@ class CartController extends AbstractController
             return $erreur;
         }
 
-        $nom = $connection->fetchOne('SELECT nom FROM pieces_detachees WHERE id = ?', [$id]);
-        if ($nom === false) {
+        $piece = $connection->fetchAssociative('SELECT nom, stock FROM pieces_detachees WHERE id = ?', [$id]);
+        if ($piece === false) {
             throw $this->createNotFoundException('Pièce introuvable.');
         }
 
-        $this->cart->add($id, $request->getPayload()->getInt('quantite', 1));
+        $avant = $this->cart->quantite($id);
+        $apres = $this->cart->add($id, $request->getPayload()->getInt('quantite', 1));
 
-        return $this->repondre($request, sprintf('« %s » a été ajouté au panier.', $nom), 'app_boutique_pieces');
+        $message = match (true) {
+            $apres > $avant => sprintf('« %s » a été ajouté au panier.', $piece['nom']),
+            $piece['stock'] !== null && (int) $piece['stock'] === 0 => sprintf('« %s » est en rupture de stock.', $piece['nom']),
+            default => sprintf('Il ne reste que %d « %s » en stock, déjà dans votre panier.', $apres, $piece['nom']),
+        };
+
+        return $this->repondre($request, $message, 'app_boutique_pieces', $apres > $avant);
     }
 
     #[Route('/quantite/{id}', name: 'app_panier_quantite', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -58,9 +65,12 @@ class CartController extends AbstractController
         if ($erreur = $this->jetonInvalide($request, 'app_panier')) {
             return $erreur;
         }
-        $this->cart->setQuantite($id, $request->getPayload()->getInt('quantite'));
+        $demande = $request->getPayload()->getInt('quantite');
+        $quantite = $this->cart->setQuantite($id, $demande);
 
-        return $this->repondre($request, 'Quantité mise à jour.', 'app_panier');
+        return $this->repondre($request, $demande > $quantite && $quantite > 0
+            ? sprintf('Il ne reste que %d exemplaire%s en stock : la quantité a été ajustée.', $quantite, $quantite > 1 ? 's' : '')
+            : 'Quantité mise à jour.', 'app_panier');
     }
 
     #[Route('/retirer/{id}', name: 'app_panier_retirer', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -105,11 +115,12 @@ class CartController extends AbstractController
     }
 
     /** JSON pour les appels JavaScript, sinon redirection classique. */
-    private function repondre(Request $request, string $message, string $route): Response
+    private function repondre(Request $request, string $message, string $route, bool $ajoute = true): Response
     {
         if ($request->isXmlHttpRequest()) {
             return $this->json([
                 'message' => $message,
+                'ajoute' => $ajoute,
                 'nombre' => $this->cart->count(),
                 'total' => $this->cart->total(),
             ]);

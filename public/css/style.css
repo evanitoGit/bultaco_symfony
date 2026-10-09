@@ -1895,6 +1895,14 @@ body.page-login:not(.page-compte) .head h1 { margin-bottom: 0; font-size: min(4e
     animation: fadeUp 0.3s var(--ease);
 }
 
+/* --- Stock des pièces --- */
+.piece-stock { margin: 6px 0 0; font-size: 0.85em; font-weight: bold; }
+.piece-stock--faible { color: #b26a00; }
+.piece-stock--rupture { color: #c0392b; }
+.panier-piece small.piece-stock { display: block; margin-top: 2px; }
+.piece-card--rupture .piece-media img { filter: grayscale(1); opacity: 0.6; }
+.piece-card .btn-commander:disabled { background-color: #b9b0a6; color: white; cursor: not-allowed; }
+
 /* --- Page panier --- */
 .panier { width: 100%; max-width: 1000px; padding: 40px 20px; }
 

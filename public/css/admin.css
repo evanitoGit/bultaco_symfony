@@ -413,6 +413,8 @@ a { color: inherit; }
 
 .admin-badge--ok { background-color: #e3f1e6; color: #2e7d4f; }
 .admin-badge--attente { background-color: #fff3cd; color: #8a6d1b; }
+.admin-badge--danger { background-color: #fdecea; color: #c0392b; }
+.admin-muted { color: var(--muted); font-size: 0.9em; }
 
 .admin-filter-empty, .admin-empty {
     padding: 30px;

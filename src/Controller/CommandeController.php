@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Cart\Cart;
 use App\Commande\CommandeService;
+use App\Commande\StockInsuffisantException;
 use App\Entity\Client;
 use App\Form\CommandeType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,10 @@ class CommandeController extends AbstractController
         if ($lignes === []) {
             $this->addFlash('panier', 'Votre panier est vide.');
 
+            return $this->redirectToRoute('app_panier');
+        }
+        if ($cart->ajustements() !== []) {
+            // stock en baisse depuis l'ajout : le client vérifie son panier corrigé avant de commander
             return $this->redirectToRoute('app_panier');
         }
 
@@ -44,7 +49,15 @@ class CommandeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $commande = $commandes->creer($form->getData(), $compte);
+            try {
+                $commande = $commandes->creer($form->getData(), $compte);
+            } catch (StockInsuffisantException $e) {
+                $this->addFlash('panier', $e->disponible > 0
+                    ? sprintf('Désolé, il ne reste que %d « %s » en stock : un autre client vient d\'en commander. Vérifiez votre panier avant de valider.', $e->disponible, $e->piece)
+                    : sprintf('Désolé, « %s » vient d\'être commandé par un autre client et n\'est plus disponible. Vérifiez votre panier avant de valider.', $e->piece));
+
+                return $this->redirectToRoute('app_panier');
+            }
             // seule cette session pourra afficher la page de confirmation
             $request->getSession()->set('derniere_commande', $commande['id']);
 

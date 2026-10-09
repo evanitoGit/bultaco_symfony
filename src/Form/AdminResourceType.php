@@ -53,8 +53,15 @@ class AdminResourceType extends AbstractType
                     break;
 
                 case 'integer':
+                    if (isset($field['min'])) {
+                        $constraints[] = new Assert\GreaterThanOrEqual(value: $field['min'], message: 'La valeur doit être supérieure ou égale à {{ compared_value }}.');
+                    }
+                    if (isset($field['max_value'])) {
+                        $constraints[] = new Assert\LessThanOrEqual(value: $field['max_value']);
+                    }
                     $builder->add($name, IntegerType::class, $common + [
                         'constraints' => $constraints,
+                        'attr' => array_filter(['min' => $field['min'] ?? null], fn ($v) => $v !== null),
                         'empty_data' => (string) ($field['default'] ?? ''),
                     ]);
                     break;

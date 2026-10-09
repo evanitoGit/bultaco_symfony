@@ -51,7 +51,8 @@
                                     <div class='sous-categorie-content' id='sous-cat-{{ sousCategorie.id }}' hidden>
                                         <div class='pieces-grid'>
                                             {% for piece in sousCategorie.pieces %}
-                                                <article class='piece-card' data-id='{{ piece.id }}'>
+                                                {% set rupture = piece.stock is not null and piece.stock <= 0 %}
+                                                <article class='piece-card{{ rupture ? ' piece-card--rupture' }}' data-id='{{ piece.id }}'>
                                                     <div class='piece-media'>
                                                         {% if piece.image_path %}
                                                             <img src='{{ asset(piece.image_path) }}' alt='{{ piece.nom }}' loading='lazy'>
@@ -64,11 +65,20 @@
                                                         {% if piece.description %}
                                                             <p class='piece-description'>{{ piece.description }}</p>
                                                         {% endif %}
+                                                        {% if rupture %}
+                                                            <p class='piece-stock piece-stock--rupture'>Rupture de stock</p>
+                                                        {% elseif piece.stock is not null and piece.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
+                                                            <p class='piece-stock piece-stock--faible'>Plus que {{ piece.stock }} en stock</p>
+                                                        {% endif %}
                                                         <div class='piece-footer'>
                                                             <span class='piece-prix'>{{ piece.prix|number_format(2, ',', ' ') }} €</span>
                                                             <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
                                                                 <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
-                                                                <button type='submit' class='btn-commander'>Ajouter au panier</button>
+                                                                {% if rupture %}
+                                                                    <button type='submit' class='btn-commander' disabled>Indisponible</button>
+                                                                {% else %}
+                                                                    <button type='submit' class='btn-commander'>Ajouter au panier</button>
+                                                                {% endif %}
                                                             </form>
                                                         </div>
                                                     </div>

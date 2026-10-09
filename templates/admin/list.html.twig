@@ -69,6 +69,16 @@
                                         <span class="admin-excerpt">{{ value|length > 110 ? value|slice(0, 110) ~ '…' : value }}</span>
                                     {% elseif format == 'date' %}
                                         {{ value ? value|date('d/m/Y à H:i') : '—' }}
+                                    {% elseif format == 'stock' %}
+                                        {% if value is null %}
+                                            <span class="admin-muted" title="Stock non suivi : toujours disponible">non suivi</span>
+                                        {% elseif value == 0 %}
+                                            <span class="admin-badge admin-badge--danger">Rupture</span>
+                                        {% elseif value <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
+                                            <span class="admin-badge admin-badge--attente">{{ value }} · faible</span>
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
                                     {% elseif format == 'bool' %}
                                         <span class="admin-badge {{ value ? 'admin-badge--ok' : 'admin-badge--attente' }}">{{ value ? (col.oui ?? 'Oui') : (col.non ?? 'Non') }}</span>
                                     {% elseif format == 'choice' %}

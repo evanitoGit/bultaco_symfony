@@ -58,8 +58,10 @@ document.addEventListener('submit', async function (e) {
         majBadge(data.nombre);
         afficherToast(data.message);
         if (miniPanier?.classList.contains('ouvert')) chargerApercu();
-        bouton.textContent = '✓ Ajouté';
-        setTimeout(() => { bouton.textContent = libelle; }, 1500);
+        if (data.ajoute) {
+            bouton.textContent = '✓ Ajouté';
+            setTimeout(() => { bouton.textContent = libelle; }, 1500);
+        }
     } catch {
         form.submit(); // repli : envoi normal
     } finally {

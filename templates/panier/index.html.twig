@@ -38,14 +38,19 @@
                                         {% else %}
                                             <span class='panier-piece-img' aria-hidden='true'>📦</span>
                                         {% endif %}
-                                        {{ ligne.nom }}
+                                        <span>
+                                            {{ ligne.nom }}
+                                            {% if ligne.stock is not null and ligne.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
+                                                <small class='piece-stock piece-stock--faible'>{{ ligne.stock > 1 ? 'Plus que ' ~ ligne.stock ~ ' en stock' : 'Dernier exemplaire' }}</small>
+                                            {% endif %}
+                                        </span>
                                     </span>
                                 </td>
                                 <td data-label='Prix unitaire'>{{ ligne.prix_unitaire|prix }}</td>
                                 <td data-label='Quantité'>
                                     <form method='post' action='{{ path('app_panier_quantite', { id: ligne.id }) }}'>
                                         <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
-                                        <input type='number' name='quantite' value='{{ ligne.quantite }}' min='0' max='99'
+                                        <input type='number' name='quantite' value='{{ ligne.quantite }}' min='0' max='{{ ligne.stock is null ? 99 : min(99, ligne.stock) }}'
                                                aria-label='Quantité de {{ ligne.nom }}' onchange='this.form.submit()'>
                                     </form>
                                 </td>
