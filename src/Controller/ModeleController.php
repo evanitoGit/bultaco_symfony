@@ -2,38 +2,43 @@
 
 namespace App\Controller;
 
-use App\Repository\TexteRepository;
+use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ModeleController extends AbstractController
 {
-    #[Route('/modeles/liste', name: 'app_modeles_liste')]
-    public function liste(TexteRepository $texteRepository, Connection $connection): Response
-    {
-        $texte = $texteRepository->findOneBy(['section' => 'album_photos']);
+    public function __construct(
+        private readonly Contenu $contenu,
+        private readonly Connection $connection,
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
 
+    #[Route('/modeles/liste', name: 'app_modeles_liste')]
+    public function liste(): Response
+    {
         // Pas encore d'entité pour cette table : requête SQL directe via DBAL
-        $modeles = $connection
+        $modeles = $this->connection
             ->executeQuery('SELECT * FROM modeles_emblematiques ORDER BY ordre ASC')
             ->fetchAllAssociative();
 
         return $this->render('modele/liste.html.twig', [
-            'texte_presentation' => $texte ? $texte->getContenu() : 'Découvrez notre collection de motos Bultaco emblématiques à travers des photos et fiches techniques détaillées.',
-            'modeles' => $modeles,
+            'texte_presentation' => $this->contenu->texte('album_photos', $this->translator->trans('modeles.texte_defaut')),
+            'modeles' => $this->contenu->traduireTout($modeles, ['type_moto', 'description', 'caracteristiques']),
         ]);
     }
 
     #[Route('/modeles/restaurations', name: 'app_modeles_restaurations')]
-    public function restaurations(TexteRepository $texteRepository, Connection $connection): Response
+    public function restaurations(): Response
     {
-        $texte = $texteRepository->findOneBy(['section' => 'restauration']);
-
-        $photos = $connection
+        $photos = $this->connection
             ->executeQuery('SELECT * FROM restauration_photos ORDER BY ordre ASC')
             ->fetchAllAssociative();
+        $photos = $this->contenu->traduireTout($photos, ['nom_modele']);
 
         // Répartition des photos dans les deux colonnes définies en base
         $colonnes = ['gauche' => [], 'droite' => []];
@@ -42,24 +47,22 @@ class ModeleController extends AbstractController
         }
 
         return $this->render('modele/restaurations.html.twig', [
-            'texte_presentation' => $texte ? $texte->getContenu() : 'Découvrez quelques exemples de restaurations de motos Bultaco réalisées par les membres du club.',
+            'texte_presentation' => $this->contenu->texte('restauration', $this->translator->trans('restaurations.texte_defaut')),
             'colonnes' => $colonnes,
             'photos' => $photos,
         ]);
     }
 
     #[Route('/modeles/pilotes', name: 'app_modeles_pilotes')]
-    public function pilotes(TexteRepository $texteRepository, Connection $connection): Response
+    public function pilotes(): Response
     {
-        $texte = $texteRepository->findOneBy(['section' => 'pilotes_legende']);
-
-        $pilotes = $connection
+        $pilotes = $this->connection
             ->executeQuery('SELECT * FROM pilotes_emblematiques ORDER BY ordre ASC')
             ->fetchAllAssociative();
 
         return $this->render('modele/pilotes.html.twig', [
-            'texte_presentation' => $texte ? $texte->getContenu() : "Découvrez les pilotes légendaires qui ont marqué l'histoire de Bultaco et écrit les plus belles pages du trial et du motocross.",
-            'pilotes' => $pilotes,
+            'texte_presentation' => $this->contenu->texte('pilotes_legende', $this->translator->trans('pilotes.texte_defaut')),
+            'pilotes' => $this->contenu->traduireTout($pilotes, ['nationalite', 'date_naissance', 'date_deces', 'description', 'palmares']),
         ]);
     }
 }

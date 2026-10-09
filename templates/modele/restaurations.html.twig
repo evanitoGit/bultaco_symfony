@@ -1,32 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Restaurations - Club Bultaco{% endblock %}
-{% block meta_description %}Exemples de restaurations de motos Bultaco réalisées par le club.{% endblock %}
+{% block title %}{{ 'restaurations.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ 'restaurations.meta'|trans }}{% endblock %}
 
 {% block body_class %}page-restau{% endblock %}
 
 {% block body %}
     <div class='head'>
-        <h1>Restaurations</h1>
+        <h1>{{ 'restaurations.titre'|trans }}</h1>
     </div>
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            sous_titre: 'Quelques exemples',
-            placeholder: 'Rechercher un modèle...'
+            sous_titre: 'restaurations.sous_titre'|trans,
+            placeholder: 'modeles.recherche'|trans
         } %}
 
         <section class='restau-section'>
             {% if photos is empty %}
-                {% include '_partials/_empty.html.twig' with { icone: '🔧', message: 'Aucune restauration pour le moment' } %}
+                {% include '_partials/_empty.html.twig' with { icone: '🔧', message: 'restaurations.aucune'|trans } %}
             {% else %}
                 <div class='restau-grid'>
                     {% for colonne in colonnes %}
                         <div class='colonne'>
                             {% for photo in colonne %}
                                 <figure class='album-card restau-item' data-id='{{ photo.id }}' role='button' tabindex='0'
-                                        aria-label='Agrandir la photo {{ photo.nom_modele }}' onclick='openPhotoModal({{ photo.id }})'>
+                                        aria-label='{{ 'restaurations.agrandir'|trans({ nom: photo.nom_modele }) }}' onclick='openPhotoModal({{ photo.id }})'>
                                     <div class='album-photo-wrap'>
                                         <img class='restau-photo' src='{{ asset(photo.image_path) }}' alt='{{ photo.nom_modele }}' loading='lazy'>
                                         <span class='zoom-hint' aria-hidden='true'>⤢</span>
@@ -55,7 +55,7 @@
             data       : photos,
             fields     : ['nom_modele'],
             labelField : 'nom_modele',
-            emptyText  : 'Aucun modèle trouvé',
+            emptyText  : {{ 'modeles.aucun_trouve'|trans|json_encode|raw }},
             onSelect   : item => scrollAndHighlight(document.querySelector(`.restau-item[data-id='${item.id}']`))
         };
 
@@ -67,7 +67,7 @@
                 <div class='carte-identite'>
                     <div class='carte-header'>
                         <h2>${escapeHtml(photo.nom_modele)}</h2>
-                        <span class='badge-modele'>Restauration</span>
+                        <span class='badge-modele'>{{ 'restaurations.badge'|trans }}</span>
                     </div>
                     <img src='${escapeHtml(mediaUrl(photo.image_path))}' alt='${escapeHtml(photo.nom_modele)}' class='carte-photo carte-photo--large'>
                 </div>

@@ -4,7 +4,7 @@
 
 {% block body %}
     <section class='hero'>
-        <img src="{{ asset('img/img_logo.png') }}" alt='logo'>
+        <img src="{{ asset('img/img_logo.png') }}" alt='Bultaco'>
     </section>
 
     <section class='presentation'>
@@ -13,7 +13,7 @@
         <div class='buttons'>
             <ul>
                 {% for label, routeName in quick_links %}
-                    <li><a href="{{ path(routeName) }}">{{ label }}</a></li>
+                    <li><a href="{{ path(routeName) }}">{{ label|trans }}</a></li>
                 {% endfor %}
             </ul>
         </div>

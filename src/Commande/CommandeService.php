@@ -4,6 +4,7 @@ namespace App\Commande;
 
 use App\Cart\Cart;
 use App\Entity\Client;
+use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -11,6 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Transforme le panier en commande enregistrée et prévient le client et le club.
@@ -34,6 +36,8 @@ final class CommandeService
         private readonly Cart $cart,
         private readonly MailerInterface $mailer,
         private readonly LoggerInterface $logger,
+        private readonly Contenu $contenu,
+        private readonly TranslatorInterface $translator,
         #[Autowire('%env(MAILER_FROM)%')]
         private readonly string $expediteur,
         #[Autowire('%env(CLUB_EMAIL)%')]
@@ -76,6 +80,7 @@ final class CommandeService
                 'pays' => $client['pays'],
                 'mode_paiement' => $client['mode_paiement'],
                 'commentaire' => $client['commentaire'],
+                'langue' => $this->contenu->langue(), // e-mails envoyés dans la langue du client
                 'total' => self::euros($total),
             ]);
             $id = (int) $connection->lastInsertId();
@@ -84,7 +89,7 @@ final class CommandeService
                 $connection->insert('commande_lignes', [
                     'commande_id' => $id,
                     'piece_id' => $ligne['id'],
-                    'nom_piece' => $ligne['nom'],
+                    'nom_piece' => $ligne['nom_fr'],
                     'prix_unitaire' => self::euros($ligne['prix_unitaire']),
                     'quantite' => $ligne['quantite'],
                 ]);
@@ -168,8 +173,11 @@ final class CommandeService
             return null;
         }
 
+        // nom_piece : nom en français au moment de l'achat ; nom_piece_en/_es : traductions actuelles de la pièce
         $commande['lignes'] = $this->connection->fetchAllAssociative(
-            'SELECT * FROM commande_lignes WHERE commande_id = ? ORDER BY id',
+            'SELECT l.*, p.nom_en AS nom_piece_en, p.nom_es AS nom_piece_es
+             FROM commande_lignes l LEFT JOIN pieces_detachees p ON p.id = l.piece_id
+             WHERE l.commande_id = ? ORDER BY l.id',
             [$id]
         );
 
@@ -210,14 +218,16 @@ final class CommandeService
     private function envoyerEmails(array $commande): void
     {
         $from = new Address($this->expediteur, 'Bultaco Club France');
+        $langue = $commande['langue'] ?? 'fr';
 
         try {
-            // Confirmation au client
+            // Confirmation au client, dans sa langue
             $this->mailer->send((new TemplatedEmail())
                 ->from($from)
                 ->to(new Address($commande['email'], $commande['prenom'] . ' ' . $commande['nom']))
-                ->subject('Votre commande ' . $commande['reference'])
+                ->subject($this->translator->trans('email.commande.sujet', ['reference' => $commande['reference']], null, $langue))
                 ->htmlTemplate('emails/commande_client.html.twig')
+                ->locale($langue)
                 ->context(['commande' => $commande]));
 
             // Notification au club (« Répondre » écrit directement au client)
@@ -227,6 +237,7 @@ final class CommandeService
                 ->replyTo($commande['email'])
                 ->subject(sprintf('Nouvelle commande %s (%s €)', $commande['reference'], number_format((float) $commande['total'], 2, ',', ' ')))
                 ->htmlTemplate('emails/commande_club.html.twig')
+                ->locale('fr')
                 ->context(['commande' => $commande]));
         } catch (TransportExceptionInterface $e) {
             // La commande est enregistrée même si l'e-mail échoue : on le note dans les logs

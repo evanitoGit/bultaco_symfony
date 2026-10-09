@@ -1,26 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des modèles - Club Bultaco{% endblock %}
-{% block meta_description %}Les modèles Bultaco emblématiques : photos, périodes de production, cylindrées et fiches techniques.{% endblock %}
+{% block title %}{{ 'modeles.titre_page'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ 'modeles.meta'|trans }}{% endblock %}
 
 {% block body_class %}page-album{% endblock %}
 
 {% block body %}
     <div class='head'>
-        <h1>Album Photos</h1>
+        <h1>{{ 'modeles.titre'|trans }}</h1>
     </div>
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            placeholder: 'Rechercher un modèle...'
+            placeholder: 'modeles.recherche'|trans
         } %}
 
         <section class='emblemes-section'>
             <div class='album-grid'>
                 {% for modele in modeles %}
                     <article class='album-card modele-item' data-id='{{ modele.id }}' role='button' tabindex='0'
-                             aria-label='Voir la fiche du modèle {{ modele.nom }}' onclick='openModeleModal({{ modele.id }})'>
+                             aria-label='{{ 'modeles.voir_fiche'|trans({ nom: modele.nom }) }}' onclick='openModeleModal({{ modele.id }})'>
                         <div class='album-photo-wrap'>
                             {% if modele.image_path %}
                                 <div class='album-photo' style='background-image: url("{{ asset(modele.image_path) }}")'></div>
@@ -37,7 +37,7 @@
                         </div>
                     </article>
                 {% else %}
-                    {% include '_partials/_empty.html.twig' with { icone: '🏍️', message: 'Aucun modèle pour le moment' } %}
+                    {% include '_partials/_empty.html.twig' with { icone: '🏍️', message: 'modeles.aucun'|trans } %}
                 {% endfor %}
             </div>
         </section>
@@ -56,7 +56,7 @@
             fields     : ['type_moto', 'cylindree', 'description'],
             labelField : 'nom',
             metaFields : m => [m.type_moto, (m.annee_debut || m.annee_fin) ? `${m.annee_debut || '?'} – ${m.annee_fin || '?'}` : null],
-            emptyText  : 'Aucun modèle trouvé',
+            emptyText  : {{ 'modeles.aucun_trouve'|trans|json_encode|raw }},
             onSelect   : item => openModeleModal(item.id)
         };
 
@@ -68,7 +68,7 @@
                 <div class='carte-identite'>
                     <div class='carte-header'>
                         <h2>${escapeHtml(modele.nom)}</h2>
-                        <span class='badge-modele'>Modèle</span>
+                        <span class='badge-modele'>{{ 'modeles.badge'|trans|e('html') }}</span>
                     </div>
                     ${modele.image_path
                         ? `<img src='${escapeHtml(mediaUrl(modele.image_path))}' alt='${escapeHtml(modele.nom)}' class='carte-photo'>`
@@ -76,21 +76,21 @@
                     <div class='carte-section'>
                         <div class='info-grid'>
                             <div class='info-item'>
-                                <span class='info-label'>Période</span>
+                                <span class='info-label'>{{ 'modeles.periode'|trans }}</span>
                                 <span class='info-value'>${escapeHtml(modele.annee_debut || '?')} – ${escapeHtml(modele.annee_fin || '?')}</span>
                             </div>
                             <div class='info-item'>
-                                <span class='info-label'>Cylindrée</span>
-                                <span class='info-value'>${escapeHtml(modele.cylindree || 'N/A')}</span>
+                                <span class='info-label'>{{ 'modeles.cylindree'|trans }}</span>
+                                <span class='info-value'>${escapeHtml(modele.cylindree || {{ 'commun.non_renseigne'|trans|json_encode|raw }})}</span>
                             </div>
                             <div class='info-item'>
-                                <span class='info-label'>Type</span>
-                                <span class='info-value'>${escapeHtml(modele.type_moto || 'N/A')}</span>
+                                <span class='info-label'>{{ 'modeles.type'|trans }}</span>
+                                <span class='info-value'>${escapeHtml(modele.type_moto || {{ 'commun.non_renseigne'|trans|json_encode|raw }})}</span>
                             </div>
                         </div>
                     </div>
                     ${modele.description ? `<div class='carte-section'><p class='description-text'>${nl2br(modele.description)}</p></div>` : ''}
-                    ${modele.caracteristiques ? `<div class='carte-section'><h3 class='carte-titre'>Caractéristiques</h3><div class='caracteristiques-text'>${nl2br(modele.caracteristiques)}</div></div>` : ''}
+                    ${modele.caracteristiques ? `<div class='carte-section'><h3 class='carte-titre'>{{ 'modeles.caracteristiques'|trans }}</h3><div class='caracteristiques-text'>${nl2br(modele.caracteristiques)}</div></div>` : ''}
                 </div>
             `);
         }

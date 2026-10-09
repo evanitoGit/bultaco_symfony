@@ -3,17 +3,21 @@
 namespace App\Controller;
 
 use App\Cart\Cart;
+use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/panier')]
 class CartController extends AbstractController
 {
-    public function __construct(private readonly Cart $cart)
-    {
+    public function __construct(
+        private readonly Cart $cart,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     #[Route('', name: 'app_panier', methods: ['GET'])]
@@ -36,24 +40,25 @@ class CartController extends AbstractController
     }
 
     #[Route('/ajouter/{id}', name: 'app_panier_ajouter', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function ajouter(int $id, Request $request, Connection $connection): Response
+    public function ajouter(int $id, Request $request, Connection $connection, Contenu $contenu): Response
     {
         if ($erreur = $this->jetonInvalide($request, 'app_boutique_pieces')) {
             return $erreur;
         }
 
-        $piece = $connection->fetchAssociative('SELECT nom, stock FROM pieces_detachees WHERE id = ?', [$id]);
+        $piece = $connection->fetchAssociative('SELECT nom, nom_en, nom_es, stock FROM pieces_detachees WHERE id = ?', [$id]);
         if ($piece === false) {
             throw $this->createNotFoundException('Pièce introuvable.');
         }
+        $piece = $contenu->traduire($piece, ['nom']);
 
         $avant = $this->cart->quantite($id);
         $apres = $this->cart->add($id, $request->getPayload()->getInt('quantite', 1));
 
         $message = match (true) {
-            $apres > $avant => sprintf('« %s » a été ajouté au panier.', $piece['nom']),
-            $piece['stock'] !== null && (int) $piece['stock'] === 0 => sprintf('« %s » est en rupture de stock.', $piece['nom']),
-            default => sprintf('Il ne reste que %d « %s » en stock, déjà dans votre panier.', $apres, $piece['nom']),
+            $apres > $avant => $this->translator->trans('panier.flash.ajoute', ['nom' => $piece['nom']]),
+            $piece['stock'] !== null && (int) $piece['stock'] === 0 => $this->translator->trans('panier.flash.rupture', ['nom' => $piece['nom']]),
+            default => $this->translator->trans('panier.flash.deja_tout_le_stock', ['nom' => $piece['nom'], 'stock' => $apres]),
         };
 
         return $this->repondre($request, $message, 'app_boutique_pieces', $apres > $avant);
@@ -69,8 +74,8 @@ class CartController extends AbstractController
         $quantite = $this->cart->setQuantite($id, $demande);
 
         return $this->repondre($request, $demande > $quantite && $quantite > 0
-            ? sprintf('Il ne reste que %d exemplaire%s en stock : la quantité a été ajustée.', $quantite, $quantite > 1 ? 's' : '')
-            : 'Quantité mise à jour.', 'app_panier');
+            ? $this->translator->trans('panier.flash.quantite_limitee', ['stock' => $quantite])
+            : $this->translator->trans('panier.flash.quantite_maj'), 'app_panier');
     }
 
     #[Route('/retirer/{id}', name: 'app_panier_retirer', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -81,7 +86,7 @@ class CartController extends AbstractController
         }
         $this->cart->remove($id);
 
-        return $this->repondre($request, 'Article retiré du panier.', 'app_panier');
+        return $this->repondre($request, $this->translator->trans('panier.flash.retire'), 'app_panier');
     }
 
     #[Route('/vider', name: 'app_panier_vider', methods: ['POST'])]
@@ -92,7 +97,7 @@ class CartController extends AbstractController
         }
         $this->cart->clear();
 
-        return $this->repondre($request, 'Le panier a été vidé.', 'app_panier');
+        return $this->repondre($request, $this->translator->trans('panier.flash.vide'), 'app_panier');
     }
 
     /**
@@ -104,7 +109,7 @@ class CartController extends AbstractController
             return null;
         }
 
-        $message = 'Votre session a expiré, veuillez réessayer.';
+        $message = $this->translator->trans('commun.session_expiree');
         if ($request->isXmlHttpRequest()) {
             return $this->json(['message' => $message], Response::HTTP_BAD_REQUEST);
         }

@@ -28,6 +28,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Espace client : connexion, inscription, vérification de l'e-mail, mot de passe oublié,
@@ -42,8 +43,10 @@ class CompteController extends AbstractController
     /** Jeton « mot de passe oublié » gardé en session (retiré de l'URL dès l'arrivée) */
     private const SESSION_JETON = 'reinitialisation_jeton';
 
-    public function __construct(private readonly CompteService $comptes)
-    {
+    public function __construct(
+        private readonly CompteService $comptes,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     #[Route('/connexion', name: 'app_compte_connexion')]
@@ -85,21 +88,20 @@ class CompteController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $client->setPassword($passwordHasher->hashPassword($client, $form->get('plainPassword')->getData()));
             $client->setDerniereConnexion(new \DateTimeImmutable());
+            $client->setLangue($request->getLocale());
             $entityManager->persist($client);
             $entityManager->flush();
 
             // Connexion automatique après l'inscription (le panier en session est fusionné dans le compte)
             $security->login($client, ClientAuthenticator::class, 'main');
-            $this->addFlash('compte', sprintf('Bienvenue %s, votre compte a bien été créé.', $client->getPrenom()));
+            $this->addFlash('compte', $this->t('compte.flash.bienvenue', ['prenom' => $client->getPrenom()]));
 
             if ($this->comptes->envoyerVerification($client)) {
-                $this->addFlash('compte', sprintf('Un e-mail de confirmation vient d\'être envoyé à %s.', $client->getEmail()));
+                $this->addFlash('compte', $this->t('compte.flash.verification_envoyee', ['email' => $client->getEmail()]));
             }
             $anciennes = $this->comptes->nbCommandesSansCompte($client->getEmail());
             if ($anciennes > 0) {
-                $this->addFlash('compte', $anciennes === 1
-                    ? 'Une commande passée avec cette adresse sera ajoutée à votre compte dès que vous l\'aurez confirmée.'
-                    : sprintf('%d commandes passées avec cette adresse seront ajoutées à votre compte dès que vous l\'aurez confirmée.', $anciennes));
+                $this->addFlash('compte', $this->t('compte.flash.commandes_a_rattacher', ['n' => $anciennes]));
             }
 
             return $request->query->get('retour') === 'commande'
@@ -119,17 +121,12 @@ class CompteController extends AbstractController
         $connecte = $this->getUser() instanceof Client;
 
         if ($client === null) {
-            $this->addFlash('compte_alerte', 'Ce lien de confirmation est invalide ou a expiré. '
-                . ($connecte ? 'Demandez-en un nouveau ci-dessous.' : 'Connectez-vous pour en demander un nouveau.'));
+            $this->addFlash('compte_alerte', $this->t($connecte ? 'compte.flash.lien_verification_invalide_connecte' : 'compte.flash.lien_verification_invalide'));
         } elseif ($client->isEmailVerifie()) {
-            $this->addFlash('compte', 'Votre adresse e-mail est déjà confirmée.');
+            $this->addFlash('compte', $this->t('compte.flash.deja_confirmee'));
         } else {
             $rattachees = $this->comptes->marquerVerifie($client);
-            $this->addFlash('compte', 'Merci, votre adresse e-mail est confirmée.' . match (true) {
-                $rattachees === 1 => ' Votre commande passée sans compte a été ajoutée à votre historique.',
-                $rattachees > 1 => sprintf(' Vos %d commandes passées sans compte ont été ajoutées à votre historique.', $rattachees),
-                default => '',
-            });
+            $this->addFlash('compte', $this->t('compte.flash.confirmee', ['n' => $rattachees]));
         }
 
         return $this->redirectToRoute($connecte ? 'app_compte' : 'app_compte_connexion');
@@ -142,7 +139,7 @@ class CompteController extends AbstractController
         $retour = $this->redirectToRoute('app_compte');
 
         if (!$this->isCsrfTokenValid('renvoyer_verification', $request->getPayload()->getString('_token'))) {
-            $this->addFlash('compte_alerte', 'La demande a expiré, veuillez réessayer.');
+            $this->addFlash('compte_alerte', $this->t('commun.session_expiree'));
 
             return $retour;
         }
@@ -150,14 +147,14 @@ class CompteController extends AbstractController
             return $retour;
         }
         if (!$renvoiVerificationLimiter->create('client-' . $client->getId())->consume()->isAccepted()) {
-            $this->addFlash('compte_alerte', 'Trop de demandes : patientez un peu avant de redemander un e-mail.');
+            $this->addFlash('compte_alerte', $this->t('compte.flash.trop_de_renvois'));
 
             return $retour;
         }
 
         $this->comptes->envoyerVerification($client)
-            ? $this->addFlash('compte', sprintf('Un nouvel e-mail de confirmation a été envoyé à %s.', $client->getEmail()))
-            : $this->addFlash('compte_alerte', 'L\'e-mail n\'a pas pu être envoyé, réessayez plus tard.');
+            ? $this->addFlash('compte', $this->t('compte.flash.verification_renvoyee', ['email' => $client->getEmail()]))
+            : $this->addFlash('compte_alerte', $this->t('compte.flash.envoi_impossible'));
 
         return $retour;
     }
@@ -172,11 +169,11 @@ class CompteController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$motDePasseOublieLimiter->create($request->getClientIp())->consume()->isAccepted()) {
-                $form->addError(new FormError('Trop de demandes depuis votre connexion : réessayez dans une heure.'));
+                $form->addError(new FormError($this->t('compte.flash.trop_de_demandes')));
             } else {
                 $reinitialisation->demander($form->get('email')->getData());
                 // Même message que l'adresse soit connue ou non
-                $this->addFlash('compte', 'Si un compte existe avec cette adresse, vous allez recevoir un e-mail avec un lien pour choisir un nouveau mot de passe (valable 1 heure).');
+                $this->addFlash('compte', $this->t('compte.flash.lien_reinitialisation_envoye'));
 
                 return $this->redirectToRoute('app_compte_connexion');
             }
@@ -204,7 +201,7 @@ class CompteController extends AbstractController
         $client = $reinitialisation->clientDuJeton($session->get(self::SESSION_JETON));
         if ($client === null) {
             $session->remove(self::SESSION_JETON);
-            $this->addFlash('compte_alerte', 'Ce lien de réinitialisation est invalide ou a expiré. Faites une nouvelle demande.');
+            $this->addFlash('compte_alerte', $this->t('compte.flash.lien_reinitialisation_invalide'));
 
             return $this->redirectToRoute('app_compte_mot_de_passe_oublie');
         }
@@ -221,7 +218,7 @@ class CompteController extends AbstractController
             $reinitialisation->terminer($client);
             $session->remove(self::SESSION_JETON);
 
-            $this->addFlash('compte', 'Votre mot de passe a été modifié, vous pouvez vous connecter.');
+            $this->addFlash('compte', $this->t('compte.flash.mot_de_passe_reinitialise'));
 
             return $this->redirectToRoute('app_compte_connexion');
         }
@@ -239,7 +236,6 @@ class CompteController extends AbstractController
         return $this->render('compte/index.html.twig', [
             'client' => $client,
             'commandes' => $commandes->commandesDuClient($client->getId()),
-            'statuts' => CommandeService::libellesStatuts(),
             // commandes en attente de rattachement (adresse pas encore confirmée)
             'sans_compte' => $client->isEmailVerifie() ? 0 : $this->comptes->nbCommandesSansCompte($client->getEmail()),
         ]);
@@ -256,7 +252,6 @@ class CompteController extends AbstractController
 
         return $this->render('compte/commande.html.twig', [
             'commande' => $commande,
-            'statuts' => CommandeService::libellesStatuts(),
         ]);
     }
 
@@ -270,7 +265,7 @@ class CompteController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-            $this->addFlash('compte', 'Vos informations ont été enregistrées.');
+            $this->addFlash('compte', $this->t('compte.flash.informations_enregistrees'));
 
             return $this->redirectToRoute('app_compte_informations');
         }
@@ -287,15 +282,15 @@ class CompteController extends AbstractController
             $email = mb_strtolower(trim($formEmail->get('email')->getData()));
 
             if ($email === $client->getEmail()) {
-                $formEmail->get('email')->addError(new FormError('C\'est déjà l\'adresse de votre compte.'));
+                $formEmail->get('email')->addError(new FormError($this->t('compte.flash.meme_adresse')));
             } elseif ($clients->findOneBy(['email' => $email]) !== null) {
-                $formEmail->get('email')->addError(new FormError('Cette adresse est déjà utilisée par un autre compte.'));
+                $formEmail->get('email')->addError(new FormError($this->t('compte.flash.adresse_utilisee')));
             } else {
                 $client->setEmail($email);
                 $client->setEmailVerifie(false);
                 $entityManager->flush();
                 $this->comptes->envoyerVerification($client);
-                $this->addFlash('compte', sprintf('Votre adresse e-mail est maintenant %s. Cliquez sur le lien que nous venons de vous envoyer pour la confirmer.', $email));
+                $this->addFlash('compte', $this->t('compte.flash.email_change', ['email' => $email]));
 
                 return $this->redirectToRoute('app_compte_informations');
             }
@@ -324,7 +319,7 @@ class CompteController extends AbstractController
             $entityManager->flush();
             // un éventuel lien « mot de passe oublié » encore valide ne sert plus
             $reinitialisation->terminer($client);
-            $this->addFlash('compte', 'Votre mot de passe a été modifié.');
+            $this->addFlash('compte', $this->t('compte.flash.mot_de_passe_modifie'));
 
             return $this->redirectToRoute('app_compte');
         }
@@ -345,7 +340,7 @@ class CompteController extends AbstractController
             $this->comptes->supprimer($client);
             // déconnexion (session invalidée, cookie « rester connecté » effacé)
             $security->logout(false);
-            $this->addFlash('compte', 'Votre compte a été supprimé. Vos commandes restent consultables par le club pour la comptabilité. À bientôt !');
+            $this->addFlash('compte', $this->t('compte.flash.compte_supprime'));
 
             return $this->redirectToRoute('app_compte_connexion');
         }
@@ -362,6 +357,11 @@ class CompteController extends AbstractController
         $response->headers->set('Cache-Control', 'no-store, private');
 
         return $response;
+    }
+
+    private function t(string $cle, array $parametres = []): string
+    {
+        return $this->translator->trans($cle, $parametres);
     }
 
     private function client(): Client

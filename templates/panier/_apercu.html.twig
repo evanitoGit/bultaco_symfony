@@ -1,6 +1,6 @@
 {% if lignes is empty %}
-    <p class='mini-panier-vide'>Votre panier est vide.</p>
-    <a href='{{ path('app_boutique_pieces') }}' class='mini-panier-lien'>Voir les pièces détachées</a>
+    <p class='mini-panier-vide'>{{ 'panier.vide_point'|trans }}</p>
+    <a href='{{ path('app_boutique_pieces') }}' class='mini-panier-lien'>{{ 'panier.voir_pieces'|trans }}</a>
 {% else %}
     <ul class='mini-panier-lignes'>
         {% for ligne in lignes|slice(0, 4) %}
@@ -20,9 +20,9 @@
     </ul>
 
     {% if lignes|length > 4 %}
-        <p class='mini-panier-plus'>+ {{ lignes|length - 4 }} autre{{ lignes|length - 4 > 1 ? 's' }} article{{ lignes|length - 4 > 1 ? 's' }}</p>
+        <p class='mini-panier-plus'>{{ 'panier.autres_articles'|trans({ n: lignes|length - 4 }) }}</p>
     {% endif %}
 
-    <p class='mini-panier-total'><span>Total</span><strong>{{ total|prix }}</strong></p>
-    <a href='{{ path('app_panier') }}' class='mini-panier-lien'>Voir mon panier</a>
+    <p class='mini-panier-total'><span>{{ 'commun.total'|trans }}</span><strong>{{ total|prix }}</strong></p>
+    <a href='{{ path('app_panier') }}' class='mini-panier-lien'>{{ 'panier.voir_mon_panier'|trans }}</a>
 {% endif %}

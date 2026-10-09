@@ -85,7 +85,7 @@ function scrollAndHighlight(element) {
     const setMenu = ouvert => {
         header.classList.toggle('menu-open', ouvert);
         toggle.setAttribute('aria-expanded', ouvert);
-        toggle.setAttribute('aria-label', ouvert ? 'Fermer le menu' : 'Ouvrir le menu');
+        toggle.setAttribute('aria-label', ouvert ? (window.I18N?.fermerMenu ?? 'Fermer le menu') : (window.I18N?.ouvrirMenu ?? 'Ouvrir le menu'));
     };
 
     toggle.addEventListener('click', () => setMenu(!header.classList.contains('menu-open')));

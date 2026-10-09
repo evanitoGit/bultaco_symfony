@@ -9,7 +9,7 @@ async function chargerApercu() {
         if (!reponse.ok) throw new Error(reponse.status);
         miniPanierContenu.innerHTML = await reponse.text(); // HTML généré (et échappé) par Twig
     } catch {
-        miniPanierContenu.innerHTML = '<p class="mini-panier-vide">Impossible de charger le panier.</p>';
+        miniPanierContenu.innerHTML = `<p class="mini-panier-vide">${escapeHtml(window.I18N?.erreurPanier ?? 'Impossible de charger le panier.')}</p>`;
     }
 }
 
@@ -59,7 +59,7 @@ document.addEventListener('submit', async function (e) {
         afficherToast(data.message);
         if (miniPanier?.classList.contains('ouvert')) chargerApercu();
         if (data.ajoute) {
-            bouton.textContent = '✓ Ajouté';
+            bouton.textContent = window.I18N?.ajoute ?? '✓ Ajouté';
             setTimeout(() => { bouton.textContent = libelle; }, 1500);
         }
     } catch {

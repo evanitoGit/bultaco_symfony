@@ -21,36 +21,37 @@ class CommandeType extends AbstractType
         $obligatoire = fn (int $max) => [new Assert\NotBlank(message: 'Ce champ est obligatoire.'), new Assert\Length(max: $max)];
 
         $builder
-            ->add('prenom', TextType::class, ['label' => 'Prénom', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'given-name']])
-            ->add('nom', TextType::class, ['label' => 'Nom', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'family-name']])
+            ->add('prenom', TextType::class, ['label' => 'form.prenom', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'given-name']])
+            ->add('nom', TextType::class, ['label' => 'form.nom', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'family-name']])
             ->add('email', EmailType::class, [
-                'label' => 'Adresse e-mail',
+                'label' => 'form.email',
                 'constraints' => [...$obligatoire(180), new Assert\Email(message: 'Cette adresse e-mail n\'est pas valide.')],
                 'attr' => ['autocomplete' => 'email'],
             ])
             ->add('telephone', TelType::class, [
-                'label' => 'Téléphone',
+                'label' => 'form.telephone',
                 'required' => false,
                 'constraints' => [new Assert\Length(max: 30)],
                 'attr' => ['autocomplete' => 'tel'],
             ])
-            ->add('adresse', TextType::class, ['label' => 'Adresse', 'constraints' => $obligatoire(255), 'attr' => ['autocomplete' => 'street-address']])
-            ->add('code_postal', TextType::class, ['label' => 'Code postal', 'constraints' => $obligatoire(10), 'attr' => ['autocomplete' => 'postal-code']])
-            ->add('ville', TextType::class, ['label' => 'Ville', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'address-level2']])
-            ->add('pays', TextType::class, ['label' => 'Pays', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'country-name']])
+            ->add('adresse', TextType::class, ['label' => 'form.adresse', 'constraints' => $obligatoire(255), 'attr' => ['autocomplete' => 'street-address']])
+            ->add('code_postal', TextType::class, ['label' => 'form.code_postal', 'constraints' => $obligatoire(10), 'attr' => ['autocomplete' => 'postal-code']])
+            ->add('ville', TextType::class, ['label' => 'form.ville', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'address-level2']])
+            ->add('pays', TextType::class, ['label' => 'form.pays', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'country-name']])
             ->add('mode_paiement', ChoiceType::class, [
-                'label' => 'Mode de paiement',
+                'label' => 'form.mode_paiement',
                 'choices' => CommandeService::PAIEMENTS,
+                'choice_label' => fn (string $mode) => 'commande.mode.' . $mode,
                 'expanded' => true,
                 'constraints' => [new Assert\NotBlank(message: 'Choisissez un mode de paiement.')],
             ])
             ->add('commentaire', TextareaType::class, [
-                'label' => 'Commentaire (facultatif)',
+                'label' => 'form.commentaire',
                 'required' => false,
-                'attr' => ['rows' => 3, 'placeholder' => 'Précision sur la livraison, référence de votre moto…'],
+                'attr' => ['rows' => 3, 'placeholder' => 'form.commentaire_aide'],
             ])
             ->add('accord', CheckboxType::class, [
-                'label' => 'J\'ai vérifié ma commande et j\'accepte d\'être contacté par le club pour la finaliser.',
+                'label' => 'form.accord',
                 'mapped' => false,
                 'row_attr' => ['class' => 'commande-accord'],
                 'constraints' => [new Assert\IsTrue(message: 'Cette case doit être cochée pour valider la commande.')],

@@ -1,16 +1,17 @@
+{# Partagé par l'e-mail au client (dans sa langue) et l'e-mail au club (en français) #}
 <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 20px 0;">
     <tr style="background: #474747; color: #FFF2E3;">
-        <th align="left">Pièce</th><th align="center">Qté</th><th align="right">Sous-total</th>
+        <th align="left">{{ 'panier.col.piece'|trans }}</th><th align="center">{{ 'email.qte'|trans }}</th><th align="right">{{ 'panier.col.sous_total'|trans }}</th>
     </tr>
     {% for ligne in commande.lignes %}
         <tr style="border-bottom: 1px solid #eee;">
-            <td>{{ ligne.nom_piece }}<br><small style="color: #888;">{{ ligne.prix_unitaire|number_format(2, ',', ' ') }} € l'unité</small></td>
+            <td>{{ ligne|traduit('nom_piece') }}<br><small style="color: #888;">{{ 'email.prix_unite'|trans({ prix: ligne.prix_unitaire|euros }) }}</small></td>
             <td align="center">{{ ligne.quantite }}</td>
-            <td align="right">{{ (ligne.prix_unitaire * ligne.quantite)|number_format(2, ',', ' ') }} €</td>
+            <td align="right">{{ (ligne.prix_unitaire * ligne.quantite)|euros }}</td>
         </tr>
     {% endfor %}
     <tr>
-        <td colspan="2" align="right"><strong>Total</strong></td>
-        <td align="right"><strong>{{ commande.total|number_format(2, ',', ' ') }} €</strong></td>
+        <td colspan="2" align="right"><strong>{{ 'commun.total'|trans }}</strong></td>
+        <td align="right"><strong>{{ commande.total|euros }}</strong></td>
     </tr>
 </table>

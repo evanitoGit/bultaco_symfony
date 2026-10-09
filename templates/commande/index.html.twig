@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Commande - Club Bultaco{% endblock %}
+{% block title %}{{ 'commande.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
 {% block body_class %}page-pieces{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block body %}
-    <div class='head'><h1>Commande</h1></div>
+    <div class='head'><h1>{{ 'commande.titre'|trans }}</h1></div>
 
     <div class='container'>
         <section class='commande'>
@@ -14,18 +14,19 @@
                     <div class='commande-bloc'>
                         {% if compte %}
                             <p class='commande-compte'>
-                                Connecté avec <strong>{{ compte.email }}</strong> : la commande sera ajoutée à
-                                <a href='{{ path('app_compte') }}'>votre compte</a>.
+                                {{ 'commande.connecte'|trans({ email: '<strong>' ~ compte.email|e ~ '</strong>', lien: '<a href="' ~ path('app_compte') ~ '">', fin: '</a>' })|raw }}
                             </p>
                         {% else %}
                             <p class='commande-compte'>
-                                Vous avez un compte ? <a href='{{ path('app_compte_connexion', { retour: 'commande' }) }}'>Connectez-vous</a>
-                                pour retrouver vos informations — ou <a href='{{ path('app_compte_inscription', { retour: 'commande' }) }}'>créez un compte</a>.
-                                Vous pouvez aussi commander sans compte.
+                                {{ 'commande.invite'|trans({
+                                    connexion: '<a href="' ~ path('app_compte_connexion', { retour: 'commande' }) ~ '">',
+                                    inscription: '<a href="' ~ path('app_compte_inscription', { retour: 'commande' }) ~ '">',
+                                    fin: '</a>'
+                                })|raw }}
                             </p>
                         {% endif %}
 
-                        <h2 class='commande-titre'>Vos coordonnées</h2>
+                        <h2 class='commande-titre'>{{ 'commande.coordonnees'|trans }}</h2>
                         <div class='commande-grille'>
                             {{ form_row(form.prenom) }}
                             {{ form_row(form.nom) }}
@@ -33,7 +34,7 @@
                             {{ form_row(form.telephone) }}
                         </div>
 
-                        <h2 class='commande-titre'>Adresse de livraison</h2>
+                        <h2 class='commande-titre'>{{ 'commande.adresse_livraison'|trans }}</h2>
                         {{ form_row(form.adresse) }}
                         <div class='commande-grille commande-grille--3'>
                             {{ form_row(form.code_postal) }}
@@ -41,16 +42,16 @@
                             {{ form_row(form.pays) }}
                         </div>
 
-                        <h2 class='commande-titre'>Paiement</h2>
+                        <h2 class='commande-titre'>{{ 'commande.paiement'|trans }}</h2>
                         {{ form_row(form.mode_paiement) }}
-                        <p class='commande-aide'>Aucun paiement n'est demandé en ligne : vous recevrez par e-mail les instructions pour régler votre commande.</p>
+                        <p class='commande-aide'>{{ 'commande.aide_paiement'|trans }}</p>
 
                         {{ form_row(form.commentaire) }}
                         {{ form_row(form.accord) }}
                     </div>
 
                     <aside class='commande-recap'>
-                        <h2 class='commande-titre'>Votre commande</h2>
+                        <h2 class='commande-titre'>{{ 'commande.votre_commande'|trans }}</h2>
                         <ul class='commande-lignes'>
                             {% for ligne in lignes %}
                                 <li>
@@ -59,9 +60,9 @@
                                 </li>
                             {% endfor %}
                         </ul>
-                        <p class='commande-total'><span>Total</span><strong>{{ total|prix }}</strong></p>
-                        <button type='submit' class='btn-commander'>Valider la commande</button>
-                        <a href='{{ path('app_panier') }}' class='panier-continuer'>← Modifier mon panier</a>
+                        <p class='commande-total'><span>{{ 'commun.total'|trans }}</span><strong>{{ total|prix }}</strong></p>
+                        <button type='submit' class='btn-commander'>{{ 'commande.valider'|trans }}</button>
+                        <a href='{{ path('app_panier') }}' class='panier-continuer'>{{ 'commande.modifier_panier'|trans }}</a>
                     </aside>
                 </div>
             {{ form_end(form) }}

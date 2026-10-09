@@ -16,7 +16,7 @@ class SuppressionCompteType extends AbstractType
     {
         $builder
             ->add('motDePasse', PasswordType::class, [
-                'label' => 'Mot de passe',
+                'label' => 'form.mot_de_passe',
                 'attr' => ['autocomplete' => 'current-password'],
                 'constraints' => [
                     new Assert\NotBlank(message: 'Ce champ est obligatoire.'),
@@ -24,7 +24,7 @@ class SuppressionCompteType extends AbstractType
                 ],
             ])
             ->add('confirmation', CheckboxType::class, [
-                'label' => 'Je comprends que la suppression est définitive.',
+                'label' => 'form.suppression_confirmation',
                 'row_attr' => ['class' => 'commande-accord'],
                 'constraints' => [new Assert\IsTrue(message: 'Cochez cette case pour confirmer.')],
             ]);

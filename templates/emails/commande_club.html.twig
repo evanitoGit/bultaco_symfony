@@ -6,6 +6,9 @@
         {{ commande.adresse }}, {{ commande.code_postal }} {{ commande.ville }} ({{ commande.pays }})
     </p>
     <p>Paiement choisi : <strong>{{ commande.mode_paiement == 'virement' ? 'virement bancaire' : 'chèque' }}</strong></p>
+    {% if (commande.langue ?? 'fr') != 'fr' %}
+        <p>Langue du client : <strong>{{ langues()[commande.langue] ?? commande.langue }}</strong> (il a reçu sa confirmation dans cette langue).</p>
+    {% endif %}
     {% if commande.commentaire %}
         <p style="background: #FFF2E3; padding: 12px;"><em>« {{ commande.commentaire|nl2br }} »</em></p>
     {% endif %}

@@ -1,44 +1,43 @@
 {% extends 'compte/_layout.html.twig' %}
 
-{% block title %}Mes commandes - Club Bultaco{% endblock %}
+{% block title %}{{ 'compte.onglet.commandes'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
 
 {% block contenu %}
     <div class='compte-bloc'>
-        <h2 class='compte-titre'>Bonjour {{ client.prenom }} 👋</h2>
+        <h2 class='compte-titre'>{{ 'compte.menu.bonjour'|trans({ prenom: client.prenom }) }} 👋</h2>
         <p class='compte-intro'>
-            Connecté avec <strong>{{ client.email }}</strong> — client depuis le {{ client.dateCreation|date('d/m/Y') }}.
+            {{ 'compte.index.connecte'|trans({ email: '<strong>' ~ client.email|e ~ '</strong>', date: client.dateCreation|date('d/m/Y') })|raw }}
             {% if not client.hasAdresse %}
-                <br><a href='{{ path('app_compte_informations') }}'>Ajoutez votre adresse</a> pour commander plus vite.
+                <br>{{ 'compte.index.ajouter_adresse'|trans({ lien: '<a href="' ~ path('app_compte_informations') ~ '">', fin: '</a>' })|raw }}
             {% endif %}
             {% if sans_compte > 0 %}
-                <br>{{ sans_compte > 1 ? sans_compte ~ ' commandes passées' : 'Une commande passée' }} sans compte avec cette adresse
-                {{ sans_compte > 1 ? 'apparaîtront' : 'apparaîtra' }} ici dès que vous l'aurez confirmée.
+                <br>{{ 'compte.index.sans_compte'|trans({ n: sans_compte }) }}
             {% endif %}
         </p>
     </div>
 
     <div class='compte-bloc'>
-        <h2 class='compte-titre'>Mes commandes</h2>
+        <h2 class='compte-titre'>{{ 'compte.onglet.commandes'|trans }}</h2>
 
         {% if commandes is empty %}
-            {% include '_partials/_empty.html.twig' with { icone: '🧾', message: 'Vous n\'avez pas encore passé de commande' } %}
+            {% include '_partials/_empty.html.twig' with { icone: '🧾', message: 'compte.index.aucune_commande'|trans } %}
             <p class='panier-actions panier-actions--vide'>
-                <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>Voir les pièces détachées</a>
+                <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>{{ 'panier.voir_pieces'|trans }}</a>
             </p>
         {% else %}
             <table class='panier-table compte-commandes'>
                 <thead>
-                    <tr><th>Référence</th><th>Date</th><th>Articles</th><th>Total</th><th>Statut</th><th><span class='sr-only'>Détail</span></th></tr>
+                    <tr><th>{{ 'compte.index.col.reference'|trans }}</th><th>{{ 'compte.index.col.date'|trans }}</th><th>{{ 'compte.index.col.articles'|trans }}</th><th>{{ 'commun.total'|trans }}</th><th>{{ 'compte.index.col.statut'|trans }}</th><th><span class='sr-only'>{{ 'compte.index.col.detail'|trans }}</span></th></tr>
                 </thead>
                 <tbody>
                     {% for commande in commandes %}
                         <tr>
-                            <td data-label='Référence'><strong>{{ commande.reference }}</strong></td>
-                            <td data-label='Date'>{{ commande.date_commande|date('d/m/Y') }}</td>
-                            <td data-label='Articles'>{{ commande.nb_articles }}</td>
-                            <td data-label='Total'><strong>{{ commande.total|number_format(2, ',', ' ') }} €</strong></td>
-                            <td data-label='Statut'><span class='statut statut--{{ commande.statut }}'>{{ statuts[commande.statut] ?? commande.statut }}</span></td>
-                            <td class='compte-col-detail'><a href='{{ path('app_compte_commande', { reference: commande.reference }) }}'>Voir le détail →</a></td>
+                            <td data-label='{{ 'compte.index.col.reference'|trans }}'><strong>{{ commande.reference }}</strong></td>
+                            <td data-label='{{ 'compte.index.col.date'|trans }}'>{{ commande.date_commande|date('d/m/Y') }}</td>
+                            <td data-label='{{ 'compte.index.col.articles'|trans }}'>{{ commande.nb_articles }}</td>
+                            <td data-label='{{ 'commun.total'|trans }}'><strong>{{ commande.total|euros }}</strong></td>
+                            <td data-label='{{ 'compte.index.col.statut'|trans }}'><span class='statut statut--{{ commande.statut }}'>{{ ('commande.statut.' ~ commande.statut)|trans }}</span></td>
+                            <td class='compte-col-detail'><a href='{{ path('app_compte_commande', { reference: commande.reference }) }}'>{{ 'compte.index.voir_detail'|trans }}</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

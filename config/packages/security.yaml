@@ -57,8 +57,9 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/compte/(connexion|inscription|verifier-email|mot-de-passe-oublie|reinitialiser), roles: PUBLIC_ACCESS }
-        - { path: ^/compte, roles: ROLE_CLIENT }
+        # (en|es)/ : mêmes pages dans les autres langues
+        - { path: ^/((en|es)/)?compte/(connexion|inscription|verifier-email|mot-de-passe-oublie|reinitialiser), roles: PUBLIC_ACCESS }
+        - { path: ^/((en|es)/)?compte, roles: ROLE_CLIENT }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

@@ -35,7 +35,8 @@
 
         <div class="admin-form-card">
             {% for name, field in resource.fields %}
-                {% if form[name] is defined %}
+                {# les traductions sont affichées sous le champ français #}
+                {% if form[name] is defined and field.traduction_de is not defined %}
                     {% if field.type == 'image' %}
                         <div class="admin-image-field">
                             <div class="admin-image-preview" id="preview_{{ name }}">
@@ -52,6 +53,19 @@
                         </div>
                     {% else %}
                         {{ form_row(form[name]) }}
+                    {% endif %}
+                    {% if field.traduire ?? false %}
+                        <div class="admin-traductions">
+                            {% for langue, nom_langue in constant('App\\I18n\\Contenu::TRADUCTIONS') %}
+                                {% if form[name ~ '_' ~ langue] is defined %}
+                                    <div class="admin-field admin-traduction">
+                                        {{ form_label(form[name ~ '_' ~ langue], null, { label_attr: { class: 'admin-traduction-label' } }) }}
+                                        {{ form_widget(form[name ~ '_' ~ langue], { attr: { placeholder: 'Vide : le texte français sera affiché', lang: langue } }) }}
+                                        {{ form_errors(form[name ~ '_' ~ langue]) }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     {% endif %}
                 {% endif %}
             {% endfor %}

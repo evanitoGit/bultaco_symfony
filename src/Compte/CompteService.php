@@ -3,6 +3,7 @@
 namespace App\Compte;
 
 use App\Entity\Client;
+use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -14,6 +15,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Vérification de l'adresse e-mail, rattachement des commandes passées sans compte,
@@ -28,6 +30,8 @@ final class CompteService
         private readonly UriSigner $uriSigner,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly LoggerInterface $logger,
+        private readonly Contenu $contenu,
+        private readonly TranslatorInterface $translator,
         #[Autowire('%env(MAILER_FROM)%')]
         private readonly string $expediteur,
     ) {
@@ -46,7 +50,7 @@ final class CompteService
             'empreinte' => self::empreinte($client->getEmail()),
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        return $this->envoyer($client, 'Confirmez votre adresse e-mail', 'emails/compte_verification.html.twig', [
+        return $this->envoyer($client, 'email.verification.sujet', 'emails/compte_verification.html.twig', [
             'url' => $this->uriSigner->sign($url, new \DateTimeImmutable('+24 hours')),
         ]);
     }
@@ -142,6 +146,7 @@ final class CompteService
                 'code_postal' => $client->getCodePostal(),
                 'ville' => $client->getVille(),
                 'pays' => $client->getPays(),
+                'langue' => $client->getLangue(),
                 'date_creation' => $client->getDateCreation()->format(\DATE_ATOM),
                 'derniere_connexion' => $client->getDerniereConnexion()?->format(\DATE_ATOM),
             ],
@@ -167,14 +172,22 @@ final class CompteService
 
     // ---------- E-mails ----------
 
+    /**
+     * E-mail au client, dans la langue de la page qui l'a déclenché.
+     *
+     * @param string $sujet clé de traduction du sujet
+     */
     public function envoyer(Client $client, string $sujet, string $template, array $contexte = []): bool
     {
+        $langue = $this->contenu->langue();
+
         try {
             $this->mailer->send((new TemplatedEmail())
                 ->from(new Address($this->expediteur, 'Bultaco Club France'))
                 ->to(new Address($client->getEmail(), $client->getNomComplet()))
-                ->subject($sujet)
+                ->subject($this->translator->trans($sujet, [], null, $langue))
                 ->htmlTemplate($template)
+                ->locale($langue)
                 ->context($contexte + ['client' => $client]));
 
             return true;

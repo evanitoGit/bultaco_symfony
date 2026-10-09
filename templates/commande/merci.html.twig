@@ -1,45 +1,45 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Commande confirmée - Club Bultaco{% endblock %}
+{% block title %}{{ 'commande.merci.titre_page'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
 {% block body_class %}page-pieces{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block body %}
-    <div class='head'><h1>Merci !</h1></div>
+    <div class='head'><h1>{{ 'commande.merci.titre'|trans }}</h1></div>
 
     <div class='container'>
         <section class='commande commande-merci'>
             <div class='commande-bloc'>
-                <p class='commande-ok'>✓ Votre commande <strong>{{ commande.reference }}</strong> a bien été enregistrée.</p>
-                <p>Un e-mail de confirmation vient d'être envoyé à <strong>{{ commande.email }}</strong>.</p>
+                <p class='commande-ok'>✓ {{ 'commande.merci.enregistree'|trans({ reference: '<strong>' ~ commande.reference|e ~ '</strong>' })|raw }}</p>
+                <p>{{ 'commande.merci.email_envoye'|trans({ email: '<strong>' ~ commande.email|e ~ '</strong>' })|raw }}</p>
 
                 {% include 'commande/_instructions_paiement.html.twig' %}
 
                 <table class='panier-table'>
-                    <thead><tr><th>Pièce</th><th>Quantité</th><th>Sous-total</th></tr></thead>
+                    <thead><tr><th>{{ 'panier.col.piece'|trans }}</th><th>{{ 'panier.col.quantite'|trans }}</th><th>{{ 'panier.col.sous_total'|trans }}</th></tr></thead>
                     <tbody>
                         {% for ligne in commande.lignes %}
                             <tr>
-                                <td data-label='Pièce'><strong>{{ ligne.nom_piece }}</strong></td>
-                                <td data-label='Quantité'>{{ ligne.quantite }} × {{ ligne.prix_unitaire|number_format(2, ',', ' ') }} €</td>
-                                <td data-label='Sous-total'>{{ (ligne.prix_unitaire * ligne.quantite)|number_format(2, ',', ' ') }} €</td>
+                                <td data-label='{{ 'panier.col.piece'|trans }}'><strong>{{ ligne|traduit('nom_piece') }}</strong></td>
+                                <td data-label='{{ 'panier.col.quantite'|trans }}'>{{ ligne.quantite }} × {{ ligne.prix_unitaire|euros }}</td>
+                                <td data-label='{{ 'panier.col.sous_total'|trans }}'>{{ (ligne.prix_unitaire * ligne.quantite)|euros }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
-                    <tfoot><tr><th colspan='2'>Total</th><th>{{ commande.total|number_format(2, ',', ' ') }} €</th></tr></tfoot>
+                    <tfoot><tr><th colspan='2'>{{ 'commun.total'|trans }}</th><th>{{ commande.total|euros }}</th></tr></tfoot>
                 </table>
 
                 {% if is_granted('ROLE_CLIENT') %}
-                    <p class='commande-compte'>Retrouvez cette commande et son suivi dans <a href='{{ path('app_compte') }}'>votre compte</a>.</p>
+                    <p class='commande-compte'>{{ 'commande.merci.dans_compte'|trans({ lien: '<a href="' ~ path('app_compte') ~ '">', fin: '</a>' })|raw }}</p>
                 {% else %}
                     <div class='commande-invitation'>
-                        <p><strong>Suivez vos commandes en ligne</strong><br>Créez un compte pour retrouver vos commandes et commander plus vite la prochaine fois.</p>
-                        <a href='{{ path('app_compte_inscription', { email: commande.email }) }}' class='btn-commander'>Créer un compte</a>
+                        <p><strong>{{ 'commande.merci.invitation_titre'|trans }}</strong><br>{{ 'commande.merci.invitation_texte'|trans }}</p>
+                        <a href='{{ path('app_compte_inscription', { email: commande.email }) }}' class='btn-commander'>{{ 'compte.menu.creer_compte'|trans }}</a>
                     </div>
                 {% endif %}
 
                 <p class='panier-actions panier-actions--vide'>
-                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>Retour à la boutique</a>
+                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>{{ 'commande.merci.retour_boutique'|trans }}</a>
                 </p>
             </div>
         </section>

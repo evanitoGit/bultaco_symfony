@@ -1,11 +1,29 @@
 # yaml-language-server: $schema=../vendor/symfony/routing/Loader/schema/routing.schema.json
 
-# This file is the entry point to configure the routes of your app.
-# Methods with the #[Route] attribute are automatically imported.
-# See also https://symfony.com/doc/current/routing.html
-
+# Site public en trois langues :
+#   français  : adresses actuelles (/boutique/pieces)
+#   anglais   : /en/boutique/pieces
+#   espagnol  : /es/boutique/pieces
+# La langue de la page vient de l'adresse (paramètre _locale des routes).
+#
 # To list all registered routes, run the following command:
 #   bin/console debug:router
 
-controllers:
-    resource: routing.controllers
+site:
+    resource: ../src/Controller/
+    type: attribute
+    exclude: '../src/Controller/{Admin,SecurityController.php}'
+    prefix:
+        fr: ''
+        en: '/en'
+        es: '/es'
+    trailing_slash_on_root: false
+
+# Administration et connexion administrateur : en français uniquement
+admin:
+    resource: ../src/Controller/Admin/
+    type: attribute
+
+securite:
+    resource: ../src/Controller/SecurityController.php
+    type: attribute

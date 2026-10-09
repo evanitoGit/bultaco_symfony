@@ -63,7 +63,7 @@ final class ReinitialisationMotDePasse
             'date_expiration' => $maintenant->modify(self::DUREE_VALIDITE)->format('Y-m-d H:i:s'),
         ]);
 
-        $this->comptes->envoyer($client, 'Réinitialisation de votre mot de passe', 'emails/compte_reinitialisation.html.twig', [
+        $this->comptes->envoyer($client, 'email.reinitialisation.sujet', 'emails/compte_reinitialisation.html.twig', [
             'url' => $this->urlGenerator->generate('app_compte_reinitialiser', ['jeton' => $selecteur . $verificateur], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
     }
