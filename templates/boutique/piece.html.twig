@@ -1,0 +1,222 @@
+{% extends 'base.html.twig' %}
+
+{% set rupture = piece.stock is not null and piece.stock <= 0 %}
+{% set url_absolue = absolute_url(piece.url) %}
+{% set resume = (piece.description ?: piece.description_longue ?: 'piece.meta_defaut'|trans({ nom: piece.nom }))|striptags|replace({ "\n": ' ', "\r": '' }) %}
+{% set resume = resume|length > 160 ? resume|slice(0, 157) ~ '…' : resume %}
+
+{% block title %}{{ piece.nom }} - {{ 'nav.pieces_detachees'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ resume }}{% endblock %}
+{% block body_class %}page-pieces page-piece{% endblock %}
+
+{% block meta %}
+    <link rel="canonical" href="{{ url_absolue }}">
+    {# Aperçu lors d'un partage (Facebook, messageries…) #}
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="Bultaco Club France">
+    <meta property="og:title" content="{{ piece.nom }}">
+    <meta property="og:description" content="{{ resume }}">
+    <meta property="og:url" content="{{ url_absolue }}">
+    <meta property="og:locale" content="{{ { fr: 'fr_FR', en: 'en_GB', es: 'es_ES' }[app.request.locale] ?? 'fr_FR' }}">
+    {% if piece.photos is not empty %}
+        <meta property="og:image" content="{{ absolute_url(asset(piece.photos|first)) }}">
+    {% endif %}
+    <meta property="product:price:amount" content="{{ piece.prix }}">
+    <meta property="product:price:currency" content="EUR">
+    {# Données « Produit » pour les moteurs de recherche (prix et disponibilité dans les résultats) #}
+    <script type="application/ld+json">
+        {{ {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: piece.nom,
+            description: resume,
+            sku: piece.reference_origine ?: 'BCF-' ~ piece.id,
+            category: piece.categorie ~ ' > ' ~ piece.sous_categorie,
+            image: piece.photos|map(photo => absolute_url(asset(photo))),
+            offers: {
+                '@type': 'Offer',
+                url: url_absolue,
+                priceCurrency: 'EUR',
+                price: piece.prix,
+                availability: rupture ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock'
+            }
+        }|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <p class='head-titre'>{{ 'nav.pieces_detachees'|trans }}</p>
+    </div>
+
+    <div class='container'>
+        <section class='piece-page'>
+            <nav class='fil-ariane' aria-label='{{ 'piece.fil_ariane'|trans }}'>
+                <a href='{{ path('app_boutique_pieces') }}'>{{ 'nav.boutique'|trans }}</a>
+                <span aria-hidden='true'>›</span>
+                <a href='{{ path('app_boutique_pieces') }}#cat-{{ piece.categorie_id }}'>{{ piece.categorie }}</a>
+                <span aria-hidden='true'>›</span>
+                <span>{{ piece.sous_categorie }}</span>
+            </nav>
+
+            {% for message in app.flashes('panier') %}
+                <p class='panier-message' role='status'>{{ message }}</p>
+            {% endfor %}
+
+            <div class='piece-fiche'>
+                {# ----- Photos ----- #}
+                <div class='piece-galerie'>
+                    {% if piece.photos is not empty %}
+                        <button type='button' class='piece-photo-principale' aria-label='{{ 'piece.agrandir'|trans }}'>
+                            <img src='{{ asset(piece.photos|first) }}' alt='{{ piece.nom }}' id='photoPrincipale'>
+                            <span class='zoom-hint' aria-hidden='true'>⤢</span>
+                        </button>
+                        {% if piece.photos|length > 1 %}
+                            <ul class='piece-vignettes'>
+                                {% for photo in piece.photos %}
+                                    <li>
+                                        <button type='button' class='piece-vignette{{ loop.first ? ' active' }}' data-src='{{ asset(photo) }}'
+                                                aria-label='{{ 'piece.photo_n'|trans({ n: loop.index, total: piece.photos|length }) }}'{% if loop.first %} aria-current='true'{% endif %}>
+                                            <img src='{{ asset(photo) }}' alt='' loading='lazy'>
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% else %}
+                        <div class='piece-photo-principale piece-photo-principale--vide' aria-hidden='true'>📦</div>
+                    {% endif %}
+                </div>
+
+                {# ----- Achat ----- #}
+                <div class='piece-details'>
+                    <h1 class='piece-titre'>{{ piece.nom }}</h1>
+                    {% if piece.reference_origine %}
+                        <p class='piece-reference'>{{ 'piece.reference'|trans }} : <strong>{{ piece.reference_origine }}</strong></p>
+                    {% endif %}
+                    {% if piece.description %}
+                        <p class='piece-resume'>{{ piece.description }}</p>
+                    {% endif %}
+
+                    <p class='piece-page-prix'>{{ piece.prix|euros }}</p>
+                    {% if rupture %}
+                        <p class='piece-stock piece-stock--rupture'>{{ 'boutique.rupture'|trans }}</p>
+                    {% elseif piece.stock is not null and piece.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
+                        <p class='piece-stock piece-stock--faible'>{{ 'boutique.plus_que'|trans({ n: piece.stock }) }}</p>
+                    {% else %}
+                        <p class='piece-stock piece-stock--ok'>✓ {{ 'piece.en_stock'|trans }}</p>
+                    {% endif %}
+
+                    <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier piece-achat'>
+                        <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                        {% if rupture %}
+                            <button type='submit' class='btn-commander' disabled>{{ 'boutique.indisponible'|trans }}</button>
+                        {% else %}
+                            <label class='piece-quantite'>
+                                <span>{{ 'panier.col.quantite'|trans }}</span>
+                                <input type='number' name='quantite' value='1' min='1' max='{{ piece.stock is null ? 99 : min(99, piece.stock) }}'>
+                            </label>
+                            <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
+                        {% endif %}
+                    </form>
+
+                    {# ----- Compatibilité ----- #}
+                    <div class='piece-compatibilite'>
+                        <h2>{{ 'piece.compatibilite'|trans }}</h2>
+                        {% if piece.universelle %}
+                            <p>✓ {{ 'piece.universelle_texte'|trans }}</p>
+                        {% elseif piece.modeles is not empty %}
+                            {% if moto and moto.id not in piece.modeles|column('id') %}
+                                <p class='piece-compat-alerte'>⚠ {{ 'piece.pas_indiquee'|trans({ moto: moto.nom }) }}</p>
+                            {% endif %}
+                            <ul class='piece-modeles'>
+                                {% for modele in piece.modeles %}
+                                    <li><a href='{{ path('app_boutique_pieces', { moto: modele.id }) }}'
+                                           class='{{ moto and moto.id == modele.id ? 'actif' }}'
+                                           title='{{ 'piece.voir_pieces_modele'|trans({ moto: modele.nom }) }}'>{{ modele.nom }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class='piece-compat-inconnue'>{{ 'piece.compat_inconnue'|trans }}</p>
+                        {% endif %}
+                    </div>
+
+                    {# ----- Partage ----- #}
+                    <div class='piece-partage'>
+                        <span>{{ 'piece.partager'|trans }}</span>
+                        <button type='button' class='piece-partage-bouton' data-copier='{{ url_absolue }}' data-copie='{{ 'piece.lien_copie'|trans }}'>🔗 {{ 'piece.copier_lien'|trans }}</button>
+                        <a class='piece-partage-bouton' href='https://www.facebook.com/sharer/sharer.php?u={{ url_absolue|url_encode }}' target='_blank' rel='noopener'>Facebook</a>
+                        <a class='piece-partage-bouton' href='mailto:?subject={{ piece.nom|url_encode }}&amp;body={{ ('piece.email_corps'|trans({ nom: piece.nom }) ~ ' ' ~ url_absolue)|url_encode }}'>✉ {{ 'piece.email'|trans }}</a>
+                    </div>
+                </div>
+            </div>
+
+            {% if piece.description_longue %}
+                <div class='piece-bloc'>
+                    <h2>{{ 'piece.description'|trans }}</h2>
+                    <p class='piece-description-longue'>{{ piece.description_longue|nl2br }}</p>
+                </div>
+            {% endif %}
+
+            {% if similaires is not empty %}
+                <div class='piece-bloc'>
+                    <h2>{{ 'piece.similaires'|trans }}</h2>
+                    <ul class='piece-similaires'>
+                        {% for autre in similaires %}
+                            <li>
+                                <a href='{{ autre.url }}'>
+                                    {% if autre.image_path %}
+                                        <img src='{{ asset(autre.image_path) }}' alt='' loading='lazy'>
+                                    {% else %}
+                                        <span class='no-image' aria-hidden='true'>📦</span>
+                                    {% endif %}
+                                    <strong>{{ autre.nom }}</strong>
+                                    <span>{{ autre.prix|euros }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <p><a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ 'piece.retour'|trans }}</a></p>
+        </section>
+    </div>
+
+    {% include '_partials/_modal.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Galerie : la vignette choisie devient la photo principale
+        const photoPrincipale = document.getElementById('photoPrincipale');
+        document.querySelectorAll('.piece-vignette').forEach(vignette => {
+            vignette.addEventListener('click', () => {
+                photoPrincipale.src = vignette.dataset.src;
+                document.querySelectorAll('.piece-vignette').forEach(v => {
+                    v.classList.toggle('active', v === vignette);
+                    v.toggleAttribute('aria-current', v === vignette);
+                });
+            });
+        });
+
+        // Zoom : photo en grand dans la fenêtre
+        document.querySelector('button.piece-photo-principale')?.addEventListener('click', () => {
+            openModal(`<div class='carte-identite'><img src='${escapeHtml(photoPrincipale.src)}' alt='${escapeHtml(photoPrincipale.alt)}' class='carte-photo carte-photo--large'></div>`);
+        });
+
+        // Partage : copie du lien
+        document.querySelector('[data-copier]')?.addEventListener('click', async function () {
+            try {
+                await navigator.clipboard.writeText(this.dataset.copier);
+            } catch {
+                window.prompt('', this.dataset.copier); // navigateur sans accès au presse-papiers
+                return;
+            }
+            const libelle = this.textContent;
+            this.textContent = '✓ ' + this.dataset.copie;
+            setTimeout(() => { this.textContent = libelle; }, 2000);
+        });
+    </script>
+{% endblock %}

@@ -51,6 +51,30 @@
                                 {% if form[name ~ '__remove'] is defined %}{{ form_row(form[name ~ '__remove']) }}{% endif %}
                             </div>
                         </div>
+                    {% elseif field.type == 'images' %}
+                        <div class="admin-field admin-photos">
+                            <span class="admin-photos-titre">{{ field.label }}</span>
+                            {% if photos[name] ?? [] is not empty %}
+                                <ul class="admin-photos-liste">
+                                    {% for photo in photos[name] %}
+                                        <li>
+                                            <img src="{{ asset(photo.image_path) }}" alt="" loading="lazy">
+                                            <label class="admin-photos-ordre">Ordre
+                                                <input type="number" name="photos_ordre[{{ name }}][{{ photo.id }}]" value="{{ photo.ordre }}" min="0">
+                                            </label>
+                                            <label class="admin-photos-supprimer">
+                                                <input type="checkbox" name="photos_supprimer[{{ name }}][]" value="{{ photo.id }}"> Supprimer
+                                            </label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            {{ form_widget(form[name]) }}
+                            {{ form_help(form[name]) }}
+                            {{ form_errors(form[name]) }}
+                        </div>
+                    {% elseif field.type == 'multiple' %}
+                        <div class="admin-field--multiple">{{ form_row(form[name]) }}</div>
                     {% else %}
                         {{ form_row(form[name]) }}
                     {% endif %}
@@ -94,6 +118,18 @@
                 preview.replaceChildren(img);
                 preview.classList.add('is-new');
             });
+        });
+
+        // Cases à cocher nombreuses (modèles compatibles) : champ de filtre
+        document.querySelectorAll('.admin-field--multiple').forEach(bloc => {
+            const choix = bloc.querySelectorAll('.admin-radio');
+            if (choix.length < 8) return;
+            const filtre = Object.assign(document.createElement('input'), { type: 'search', placeholder: 'Filtrer les modèles…', className: 'admin-multiple-filtre' });
+            filtre.addEventListener('input', () => {
+                const texte = filtre.value.trim().toLowerCase();
+                choix.forEach(c => c.hidden = texte !== '' && !c.textContent.toLowerCase().includes(texte));
+            });
+            bloc.querySelector('.admin-radios').before(filtre);
         });
 
         // Avertit avant de quitter la page avec des modifications non enregistrées

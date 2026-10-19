@@ -58,6 +58,10 @@ class LangueExtension extends AbstractExtension
     public function urlLangue(string $langue): string
     {
         $requete = $this->requestStack->getMainRequest();
+        // adresse fournie par la page elle-même (ex. le nom de la pièce change selon la langue)
+        if (isset($requete?->attributes->get('_urls_langues', [])[$langue])) {
+            return $requete->attributes->get('_urls_langues')[$langue];
+        }
         $route = $this->routeCourante();
         // page sans version traduite (connexion administrateur, erreur…) : accueil dans la langue choisie
         if ($requete === null || $route === null || !$requete->attributes->has('_locale')) {

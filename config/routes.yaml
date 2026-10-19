@@ -12,7 +12,7 @@
 site:
     resource: ../src/Controller/
     type: attribute
-    exclude: '../src/Controller/{Admin,SecurityController.php}'
+    exclude: '../src/Controller/{Admin,SecurityController.php,SitemapController.php}'
     prefix:
         fr: ''
         en: '/en'
@@ -26,4 +26,9 @@ admin:
 
 securite:
     resource: ../src/Controller/SecurityController.php
+    type: attribute
+
+# Plan du site et robots.txt : à la racine, sans langue
+referencement:
+    resource: ../src/Controller/SitemapController.php
     type: attribute

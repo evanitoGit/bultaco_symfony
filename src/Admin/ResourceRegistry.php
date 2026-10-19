@@ -13,7 +13,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * formulaire d'administration sont génériques : pour rendre un nouveau champ
  * modifiable, il suffit de l'ajouter ici.
  *
- * Types de champs : text, textarea, integer, money, choice, relation, url, image, password.
+ * Types de champs : text, textarea, integer, money, bool, choice, relation, url, image, password,
+ *   multiple (cases à cocher enregistrées dans une table de liaison), images (photos supplémentaires).
  *
  * 'traduire' => true : le champ est affiché sur le site en anglais et en espagnol.
  * Les champs « _en » et « _es » (colonnes de la base) sont ajoutés automatiquement au formulaire.
@@ -21,7 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ResourceRegistry
 {
     /** Pour la contrainte de route (doit lister toutes les clés de RESOURCES). */
-    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|commandes|clients|admins';
+    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|modeles-moto|commandes|clients|admins';
 
     /** Libellés lisibles des sections de la table `textes`, avec la page qui les affiche. */
     public const TEXT_SECTIONS = [
@@ -215,7 +216,8 @@ final class ResourceRegistry
             ],
             'delete_warning' => 'Ses sous-catégories et toutes leurs pièces seront aussi supprimées.',
             // Images des pièces supprimées en cascade par la base
-            'cascade_images' => 'SELECT p.image_path FROM pieces_detachees p INNER JOIN sous_categories sc ON sc.id = p.sous_categorie_id WHERE sc.categorie_id = :id',
+            'cascade_images' => 'SELECT p.image_path FROM pieces_detachees p INNER JOIN sous_categories sc ON sc.id = p.sous_categorie_id WHERE sc.categorie_id = :id
+                UNION ALL SELECT ph.image_path FROM piece_photos ph INNER JOIN pieces_detachees p ON p.id = ph.piece_id INNER JOIN sous_categories sc ON sc.id = p.sous_categorie_id WHERE sc.categorie_id = :id',
             'cascade_sql' => [
                 'DELETE FROM pieces_detachees WHERE sous_categorie_id IN (SELECT id FROM sous_categories WHERE categorie_id = :id)',
                 'DELETE FROM sous_categories WHERE categorie_id = :id',
@@ -243,7 +245,8 @@ final class ResourceRegistry
                 'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0],
             ],
             'delete_warning' => 'Toutes ses pièces seront aussi supprimées.',
-            'cascade_images' => 'SELECT image_path FROM pieces_detachees WHERE sous_categorie_id = :id',
+            'cascade_images' => 'SELECT image_path FROM pieces_detachees WHERE sous_categorie_id = :id
+                UNION ALL SELECT ph.image_path FROM piece_photos ph INNER JOIN pieces_detachees p ON p.id = ph.piece_id WHERE p.sous_categorie_id = :id',
             'cascade_sql' => [
                 'DELETE FROM pieces_detachees WHERE sous_categorie_id = :id',
             ],
@@ -257,24 +260,70 @@ final class ResourceRegistry
             'public_route' => 'app_boutique_pieces',
             'order' => 'nom ASC',
             'title' => ['nom'],
-            'list_sql' => 'SELECT p.*, sc.nom AS sous_categorie_nom, c.nom AS categorie_nom FROM pieces_detachees p LEFT JOIN sous_categories sc ON sc.id = p.sous_categorie_id LEFT JOIN categories c ON c.id = sc.categorie_id ORDER BY c.ordre ASC, sc.ordre ASC, p.nom ASC',
+            'list_sql' => "SELECT p.*, sc.nom AS sous_categorie_nom, c.nom AS categorie_nom,
+                    IF(p.universelle, 'Toutes', (SELECT GROUP_CONCAT(m.nom ORDER BY m.ordre, m.nom SEPARATOR ', ') FROM piece_modeles pm INNER JOIN modeles_moto m ON m.id = pm.modele_id WHERE pm.piece_id = p.id)) AS modeles_noms
+                FROM pieces_detachees p LEFT JOIN sous_categories sc ON sc.id = p.sous_categorie_id LEFT JOIN categories c ON c.id = sc.categorie_id
+                ORDER BY c.ordre ASC, sc.ordre ASC, p.nom ASC",
             'list' => [
                 'image_path' => ['label' => 'Photo', 'format' => 'image'],
                 'nom' => ['label' => 'Nom'],
                 'categorie_nom' => ['label' => 'Catégorie'],
                 'sous_categorie_nom' => ['label' => 'Sous-catégorie'],
+                'modeles_noms' => ['label' => 'Modèles', 'format' => 'excerpt'],
                 'prix' => ['label' => 'Prix', 'format' => 'money'],
                 'stock' => ['label' => 'Stock', 'format' => 'stock'],
             ],
             'fields' => [
                 'nom' => ['type' => 'text', 'label' => 'Nom de la pièce', 'required' => true, 'max' => 150, 'traduire' => true],
                 'sous_categorie_id' => ['type' => 'relation', 'label' => 'Catégorie', 'required' => true, 'choices' => 'sous_categories'],
+                'reference_origine' => ['type' => 'text', 'label' => 'Référence d\'origine', 'max' => 50, 'help' => 'Numéro de pièce Bultaco, ex. : 1050.042 (facultatif).'],
                 'prix' => ['type' => 'money', 'label' => 'Prix', 'required' => true],
                 'stock' => ['type' => 'integer', 'label' => 'Stock', 'min' => 0, 'max_value' => 100000,
                     'help' => 'Nombre d\'exemplaires disponibles. Laissez vide pour ne pas suivre le stock (pièce toujours disponible). Il diminue à chaque commande et remonte si une commande est annulée.'],
-                'description' => ['type' => 'textarea', 'label' => 'Description', 'rows' => 4, 'traduire' => true],
-                'image_path' => ['type' => 'image', 'label' => 'Photo', 'dir' => 'pieces'],
+                'universelle' => ['type' => 'bool', 'label' => 'Pièce universelle (compatible avec toutes les motos)',
+                    'help' => 'Joints, câbles, bougies… Inutile alors de cocher les modèles ci-dessous.'],
+                'modeles' => ['type' => 'multiple', 'label' => 'Compatible avec', 'choices' => 'modeles_moto',
+                    'liaison' => ['table' => 'piece_modeles', 'cle' => 'piece_id', 'valeur' => 'modele_id'],
+                    'help' => 'Les modèles se gèrent dans Boutique › Modèles de motos.'],
+                'description' => ['type' => 'textarea', 'label' => 'Description courte', 'rows' => 3, 'traduire' => true,
+                    'help' => 'Affichée sur la carte de la pièce dans la boutique.'],
+                'description_longue' => ['type' => 'textarea', 'label' => 'Description détaillée', 'rows' => 6, 'traduire' => true,
+                    'help' => 'Affichée sur la page de la pièce : état, dimensions, montage…'],
+                'image_path' => ['type' => 'image', 'label' => 'Photo principale', 'dir' => 'pieces'],
+                'photos' => ['type' => 'images', 'label' => 'Photos supplémentaires', 'dir' => 'pieces',
+                    'liaison' => ['table' => 'piece_photos', 'cle' => 'piece_id']],
             ],
+            'cascade_images' => 'SELECT image_path FROM piece_photos WHERE piece_id = :id',
+        ],
+        'modeles-moto' => [
+            'table' => 'modeles_moto',
+            'group' => 'Boutique',
+            'label' => 'Modèles de motos',
+            'singular' => 'un modèle de moto',
+            'icon' => '🏍️',
+            'public_route' => 'app_boutique_pieces',
+            'description' => 'Liste des motos proposées dans le filtre « Ma moto » de la boutique et cochées sur chaque pièce compatible.',
+            'order' => 'ordre ASC, nom ASC',
+            'title' => ['nom'],
+            'list_sql' => 'SELECT m.*, a.nom AS album_nom, (SELECT COUNT(*) FROM piece_modeles pm WHERE pm.modele_id = m.id) AS nb_pieces
+                FROM modeles_moto m LEFT JOIN modeles_emblematiques a ON a.id = m.modele_album_id ORDER BY m.ordre ASC, m.nom ASC',
+            'list' => [
+                'nom' => ['label' => 'Modèle'],
+                'cylindree' => ['label' => 'Cylindrée'],
+                'annees' => ['label' => 'Années'],
+                'album_nom' => ['label' => 'Fiche de l\'album'],
+                'nb_pieces' => ['label' => 'Pièces'],
+                'ordre' => ['label' => 'Ordre'],
+            ],
+            'fields' => [
+                'nom' => ['type' => 'text', 'label' => 'Nom du modèle', 'required' => true, 'max' => 100, 'unique' => true, 'help' => 'Ex. : Sherpa T 350'],
+                'cylindree' => ['type' => 'text', 'label' => 'Cylindrée', 'max' => 50, 'help' => 'Ex. : 325 cc'],
+                'annees' => ['type' => 'text', 'label' => 'Années de production', 'max' => 50, 'help' => 'Ex. : 1972–1978'],
+                'modele_album_id' => ['type' => 'relation', 'label' => 'Fiche de l\'album photos (facultatif)', 'choices' => 'modeles_album',
+                    'help' => 'La fiche de l\'album affichera un lien « Voir les pièces pour ce modèle ».'],
+                'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0, 'help' => 'Ordre dans le menu « Ma moto ».'],
+            ],
+            'delete_warning' => 'Les pièces ne seront plus indiquées comme compatibles avec ce modèle.',
         ],
         'commandes' => [
             'table' => 'commandes',
