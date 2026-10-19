@@ -21,11 +21,31 @@
             <p class='panier-message' role='status'>{{ message }}</p>
         {% endfor %}
 
+        {# Filtre « Ma moto » : ne garder que les pièces compatibles #}
+        {% if modeles_moto is not empty %}
+            <form method='get' action='{{ path('app_boutique_pieces') }}' class='filtre-moto'>
+                <label for='filtreMoto'>🏍️ {{ 'boutique.ma_moto'|trans }}</label>
+                <select name='moto' id='filtreMoto' onchange='this.form.submit()'>
+                    <option value='0'>{{ 'boutique.toutes_motos'|trans }}</option>
+                    {% for modele in modeles_moto %}
+                        <option value='{{ modele.id }}'{{ moto and moto.id == modele.id ? ' selected' }}>{{ modele.nom }}{{ modele.cylindree ? ' — ' ~ modele.cylindree }}</option>
+                    {% endfor %}
+                </select>
+                <noscript><button type='submit' class='btn-commander'>{{ 'boutique.filtrer'|trans }}</button></noscript>
+            </form>
+            {% if moto %}
+                <p class='filtre-moto-actif' role='status'>
+                    {{ 'boutique.filtre_actif'|trans({ moto: '<strong>' ~ moto.nom|e ~ '</strong>', n: pieces|length })|raw }}
+                    <a href='{{ path('app_boutique_pieces', { moto: 0 }) }}'>{{ 'boutique.voir_toutes'|trans }}</a>
+                </p>
+            {% endif %}
+        {% endif %}
+
         <section class='pieces-section'>
             <div class='categories-container'>
                 {% for categorie in categories %}
                     <div class='categorie-block'>
-                        <div class='categorie-header' role='button' tabindex='0' aria-expanded='false' aria-controls='cat-{{ categorie.id }}'
+                        <div class='categorie-header' role='button' tabindex='0' aria-expanded='{{ moto ? 'true' : 'false' }}' aria-controls='cat-{{ categorie.id }}'
                              onclick="toggleBloc('cat-{{ categorie.id }}')">
                             <h3>
                                 <span class='arrow' aria-hidden='true'>▶</span>
@@ -34,10 +54,10 @@
                             </h3>
                         </div>
 
-                        <div class='categorie-content' id='cat-{{ categorie.id }}' hidden>
+                        <div class='categorie-content' id='cat-{{ categorie.id }}'{{ moto ? '' : ' hidden' }}>
                             {% for sousCategorie in categorie.sous_categories %}
                                 <div class='sous-categorie-block'>
-                                    <div class='sous-categorie-header' role='button' tabindex='0' aria-expanded='false' aria-controls='sous-cat-{{ sousCategorie.id }}'
+                                    <div class='sous-categorie-header' role='button' tabindex='0' aria-expanded='{{ moto ? 'true' : 'false' }}' aria-controls='sous-cat-{{ sousCategorie.id }}'
                                          onclick="toggleBloc('sous-cat-{{ sousCategorie.id }}')">
                                         <h4>
                                             <span class='arrow' aria-hidden='true'>▶</span>
@@ -46,20 +66,25 @@
                                         </h4>
                                     </div>
 
-                                    <div class='sous-categorie-content' id='sous-cat-{{ sousCategorie.id }}' hidden>
+                                    <div class='sous-categorie-content' id='sous-cat-{{ sousCategorie.id }}'{{ moto ? '' : ' hidden' }}>
                                         <div class='pieces-grid'>
                                             {% for piece in sousCategorie.pieces %}
                                                 {% set rupture = piece.stock is not null and piece.stock <= 0 %}
                                                 <article class='piece-card{{ rupture ? ' piece-card--rupture' }}' data-id='{{ piece.id }}'>
-                                                    <div class='piece-media'>
+                                                    <a href='{{ piece.url }}' class='piece-media' tabindex='-1' aria-hidden='true'>
                                                         {% if piece.image_path %}
-                                                            <img src='{{ asset(piece.image_path) }}' alt='{{ piece.nom }}' loading='lazy'>
+                                                            <img src='{{ asset(piece.image_path) }}' alt='' loading='lazy'>
                                                         {% else %}
-                                                            <div class='no-image' aria-hidden='true'>📦</div>
+                                                            <div class='no-image'>📦</div>
                                                         {% endif %}
-                                                    </div>
+                                                    </a>
                                                     <div class='piece-info'>
-                                                        <h5>{{ piece.nom }}</h5>
+                                                        <h5><a href='{{ piece.url }}' class='piece-lien'>{{ piece.nom }}</a></h5>
+                                                        {% if piece.universelle %}
+                                                            <span class='piece-compat piece-compat--universelle'>{{ 'boutique.universelle'|trans }}</span>
+                                                        {% elseif moto and piece.compatible %}
+                                                            <span class='piece-compat'>✓ {{ 'boutique.compatible'|trans({ moto: moto.nom }) }}</span>
+                                                        {% endif %}
                                                         {% if piece.description %}
                                                             <p class='piece-description'>{{ piece.description }}</p>
                                                         {% endif %}
@@ -93,7 +118,10 @@
                         </div>
                     </div>
                 {% else %}
-                    {% include '_partials/_empty.html.twig' with { icone: '📦', message: 'boutique.aucune_piece'|trans } %}
+                    {% include '_partials/_empty.html.twig' with { icone: '📦', message: moto ? 'boutique.aucune_compatible'|trans({ moto: moto.nom }) : 'boutique.aucune_piece'|trans } %}
+                    {% if moto %}
+                        <p class='panier-actions panier-actions--vide'><a href='{{ path('app_boutique_pieces', { moto: 0 }) }}' class='btn-commander'>{{ 'boutique.voir_toutes'|trans }}</a></p>
+                    {% endif %}
                 {% endfor %}
             </div>
         </section>
@@ -114,6 +142,9 @@
             if (header) header.setAttribute('aria-expanded', ouvert);
         }
 
+        // arrivée depuis le fil d'Ariane d'une pièce (#cat-3) : catégorie ouverte
+        if (/^#cat-\d+$/.test(location.hash)) setBloc(location.hash.slice(1), true);
+
         function toggleBloc(id) {
             const content = document.getElementById(id);
             if (content) setBloc(id, content.hidden);
@@ -121,18 +152,12 @@
 
         window.searchConfig = {
             data       : pieces,
-            fields     : ['description', 'categorie', 'sous_categorie'],
+            fields     : ['description', 'categorie', 'sous_categorie', 'reference_origine'],
             labelField : 'nom',
             metaFields : p => [`${p.categorie} › ${p.sous_categorie}`, formatPrix(p.prix)],
             emptyText  : {{ 'boutique.aucune_trouvee'|trans|json_encode|raw }},
-            onSelect   : function (item) {
-                const card = document.querySelector(`.piece-card[data-id='${item.id}']`);
-                if (!card) return;
-                // Ouverture de la catégorie et de la sous-catégorie contenant la pièce
-                setBloc(card.closest('.categorie-content').id, true);
-                setBloc(card.closest('.sous-categorie-content').id, true);
-                setTimeout(() => scrollAndHighlight(card), 100);
-            }
+            // résultat choisi : ouverture de la page de la pièce
+            onSelect   : item => { window.location.href = item.url; }
         };
     </script>
     <script src="{{ asset('js/search.js') }}"></script>

@@ -85,6 +85,37 @@ class AdminResourceType extends AbstractType
                     ]);
                     break;
 
+                case 'bool':
+                    $builder->add($name, CheckboxType::class, ['label' => $field['label'], 'required' => false, 'help' => $field['help'] ?? null]);
+                    break;
+
+                case 'multiple':
+                    // cases à cocher, enregistrées dans une table de liaison par le contrôleur
+                    $builder->add($name, ChoiceType::class, [
+                        'label' => $field['label'],
+                        'help' => $field['help'] ?? null,
+                        'required' => false,
+                        'multiple' => true,
+                        'expanded' => true,
+                        'choices' => $options['choices'][$name] ?? [],
+                    ]);
+                    break;
+
+                case 'images':
+                    // photos supplémentaires : ajout de plusieurs fichiers d'un coup
+                    $builder->add($name, FileType::class, [
+                        'label' => $field['label'],
+                        'mapped' => false,
+                        'required' => false,
+                        'multiple' => true,
+                        'help' => 'Vous pouvez en choisir plusieurs à la fois. Formats : JPG, PNG, WEBP, GIF (10 Mo maximum chacune).',
+                        'attr' => ['accept' => 'image/*'],
+                        'constraints' => [new Assert\All([
+                            new Assert\Image(maxSize: '10M', mimeTypesMessage: 'Le fichier doit être une image (JPG, PNG, WEBP, GIF).'),
+                        ])],
+                    ]);
+                    break;
+
                 case 'url':
                     $builder->add($name, UrlType::class, $common + [
                         'default_protocol' => 'https',

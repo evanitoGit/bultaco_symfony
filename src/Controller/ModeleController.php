@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Boutique\Catalogue;
 use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,12 +20,19 @@ class ModeleController extends AbstractController
     }
 
     #[Route('/modeles/liste', name: 'app_modeles_liste')]
-    public function liste(): Response
+    public function liste(Catalogue $catalogue): Response
     {
         // Pas encore d'entité pour cette table : requête SQL directe via DBAL
         $modeles = $this->connection
             ->executeQuery('SELECT * FROM modeles_emblematiques ORDER BY ordre ASC')
             ->fetchAllAssociative();
+
+        // liens « Voir les pièces pour ce modèle » (modèles de motos reliés à la fiche)
+        $motos = $catalogue->modelesParFicheAlbum();
+        $modeles = array_map(fn (array $modele) => $modele + ['motos' => array_map(
+            fn (array $moto) => ['nom' => $moto['nom'], 'url' => $this->generateUrl('app_boutique_pieces', ['moto' => $moto['id']])],
+            $motos[(int) $modele['id']] ?? []
+        )], $modeles);
 
         return $this->render('modele/liste.html.twig', [
             'texte_presentation' => $this->contenu->texte('album_photos', $this->translator->trans('modeles.texte_defaut')),

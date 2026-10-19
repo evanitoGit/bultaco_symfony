@@ -10,6 +10,8 @@
         <link rel="alternate" hreflang="{{ code }}" href="{{ absolute_url(url_langue(code)) }}">
     {% endfor %}
     <link rel="icon" type="image/png" href="{{ asset('img/logo_rond.png') }}" sizes="50x50">
+    {# Balises propres à une page (partage sur les réseaux sociaux, données pour Google…) #}
+    {% block meta %}{% endblock %}
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>

@@ -155,8 +155,16 @@ class AdminController extends AbstractController
                 $row[$name] = match ($field['type']) {
                     'integer', 'relation' => (int) $row[$name],
                     'money' => (float) $row[$name],
+                    'bool' => (bool) $row[$name],
                     default => $row[$name],
                 };
+            }
+            // cases cochées : lues dans la table de liaison
+            if ($field['type'] === 'multiple') {
+                $row[$name] = $isNew ? [] : array_map('intval', $this->connection->fetchFirstColumn(
+                    sprintf('SELECT %s FROM %s WHERE %s = ?', $field['liaison']['valeur'], $field['liaison']['table'], $field['liaison']['cle']),
+                    [$id]
+                ));
             }
         }
 
@@ -176,12 +184,14 @@ class AdminController extends AbstractController
 
             if ($isNew) {
                 $this->connection->insert($config['table'], $values + ($config['fixed'] ?? []));
+                $id = (int) $this->connection->lastInsertId();
             } elseif ($config['key'] === 'commandes') {
                 // le changement de statut met aussi le stock à jour (annulation)
                 $this->commandes->changerStatut($id, $values['statut']);
             } else {
                 $this->connection->update($config['table'], $values, ['id' => $id]);
             }
+            $this->saveLinkedData($config, $form, $request, $id);
 
             $title = $this->rowTitle($config, $values + $row);
             $this->addFlash('success', $isNew ? sprintf('« %s » a été ajouté.', $title) : sprintf('« %s » a été enregistré.', $title));
@@ -198,6 +208,7 @@ class AdminController extends AbstractController
             'details' => (!$isNew && isset($config['detail_sql']))
                 ? $this->connection->fetchAllAssociative($config['detail_sql'], ['id' => $id])
                 : [],
+            'photos' => $isNew ? [] : $this->linkedPhotos($config, $id),
         ], new Response(status: $form->isSubmitted() ? 422 : 200));
     }
 
@@ -238,6 +249,15 @@ class AdminController extends AbstractController
                     $values[$name] = $data[$name] ?? ($field['default'] ?? null);
                     break;
 
+                case 'bool':
+                    $values[$name] = (int) (bool) ($data[$name] ?? false);
+                    break;
+
+                case 'multiple':
+                case 'images':
+                    // enregistrés dans d'autres tables (saveLinkedData)
+                    break;
+
                 default:
                     $value = $data[$name] ?? null;
                     $values[$name] = is_string($value) ? trim($value) : $value;
@@ -273,6 +293,66 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Données rangées dans d'autres tables : cases à cocher (table de liaison) et photos supplémentaires.
+     */
+    private function saveLinkedData(array $config, FormInterface $form, Request $request, int $id): void
+    {
+        foreach ($config['fields'] as $name => $field) {
+            if (!$form->has($name) || !isset($field['liaison'])) {
+                continue;
+            }
+            ['table' => $table, 'cle' => $cle] = $field['liaison'];
+
+            if ($field['type'] === 'multiple') {
+                $this->connection->transactional(function (Connection $connection) use ($form, $name, $field, $table, $cle, $id): void {
+                    $connection->executeStatement(sprintf('DELETE FROM %s WHERE %s = ?', $table, $cle), [$id]);
+                    foreach (array_unique(array_map('intval', $form->get($name)->getData() ?? [])) as $valeur) {
+                        $connection->insert($table, [$cle => $id, $field['liaison']['valeur'] => $valeur]);
+                    }
+                });
+            }
+
+            if ($field['type'] === 'images') {
+                // photos cochées « Supprimer »
+                $aSupprimer = array_map('intval', (array) ($request->request->all('photos_supprimer')[$name] ?? []));
+                foreach ($this->connection->fetchAllAssociative(sprintf('SELECT id, image_path FROM %s WHERE %s = ?', $table, $cle), [$id]) as $photo) {
+                    if (in_array((int) $photo['id'], $aSupprimer, true)) {
+                        $this->connection->delete($table, ['id' => $photo['id']]);
+                        $this->uploader->remove($photo['image_path']);
+                    }
+                }
+                // ordre d'affichage
+                foreach ((array) ($request->request->all('photos_ordre')[$name] ?? []) as $photoId => $ordre) {
+                    $this->connection->executeStatement(sprintf('UPDATE %s SET ordre = ? WHERE id = ? AND %s = ?', $table, $cle), [(int) $ordre, (int) $photoId, $id]);
+                }
+                // nouvelles photos, ajoutées à la fin
+                $ordre = (int) $this->connection->fetchOne(sprintf('SELECT COALESCE(MAX(ordre), 0) FROM %s WHERE %s = ?', $table, $cle), [$id]);
+                foreach ($form->get($name)->getData() ?? [] as $fichier) {
+                    $this->connection->insert($table, [$cle => $id, 'image_path' => $this->uploader->upload($fichier, $field['dir']), 'ordre' => ++$ordre]);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return array<string, list<array>> photos supplémentaires déjà enregistrées, par champ
+     */
+    private function linkedPhotos(array $config, int $id): array
+    {
+        $photos = [];
+        foreach ($config['fields'] as $name => $field) {
+            if ($field['type'] === 'images') {
+                $photos[$name] = $this->connection->fetchAllAssociative(
+                    sprintf('SELECT * FROM %s WHERE %s = ? ORDER BY ordre ASC, id ASC', $field['liaison']['table'], $field['liaison']['cle']),
+                    [$id]
+                );
+            }
+        }
+
+        return $photos;
+    }
+
+    /**
      * Remplace les listes de choix dynamiques (ex. sections de textes encore libres).
      */
     private function fieldsWithChoices(array $fields, bool $isNew): array
@@ -300,21 +380,25 @@ class AdminController extends AbstractController
     {
         $choices = [];
         foreach ($fields as $name => $field) {
-            if ($field['type'] !== 'relation') {
+            if (!in_array($field['type'], ['relation', 'multiple'], true)) {
                 continue;
             }
             $choices[$name] = match ($field['choices']) {
-                'categories' => array_column(
-                    $this->connection->fetchAllAssociative('SELECT id, nom FROM categories ORDER BY ordre ASC, nom ASC'),
-                    'id',
-                    'nom'
-                ),
+                'categories' => $this->idsByName('SELECT id, nom FROM categories ORDER BY ordre ASC, nom ASC'),
                 'sous_categories' => $this->groupedSubCategories(),
+                'modeles_moto' => $this->idsByName('SELECT id, nom FROM modeles_moto ORDER BY ordre ASC, nom ASC'),
+                'modeles_album' => $this->idsByName('SELECT id, nom FROM modeles_emblematiques ORDER BY ordre ASC, nom ASC'),
                 default => [],
             };
         }
 
         return $choices;
+    }
+
+    /** @return array<string, int> nom => id */
+    private function idsByName(string $sql): array
+    {
+        return array_map('intval', array_column($this->connection->fetchAllAssociative($sql), 'id', 'nom'));
     }
 
     /**
