@@ -1,4 +1,22 @@
 # Textos del sitio en español (formato ICU)
+alerte:
+    annuler:
+        bouton: "Dejar de recibir avisos"
+        fait: "Hecho: ya no recibirá avisos sobre «{nom}»."
+        invalide: "Este enlace ya no es válido: el aviso ya se ha cancelado o enviado."
+        question: "¿Dejar de avisar a {email} cuando {nom} vuelva a estar en stock?"
+        titre: "Aviso de reposición"
+    bouton: "Avisarme"
+    bouton_connecte: "Avisarme en {email}"
+    deja_disponible: "¡Buenas noticias: esta pieza vuelve a estar disponible!"
+    deja_inscrit: "Le avisaremos en {email} cuando vuelva a estar en stock."
+    email_invalide: "Indique un correo electrónico válido."
+    inscrit: "Hecho: le avisaremos en {email} en cuanto la pieza vuelva a estar en stock."
+    me_prevenir: "Avisarme"
+    placeholder: "Su correo electrónico"
+    texte: "Deje su correo electrónico: le enviaremos un mensaje en cuanto esta pieza vuelva a estar disponible."
+    titre: "Avíseme cuando vuelva"
+    trop_de_demandes: "Demasiadas solicitudes desde su conexión: inténtelo de nuevo dentro de una hora."
 boutique:
     ajouter: "Añadir a la cesta"
     aucune_compatible: "Todavía no hay piezas para la {moto}"
@@ -156,6 +174,18 @@ compte:
         titre: "Confirme su correo electrónico."
 email:
     a_bientot: "Hasta pronto,"
+    alerte:
+        annuler: "Cancelar el aviso"
+        confirmation_sujet: "Aviso registrado: «{nom}»"
+        confirmation_texte: "Esta pieza está agotada por el momento. Recibirá un correo en cuanto vuelva a estar disponible."
+        confirmation_titre: "Su aviso se ha registrado"
+        pas_vous: "¿No ha hecho esta solicitud o ya no quiere recibir avisos?"
+        retour_sujet: "«{nom}» vuelve a estar disponible"
+        retour_texte: "La pieza {nom} que esperaba vuelve a estar en stock."
+        retour_titre: "¡Buenas noticias!"
+        retour_unique: "Este aviso era único: no recibirá más correos sobre esta pieza."
+        retour_vite: "Las cantidades suelen ser limitadas: ¡no tarde demasiado!"
+        voir_piece: "Ver la pieza"
     bonjour: "Hola, {prenom}:"
     commande:
         question: "¿Alguna pregunta? Responda a este correo o llámenos al +33 6 75 06 83 20."

@@ -2086,6 +2086,37 @@ a.piece-media { display: block; }
 .piece-similaires strong, .piece-similaires span:not(.no-image) { padding: 0 12px; }
 .piece-page > p:last-child { margin-top: 24px; }
 
+/* « Prévenez-moi quand elle revient » */
+.piece-alerte {
+    scroll-margin-top: calc(var(--header-height) + 20px); /* arrivée par le lien #alerte : pas caché sous le menu */
+    margin: 6px 0;
+    padding: 16px 18px;
+    border: 2px dashed var(--sepia);
+    border-radius: 12px;
+    background-color: #fdfaf6;
+}
+.piece-alerte .panier-message { margin-bottom: 12px; font-size: 0.92em; }
+.piece-alerte-titre { margin-bottom: 4px; font-weight: bold; }
+.piece-alerte-texte { margin-bottom: 12px; color: #6b6b6b; font-size: 0.92em; line-height: 1.5; }
+.piece-alerte-ok { font-weight: bold; color: #2e7d4f; }
+.piece-alerte-form { display: flex; flex-wrap: wrap; gap: 10px; }
+.piece-alerte-form input[type=email] {
+    flex: 1 1 200px;
+    min-width: 0;
+    padding: 11px 14px;
+    border: 2px solid #e2d6c8;
+    border-radius: 50px;
+    font: inherit;
+    background-color: white;
+}
+.piece-alerte-form input[type=email]:focus { outline: none; border-color: var(--sepia); box-shadow: 0 0 0 4px rgba(204, 175, 146, 0.3); }
+.piece-alerte-form .btn-commander { padding: 12px 22px; border: none; font-size: 0.95em; cursor: pointer; white-space: normal; }
+.piece-card .btn-alerte { background-color: var(--sepia); color: var(--carbone); }
+.piece-card .btn-alerte:hover { background-color: var(--carbone); color: var(--beige); }
+.alerte-annuler { max-width: 640px; margin: 0 auto; }
+.alerte-annuler p { margin: 14px 0; line-height: 1.6; }
+.alerte-annuler-liens { display: flex; flex-wrap: wrap; gap: 20px; }
+
 /* Fiche d'un modèle (album) : lien vers ses pièces */
 .carte-pieces { display: flex; flex-wrap: wrap; gap: 10px; }
 .carte-pieces .btn-commander { display: inline-block; padding: 11px 20px; font-size: 0.95em; }

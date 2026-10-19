@@ -107,18 +107,39 @@
                         <p class='piece-stock piece-stock--ok'>✓ {{ 'piece.en_stock'|trans }}</p>
                     {% endif %}
 
-                    <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier piece-achat'>
-                        <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
-                        {% if rupture %}
-                            <button type='submit' class='btn-commander' disabled>{{ 'boutique.indisponible'|trans }}</button>
-                        {% else %}
+                    {% if rupture %}
+                        {# « Prévenez-moi quand elle revient » #}
+                        <div class='piece-alerte' id='alerte'>
+                            {% for message in app.flashes('alerte') %}
+                                <p class='panier-message{{ message[0] == 'erreur' ? ' compte-alerte' }}' role='status'>{{ message[1] }}</p>
+                            {% endfor %}
+                            {% if alerte_en_attente %}
+                                <p class='piece-alerte-ok'>🔔 {{ 'alerte.deja_inscrit'|trans({ email: app.user.email }) }}</p>
+                            {% else %}
+                                <p class='piece-alerte-titre'>🔔 {{ 'alerte.titre'|trans }}</p>
+                                <p class='piece-alerte-texte'>{{ 'alerte.texte'|trans }}</p>
+                                <form method='post' action='{{ path('app_alerte_stock', { id: piece.id }) }}' class='piece-alerte-form'>
+                                    <input type='hidden' name='_token' value='{{ csrf_token('alerte_stock') }}'>
+                                    {% if is_granted('ROLE_CLIENT') %}
+                                        <button type='submit' class='btn-commander'>{{ 'alerte.bouton_connecte'|trans({ email: app.user.email }) }}</button>
+                                    {% else %}
+                                        <label for='alerteEmail' class='sr-only'>{{ 'form.email'|trans }}</label>
+                                        <input type='email' name='email' id='alerteEmail' required autocomplete='email' placeholder='{{ 'alerte.placeholder'|trans }}'>
+                                        <button type='submit' class='btn-commander'>{{ 'alerte.bouton'|trans }}</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier piece-achat'>
+                            <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
                             <label class='piece-quantite'>
                                 <span>{{ 'panier.col.quantite'|trans }}</span>
                                 <input type='number' name='quantite' value='1' min='1' max='{{ piece.stock is null ? 99 : min(99, piece.stock) }}'>
                             </label>
                             <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
-                        {% endif %}
-                    </form>
+                        </form>
+                    {% endif %}
 
                     {# ----- Compatibilité ----- #}
                     <div class='piece-compatibilite'>

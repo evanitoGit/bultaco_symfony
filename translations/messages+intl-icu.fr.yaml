@@ -1,5 +1,23 @@
 # Textes du site en français (format ICU : {variable}, pluriels {n, plural, ...})
 # Généré à partir des mêmes clés que les fichiers anglais et espagnol.
+alerte:
+    annuler:
+        bouton: "Ne plus être prévenu"
+        fait: "C'est fait : vous ne serez plus prévenu pour « {nom} »."
+        invalide: "Ce lien n'est plus valable : l'alerte a déjà été annulée ou envoyée."
+        question: "Ne plus prévenir {email} du retour en stock de {nom} ?"
+        titre: "Alerte de retour en stock"
+    bouton: "Me prévenir"
+    bouton_connecte: "Me prévenir à {email}"
+    deja_disponible: "Bonne nouvelle : cette pièce est de nouveau disponible !"
+    deja_inscrit: "Vous serez prévenu à {email} dès son retour en stock."
+    email_invalide: "Indiquez une adresse e-mail valide."
+    inscrit: "C'est noté : vous serez prévenu à {email} dès que la pièce sera de nouveau en stock."
+    me_prevenir: "Me prévenir"
+    placeholder: "Votre adresse e-mail"
+    texte: "Laissez votre adresse e-mail : vous recevrez un message dès que cette pièce sera de nouveau disponible."
+    titre: "Prévenez-moi quand elle revient"
+    trop_de_demandes: "Trop de demandes depuis votre connexion : réessayez dans une heure."
 boutique:
     ajouter: "Ajouter au panier"
     aucune_compatible: "Aucune pièce compatible avec {moto} pour le moment"
@@ -157,6 +175,18 @@ compte:
         titre: "Confirmez votre adresse e-mail."
 email:
     a_bientot: "À bientôt,"
+    alerte:
+        annuler: "Annuler l'alerte"
+        confirmation_sujet: "Alerte enregistrée : « {nom} »"
+        confirmation_texte: "Cette pièce est en rupture de stock pour le moment. Vous recevrez un e-mail dès qu'elle sera de nouveau disponible."
+        confirmation_titre: "Votre alerte est enregistrée"
+        pas_vous: "Vous n'êtes pas à l'origine de cette demande, ou vous ne souhaitez plus être prévenu ?"
+        retour_sujet: "« {nom} » est de nouveau disponible"
+        retour_texte: "La pièce {nom} que vous attendiez est de nouveau en stock."
+        retour_titre: "Bonne nouvelle !"
+        retour_unique: "Cette alerte n'était valable qu'une fois : vous ne recevrez plus d'e-mail pour cette pièce."
+        retour_vite: "Les quantités sont souvent limitées : ne tardez pas trop !"
+        voir_piece: "Voir la pièce"
     bonjour: "Bonjour {prenom},"
     commande:
         question: "Une question ? Répondez simplement à cet e-mail ou appelez-nous au 06 75 06 83 20."

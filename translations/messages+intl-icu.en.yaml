@@ -1,4 +1,22 @@
 # Site texts in English (ICU message format)
+alerte:
+    annuler:
+        bouton: "Stop notifications"
+        fait: "Done: you will no longer be notified about “{nom}”."
+        invalide: "This link is no longer valid: the alert has already been cancelled or sent."
+        question: "Stop notifying {email} when {nom} is back in stock?"
+        titre: "Back-in-stock alert"
+    bouton: "Notify me"
+    bouton_connecte: "Notify me at {email}"
+    deja_disponible: "Good news: this part is available again!"
+    deja_inscrit: "We will notify you at {email} when it is back in stock."
+    email_invalide: "Please enter a valid e-mail address."
+    inscrit: "Done: we will notify you at {email} as soon as the part is back in stock."
+    me_prevenir: "Notify me"
+    placeholder: "Your e-mail address"
+    texte: "Leave your e-mail address: we will send you a message as soon as this part is available again."
+    titre: "Let me know when it's back"
+    trop_de_demandes: "Too many requests from your connection: please try again in an hour."
 boutique:
     ajouter: "Add to cart"
     aucune_compatible: "No parts for the {moto} yet"
@@ -156,6 +174,18 @@ compte:
         titre: "Please confirm your e-mail address."
 email:
     a_bientot: "See you soon,"
+    alerte:
+        annuler: "Cancel the alert"
+        confirmation_sujet: "Alert saved: “{nom}”"
+        confirmation_texte: "This part is out of stock at the moment. You will receive an e-mail as soon as it is available again."
+        confirmation_titre: "Your alert has been saved"
+        pas_vous: "Didn't request this, or no longer want to be notified?"
+        retour_sujet: "“{nom}” is back in stock"
+        retour_texte: "The part you were waiting for, {nom}, is back in stock."
+        retour_titre: "Good news!"
+        retour_unique: "This alert was a one-off: you will not receive further e-mails about this part."
+        retour_vite: "Quantities are often limited, so don't wait too long!"
+        voir_piece: "View the part"
     bonjour: "Hello {prenom},"
     commande:
         question: "Any questions? Simply reply to this e-mail or call us on +33 6 75 06 83 20."

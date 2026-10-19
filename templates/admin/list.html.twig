@@ -79,6 +79,8 @@
                                         {% else %}
                                             {{ value }}
                                         {% endif %}
+                                    {% elseif format == 'alertes' %}
+                                        {% if value > 0 %}<span class="admin-badge admin-badge--attente" title="Visiteurs qui attendent son retour en stock">🔔 {{ value }}</span>{% endif %}
                                     {% elseif format == 'bool' %}
                                         <span class="admin-badge {{ value ? 'admin-badge--ok' : 'admin-badge--attente' }}">{{ value ? (col.oui ?? 'Oui') : (col.non ?? 'Non') }}</span>
                                     {% elseif format == 'choice' %}
@@ -91,7 +93,9 @@
                                 </td>
                             {% endfor %}
                             <td class="actions">
-                                <a href="{{ path('app_admin_edit', { resource: resource.key, id: row.id }) }}" class="admin-btn admin-btn--small">Modifier</a>
+                                {% if resource.can_edit ?? true %}
+                                    <a href="{{ path('app_admin_edit', { resource: resource.key, id: row.id }) }}" class="admin-btn admin-btn--small">Modifier</a>
+                                {% endif %}
                                 <form method="post" action="{{ path('app_admin_delete', { resource: resource.key, id: row.id }) }}"
                                       onsubmit="return confirm({{ ('Supprimer définitivement cet élément ?' ~ (resource.delete_warning is defined ? '\n\n' ~ resource.delete_warning : ''))|json_encode }});">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete-' ~ resource.key ~ '-' ~ row.id) }}">

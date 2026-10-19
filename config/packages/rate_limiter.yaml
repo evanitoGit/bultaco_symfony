@@ -11,3 +11,8 @@ framework:
             policy: 'fixed_window'
             limit: 5
             interval: '1 hour'
+        # alertes « Prévenez-moi quand elle revient » (par adresse IP)
+        alerte_stock:
+            policy: 'fixed_window'
+            limit: 10
+            interval: '1 hour'
