@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ResourceRegistry
 {
     /** Pour la contrainte de route (doit lister toutes les clés de RESOURCES). */
-    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|modeles-moto|commandes|clients|admins';
+    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|modeles-moto|alertes-stock|commandes|clients|admins';
 
     /** Libellés lisibles des sections de la table `textes`, avec la page qui les affiche. */
     public const TEXT_SECTIONS = [
@@ -261,6 +261,7 @@ final class ResourceRegistry
             'order' => 'nom ASC',
             'title' => ['nom'],
             'list_sql' => "SELECT p.*, sc.nom AS sous_categorie_nom, c.nom AS categorie_nom,
+                    (SELECT COUNT(*) FROM alertes_stock a WHERE a.piece_id = p.id AND a.date_envoi IS NULL) AS nb_alertes,
                     IF(p.universelle, 'Toutes', (SELECT GROUP_CONCAT(m.nom ORDER BY m.ordre, m.nom SEPARATOR ', ') FROM piece_modeles pm INNER JOIN modeles_moto m ON m.id = pm.modele_id WHERE pm.piece_id = p.id)) AS modeles_noms
                 FROM pieces_detachees p LEFT JOIN sous_categories sc ON sc.id = p.sous_categorie_id LEFT JOIN categories c ON c.id = sc.categorie_id
                 ORDER BY c.ordre ASC, sc.ordre ASC, p.nom ASC",
@@ -272,6 +273,7 @@ final class ResourceRegistry
                 'modeles_noms' => ['label' => 'Modèles', 'format' => 'excerpt'],
                 'prix' => ['label' => 'Prix', 'format' => 'money'],
                 'stock' => ['label' => 'Stock', 'format' => 'stock'],
+                'nb_alertes' => ['label' => 'Attendue', 'format' => 'alertes'],
             ],
             'fields' => [
                 'nom' => ['type' => 'text', 'label' => 'Nom de la pièce', 'required' => true, 'max' => 150, 'traduire' => true],
@@ -324,6 +326,30 @@ final class ResourceRegistry
                 'ordre' => ['type' => 'integer', 'label' => "Ordre d'affichage", 'default' => 0, 'help' => 'Ordre dans le menu « Ma moto ».'],
             ],
             'delete_warning' => 'Les pièces ne seront plus indiquées comme compatibles avec ce modèle.',
+        ],
+        'alertes-stock' => [
+            'table' => 'alertes_stock',
+            'group' => 'Boutique',
+            'label' => 'Alertes stock',
+            'singular' => 'une alerte',
+            'icon' => '🔔',
+            'can_create' => false, // les visiteurs s'inscrivent sur la page d'une pièce en rupture
+            'can_edit' => false,
+            'description' => 'Visiteurs qui attendent le retour en stock d\'une pièce. Ils sont prévenus automatiquement par e-mail dès que vous remettez du stock sur la pièce. Les alertes envoyées sont effacées au bout de 6 mois.',
+            'order' => 'date_demande DESC',
+            'title' => ['email'],
+            'list_sql' => 'SELECT a.*, p.nom AS piece_nom, a.date_envoi IS NOT NULL AS envoyee
+                FROM alertes_stock a INNER JOIN pieces_detachees p ON p.id = a.piece_id
+                ORDER BY a.date_envoi IS NULL DESC, a.date_demande DESC',
+            'list' => [
+                'piece_nom' => ['label' => 'Pièce'],
+                'email' => ['label' => 'E-mail'],
+                'langue' => ['label' => 'Langue'],
+                'date_demande' => ['label' => 'Demandée le', 'format' => 'date'],
+                'envoyee' => ['label' => 'État', 'format' => 'bool', 'oui' => 'envoyée', 'non' => 'en attente'],
+            ],
+            'fields' => [],
+            'delete_warning' => 'Cette personne ne sera pas prévenue du retour de la pièce.',
         ],
         'commandes' => [
             'table' => 'commandes',

@@ -98,7 +98,7 @@
                                                             <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
                                                                 <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
                                                                 {% if rupture %}
-                                                                    <button type='submit' class='btn-commander' disabled>{{ 'boutique.indisponible'|trans }}</button>
+                                                                    <a href='{{ piece.url }}#alerte' class='btn-commander btn-alerte'>🔔 {{ 'alerte.me_prevenir'|trans }}</a>
                                                                 {% else %}
                                                                     <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
                                                                 {% endif %}

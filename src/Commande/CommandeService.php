@@ -2,6 +2,7 @@
 
 namespace App\Commande;
 
+use App\Boutique\AlerteStock;
 use App\Cart\Cart;
 use App\Entity\Client;
 use App\I18n\Contenu;
@@ -38,6 +39,7 @@ final class CommandeService
         private readonly LoggerInterface $logger,
         private readonly Contenu $contenu,
         private readonly TranslatorInterface $translator,
+        private readonly AlerteStock $alertes,
         #[Autowire('%env(MAILER_FROM)%')]
         private readonly string $expediteur,
         #[Autowire('%env(CLUB_EMAIL)%')]
@@ -119,10 +121,13 @@ final class CommandeService
     /**
      * Change le statut d'une commande (administration).
      * Annuler une commande remet ses pièces en stock, une seule fois ; la réactiver les retire à nouveau.
+     *
+     * @return int alertes « de retour en stock » envoyées (pièces remises en stock)
      */
-    public function changerStatut(int $id, string $statut): void
+    public function changerStatut(int $id, string $statut): int
     {
-        $this->connection->transactional(function (Connection $connection) use ($id, $statut): void {
+        $remisesEnStock = $this->connection->transactional(function (Connection $connection) use ($id, $statut): array {
+            $pieces = [];
             $restitue = (bool) $connection->fetchOne('SELECT stock_restitue FROM commandes WHERE id = ? FOR UPDATE', [$id]);
             $annulee = $statut === 'annulee';
 
@@ -132,6 +137,7 @@ final class CommandeService
                     [$id]
                 );
                 foreach ($lignes as $ligne) {
+                    $pieces[] = (int) $ligne['piece_id'];
                     // GREATEST : le stock ne descend jamais sous zéro (colonne non signée)
                     $connection->executeStatement(
                         $annulee
@@ -145,7 +151,12 @@ final class CommandeService
             }
 
             $connection->update('commandes', ['statut' => $statut, 'stock_restitue' => (int) $annulee], ['id' => $id]);
+
+            return $annulee ? $pieces : [];
         });
+
+        // e-mails envoyés après l'enregistrement : un échec d'envoi n'annule pas le changement de statut
+        return $this->alertes->envoyerDisponibles($remisesEnStock);
     }
 
     /**

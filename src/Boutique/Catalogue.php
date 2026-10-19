@@ -84,6 +84,16 @@ final class Catalogue
     }
 
     /**
+     * Pièce dans une langue donnée (ex. e-mail au visiteur, envoyé depuis l'administration en français).
+     */
+    public function pieceTraduite(array $piece, string $langue): array
+    {
+        $brut = $this->connection->fetchAssociative(self::SELECT_PIECES . ' WHERE p.id = ?', [$piece['id']]);
+
+        return $brut === false ? $piece : ['nom_fr' => $brut['nom']] + $this->contenu->traduire($brut, self::CHAMPS_TRADUITS, $langue);
+    }
+
+    /**
      * Quelques autres pièces de la même sous-catégorie (sinon de la même catégorie).
      */
     public function similaires(array $piece, int $nombre = 4): array

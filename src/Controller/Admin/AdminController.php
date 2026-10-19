@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Admin\ImageUploader;
 use App\Admin\ResourceRegistry;
+use App\Boutique\AlerteStock;
 use App\Commande\CommandeService;
 use App\Entity\Admin;
 use App\Form\AdminResourceType;
@@ -31,6 +32,7 @@ class AdminController extends AbstractController
         private readonly ImageUploader $uploader,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly CommandeService $commandes,
+        private readonly AlerteStock $alertes,
     ) {
     }
 
@@ -92,6 +94,9 @@ class AdminController extends AbstractController
     public function edit(string $resource, int $id, Request $request): Response
     {
         $config = $this->registry->get($resource);
+        if (($config['can_edit'] ?? true) === false) {
+            throw $this->createNotFoundException();
+        }
 
         return $this->handleForm($config, $request, $this->findRow($config, $id), $id);
     }
@@ -187,11 +192,19 @@ class AdminController extends AbstractController
                 $id = (int) $this->connection->lastInsertId();
             } elseif ($config['key'] === 'commandes') {
                 // le changement de statut met aussi le stock à jour (annulation)
-                $this->commandes->changerStatut($id, $values['statut']);
+                $alertesEnvoyees = $this->commandes->changerStatut($id, $values['statut']);
             } else {
                 $this->connection->update($config['table'], $values, ['id' => $id]);
             }
             $this->saveLinkedData($config, $form, $request, $id);
+
+            // pièce de nouveau en stock : les visiteurs qui l'attendaient sont prévenus
+            if ($config['key'] === 'pieces') {
+                $alertesEnvoyees = $this->alertes->envoyerDisponibles([$id]);
+            }
+            if (($alertesEnvoyees ?? 0) > 0) {
+                $this->addFlash('success', sprintf('🔔 %d alerte%s « de retour en stock » envoyée%2$s par e-mail.', $alertesEnvoyees, $alertesEnvoyees > 1 ? 's' : ''));
+            }
 
             $title = $this->rowTitle($config, $values + $row);
             $this->addFlash('success', $isNew ? sprintf('« %s » a été ajouté.', $title) : sprintf('« %s » a été enregistré.', $title));

@@ -1,0 +1,11 @@
+<div style="font-family: Arial, sans-serif; color: #474747; max-width: 600px; margin: 0 auto;">
+    {% include 'emails/_entete.html.twig' %}
+    <div style="padding: 24px;">
+        <h1 style="font-size: 22px;">🔔 {{ 'email.alerte.confirmation_titre'|trans }}</h1>
+        <p>{{ 'email.alerte.confirmation_texte'|trans }}</p>
+        {% include 'emails/_piece_carte.html.twig' %}
+        <p style="font-size: 13px; color: #8a7a6a;">{{ 'email.alerte.pas_vous'|trans }}
+            <a href="{{ url_annuler }}" style="color: #8a7a6a;">{{ 'email.alerte.annuler'|trans }}</a></p>
+        <p>{{ 'email.a_bientot'|trans }}<br>Le Bultaco Club France</p>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'alerte.annuler.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block body_class %}page-pieces{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <p class='head-titre'>{{ 'nav.pieces_detachees'|trans }}</p>
+    </div>
+
+    <div class='container'>
+        <section class='piece-page'>
+            <div class='piece-bloc alerte-annuler'>
+                <h1 class='piece-titre'>🔔 {{ 'alerte.annuler.titre'|trans }}</h1>
+                {% if annulee %}
+                    <p class='panier-message' role='status'>{{ 'alerte.annuler.fait'|trans({ nom: piece.nom ?? '' }) }}</p>
+                {% elseif alerte is null or piece is null %}
+                    <p>{{ 'alerte.annuler.invalide'|trans }}</p>
+                {% else %}
+                    <p>{{ 'alerte.annuler.question'|trans({ nom: '<strong>' ~ piece.nom|e ~ '</strong>', email: '<strong>' ~ alerte.email|e ~ '</strong>' })|raw }}</p>
+                    <form method='post' action='{{ path('app_alerte_annuler', { jeton: jeton }) }}'>
+                        <input type='hidden' name='_token' value='{{ csrf_token('alerte_annuler') }}'>
+                        <button type='submit' class='btn-commander compte-enregistrer'>{{ 'alerte.annuler.bouton'|trans }}</button>
+                    </form>
+                {% endif %}
+                <p class='alerte-annuler-liens'>
+                    {% if piece %}<a href='{{ piece.url }}' class='panier-continuer'>{{ 'email.alerte.voir_piece'|trans }}</a>{% endif %}
+                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ 'piece.retour'|trans }}</a>
+                </p>
+            </div>
+        </section>
+    </div>
+{% endblock %}

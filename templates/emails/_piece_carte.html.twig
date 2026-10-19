@@ -1,0 +1,15 @@
+{# Pièce dans un e-mail : photo, nom, prix, bouton vers sa page #}
+<table cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0; border: 1px solid #eee; border-radius: 10px;">
+    <tr>
+        {% if piece.image_path %}
+            <td width="140" style="padding: 12px;"><img src="{{ absolute_url(asset(piece.image_path)) }}" alt="" width="120" style="display: block; border-radius: 6px;"></td>
+        {% endif %}
+        <td style="padding: 12px;">
+            <strong style="font-size: 16px;">{{ piece.nom }}</strong><br>
+            <span style="color: #8a7a6a;">{{ piece.prix|euros }}</span>
+        </td>
+    </tr>
+</table>
+<p style="text-align: center; margin: 24px 0;">
+    <a href="{{ url_piece }}" style="display: inline-block; padding: 12px 28px; border-radius: 50px; background: #474747; color: #fff2e3; font-weight: bold; text-decoration: none;">{{ 'email.alerte.voir_piece'|trans }}</a>
+</p>

@@ -155,6 +155,10 @@ final class CompteService
                 'SELECT p.nom, cp.quantite, cp.date_ajout FROM client_panier cp INNER JOIN pieces_detachees p ON p.id = cp.piece_id WHERE cp.client_id = ?',
                 [$client->getId()]
             ),
+            'alertes_stock' => $this->connection->fetchAllAssociative(
+                'SELECT p.nom AS piece, a.langue, a.date_demande, a.date_envoi FROM alertes_stock a INNER JOIN pieces_detachees p ON p.id = a.piece_id WHERE a.email = ? ORDER BY a.date_demande',
+                [$client->getEmail()]
+            ),
         ];
     }
 
@@ -165,6 +169,7 @@ final class CompteService
     public function supprimer(Client $client): void
     {
         $this->connection->executeStatement('UPDATE commandes SET client_id = NULL WHERE client_id = ?', [$client->getId()]);
+        $this->connection->executeStatement('DELETE FROM alertes_stock WHERE email = ?', [$client->getEmail()]);
         // le panier sauvegardé et les demandes de réinitialisation suivent (ON DELETE CASCADE)
         $this->entityManager->remove($client);
         $this->entityManager->flush();

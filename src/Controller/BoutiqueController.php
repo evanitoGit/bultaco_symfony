@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Boutique\AlerteStock;
 use App\Boutique\Catalogue;
+use App\Entity\Client;
 use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -78,7 +80,7 @@ class BoutiqueController extends AbstractController
      * Seul le numéro compte : si le nom a changé, l'ancienne adresse redirige vers la nouvelle.
      */
     #[Route('/boutique/pieces/{id}-{slug}', name: 'app_boutique_piece', requirements: ['id' => '\d+', 'slug' => '[a-z0-9-]*'], methods: ['GET'])]
-    public function piece(int $id, string $slug, Request $request): Response
+    public function piece(int $id, string $slug, Request $request, AlerteStock $alertes): Response
     {
         $piece = $this->catalogue->piece($id);
         if ($piece === null) {
@@ -101,6 +103,9 @@ class BoutiqueController extends AbstractController
             'piece' => $piece,
             'similaires' => $this->catalogue->similaires($piece),
             'moto' => $this->motoChoisie($request, false),
+            // client connecté déjà inscrit à l'alerte de retour en stock
+            'alerte_en_attente' => $this->getUser() instanceof Client && !AlerteStock::disponible($piece)
+                && $alertes->enAttente($piece['id'], $this->getUser()->getEmail()),
         ]);
     }
 
