@@ -105,6 +105,19 @@ a { color: inherit; }
 
 .admin-nav-icon { width: 22px; text-align: center; }
 
+/* Pastille « nouveau » (demandes de pièces) */
+.admin-nav-badge {
+    margin-left: auto;
+    min-width: 22px;
+    padding: 1px 7px;
+    border-radius: 20px;
+    background-color: #c0392b;
+    color: #fff;
+    font-size: 0.78em;
+    font-weight: bold;
+    text-align: center;
+}
+
 .admin-sidebar-footer {
     padding: 12px;
     border-top: 1px solid rgba(204, 175, 146, 0.25);
@@ -618,6 +631,10 @@ a { color: inherit; }
 .admin-commande-infos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
 .admin-commande h2 { font-size: 0.75em; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
 .admin-commande-commentaire { padding: 12px 16px; border-left: 4px solid var(--sepia); background: var(--sepia-light); border-radius: 8px; }
+/* ---------- Détail d'une demande de pièce ---------- */
+.admin-demande > h2 { margin-top: 18px; }
+.admin-demande-photos { display: flex; flex-wrap: wrap; gap: 12px; }
+.admin-demande-photos img { width: 180px; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
 .admin-commande tfoot th { text-align: left; padding: 12px 16px; font-size: 1.1em; }
 
 /* --- Traductions anglais / espagnol sous un champ --- */

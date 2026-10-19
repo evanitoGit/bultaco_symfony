@@ -14,6 +14,7 @@
         <section class='compte'>
             <nav class='compte-onglets' aria-label='{{ 'compte.menu.mon_compte'|trans }}'>
                 <a href='{{ path('app_compte') }}' class='{{ onglet in ['app_compte', 'app_compte_commande'] ? 'actif' }}'>{{ 'compte.onglet.commandes'|trans }}</a>
+                <a href='{{ path('app_compte_demandes') }}' class='{{ onglet == 'app_compte_demandes' ? 'actif' }}'>{{ 'compte.onglet.demandes'|trans }}</a>
                 <a href='{{ path('app_compte_informations') }}' class='{{ onglet == 'app_compte_informations' ? 'actif' }}'>{{ 'compte.onglet.informations'|trans }}</a>
                 <a href='{{ path('app_compte_mot_de_passe') }}' class='{{ onglet == 'app_compte_mot_de_passe' ? 'actif' }}'>{{ 'compte.onglet.mot_de_passe'|trans }}</a>
                 <a href='{{ path('app_compte_donnees') }}' class='{{ onglet == 'app_compte_donnees' ? 'actif' }}'>{{ 'compte.onglet.donnees'|trans }}</a>

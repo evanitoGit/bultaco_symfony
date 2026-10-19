@@ -7,6 +7,7 @@
  *   metaFields  : champs affichés sous le titre (ou fonction item => [textes])
  *   onSelect    : fonction appelée avec l'élément choisi
  *   emptyText   : message si aucun résultat (optionnel)
+ *   emptyLink   : lien proposé si aucun résultat, { texte, url } (optionnel)
  */
 (function () {
     const config = window.searchConfig;
@@ -84,7 +85,8 @@
         searchInput.setAttribute('aria-expanded', 'true');
 
         if (resultats.length === 0) {
-            searchResults.innerHTML = `<div class="no-results">${escapeHtml(config.emptyText || window.I18N?.aucunResultat || 'Aucun résultat trouvé')}</div>`;
+            const lien = config.emptyLink ? `<a href="${escapeHtml(config.emptyLink.url)}" class="no-results-lien">${escapeHtml(config.emptyLink.texte)}</a>` : '';
+            searchResults.innerHTML = `<div class="no-results">${escapeHtml(config.emptyText || window.I18N?.aucunResultat || 'Aucun résultat trouvé')}${lien}</div>`;
             return;
         }
 

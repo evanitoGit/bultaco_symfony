@@ -124,6 +124,12 @@
                     {% endif %}
                 {% endfor %}
             </div>
+
+            {# « Vous ne trouvez pas votre pièce ? » : demande envoyée au club #}
+            <aside class='demande-encart'>
+                <p><strong>{{ 'demande.encart.titre'|trans }}</strong> {{ 'demande.encart.texte'|trans }}</p>
+                <a href='{{ path('app_demande_piece', moto ? { moto: moto.id } : {}) }}' class='btn-commander'>{{ 'demande.encart.bouton'|trans }}</a>
+            </aside>
         </section>
     </div>
 {% endblock %}
@@ -156,6 +162,7 @@
             labelField : 'nom',
             metaFields : p => [`${p.categorie} › ${p.sous_categorie}`, formatPrix(p.prix)],
             emptyText  : {{ 'boutique.aucune_trouvee'|trans|json_encode|raw }},
+            emptyLink  : { texte: {{ 'demande.encart.bouton'|trans|json_encode|raw }}, url: {{ path('app_demande_piece')|json_encode|raw }} },
             // résultat choisi : ouverture de la page de la pièce
             onSelect   : item => { window.location.href = item.url; }
         };

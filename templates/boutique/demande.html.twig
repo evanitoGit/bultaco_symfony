@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'demande.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ 'demande.intro'|trans }}{% endblock %}
+{% block body_class %}page-pieces{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <p class='head-titre'>{{ 'nav.pieces_detachees'|trans }}</p>
+    </div>
+
+    <div class='container'>
+        <section class='commande demande-piece'>
+            {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
+                <div class='commande-bloc'>
+                    <h1 class='piece-titre'>🔍 {{ 'demande.titre'|trans }}</h1>
+                    <p class='compte-intro'>{{ 'demande.intro'|trans }}</p>
+                    {{ form_errors(form) }}
+
+                    <h2 class='commande-titre'>{{ 'demande.ma_moto'|trans }}</h2>
+                    <div class='commande-grille'>
+                        {{ form_row(form.modele) }}
+                        {{ form_row(form.annee) }}
+                    </div>
+                    <div class='demande-autre'{{ form.modele.vars.value == 'autre' or form.modele_autre.vars.errors|length ? '' : ' hidden' }}>
+                        {{ form_row(form.modele_autre) }}
+                    </div>
+
+                    <h2 class='commande-titre'>{{ 'demande.la_piece'|trans }}</h2>
+                    {{ form_row(form.description) }}
+                    {{ form_row(form.photos) }}
+
+                    <h2 class='commande-titre'>{{ 'commande.coordonnees'|trans }}</h2>
+                    <div class='commande-grille'>
+                        {{ form_row(form.nom) }}
+                        {{ form_row(form.email) }}
+                        {{ form_row(form.telephone) }}
+                    </div>
+
+                    {{ form_row(form.site_web) }}
+                    {{ form_row(form.accord) }}
+
+                    <button type='submit' class='btn-commander compte-enregistrer'>{{ 'demande.envoyer'|trans }}</button>
+                    <p class='commande-aide demande-delai'>{{ 'demande.delai'|trans }}</p>
+                </div>
+            {{ form_end(form) }}
+
+            <p><a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ 'piece.retour'|trans }}</a></p>
+        </section>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // champ « Autre modèle » affiché seulement si « Autre » est choisi
+        const choixModele = document.getElementById('demande_piece_modele');
+        const blocAutre = document.querySelector('.demande-autre');
+        choixModele?.addEventListener('change', () => {
+            blocAutre.hidden = choixModele.value !== 'autre';
+            if (!blocAutre.hidden) blocAutre.querySelector('input').focus();
+        });
+    </script>
+{% endblock %}

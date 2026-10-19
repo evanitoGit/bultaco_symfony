@@ -2223,6 +2223,7 @@ a.piece-media { display: block; }
 .commande-form input[type=text],
 .commande-form input[type=email],
 .commande-form input[type=tel],
+.commande-form select,
 .commande-form textarea {
     width: 100%;
     padding: 12px 14px;
@@ -2233,7 +2234,7 @@ a.piece-media { display: block; }
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.commande-form input:focus, .commande-form textarea:focus {
+.commande-form input:focus, .commande-form select:focus, .commande-form textarea:focus {
     outline: none;
     border-color: var(--sepia);
     box-shadow: 0 0 0 4px rgba(204, 175, 146, 0.3);
@@ -2729,3 +2730,64 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
     .masonry-grid { column-count: 1; }
     body.page-index .presentation ul { grid-template-columns: 1fr; }
 }
+
+/* ---------- Demande de pièce (« Vous ne trouvez pas votre pièce ? ») ---------- */
+.demande-piece .commande-form { max-width: 820px; margin: 0 auto; }
+.demande-autre[hidden] { display: none; }
+.demande-delai { margin-top: 12px; }
+.demande-piece [id$=_help] { font-size: 0.85em; color: #8a7a6a; margin-top: 6px; }
+.demande-piece input[type=file] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px dashed #e2d6c8;
+    border-radius: 10px;
+    background-color: #fffdfb;
+    font: inherit;
+    cursor: pointer;
+}
+.demande-piece input[type=file]::file-selector-button {
+    margin-right: 12px;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 20px;
+    background-color: var(--carbone);
+    color: var(--beige);
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* piège à robots : invisible pour les visiteurs (mais pas display:none, que certains robots repèrent) */
+.champ-piege { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.demande-encart {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 24px;
+    margin: 30px 0 10px;
+    padding: 20px 24px;
+    border-left: 5px solid var(--sepia);
+    border-radius: var(--radius);
+    background-color: var(--beige);
+    box-shadow: var(--shadow-sm);
+}
+.demande-encart p { margin: 0; line-height: 1.6; flex: 1 1 320px; }
+
+.no-results-lien { display: block; margin-top: 8px; font-style: normal; color: var(--carbone); font-weight: bold; }
+
+/* Onglet « Mes demandes » */
+.compte-demandes { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 16px; }
+.compte-demande { padding: 16px 18px; border: 1px solid #e4dcd3; border-radius: 12px; background-color: #fff; }
+.compte-demande-entete { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.compte-demande-entete .statut { margin-left: auto; }
+.compte-demande-moto { margin: 8px 0 4px; color: #6b6b6b; font-size: 0.95em; }
+.compte-demande-description { margin: 0; line-height: 1.6; }
+.compte-demande-reponse { margin-top: 12px; padding: 12px 16px; border-left: 4px solid var(--sepia); border-radius: 8px; background-color: var(--beige); }
+.compte-demande-reponse p { margin: 0; line-height: 1.6; }
+.compte-demande-reponse .compte-demande-reponse-titre { font-weight: bold; margin-bottom: 4px; }
+.statut--demande-nouvelle { background-color: #e1ecf7; color: #2b5d8a; }
+.statut--demande-en_cours { background-color: #fff3cd; color: #8a6d1b; }
+.statut--demande-trouvee { background-color: #e3f1e6; color: #2e7d4f; }
+.statut--demande-introuvable { background-color: #f3e5e5; color: #a94442; }

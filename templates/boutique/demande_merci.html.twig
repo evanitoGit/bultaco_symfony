@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'demande.merci.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block body_class %}page-pieces{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <p class='head-titre'>{{ 'nav.pieces_detachees'|trans }}</p>
+    </div>
+
+    <div class='container'>
+        <section class='commande commande-merci'>
+            <div class='commande-bloc'>
+                <p class='commande-ok'>✓ {{ 'demande.merci.titre'|trans }}</p>
+                <p>{{ 'demande.merci.texte'|trans }}</p>
+                {% if demande %}
+                    <p>{{ 'demande.merci.email'|trans({ email: '<strong>' ~ demande.email|e ~ '</strong>', numero: '<strong>' ~ demande.id ~ '</strong>' })|raw }}</p>
+                {% endif %}
+                {% if is_granted('ROLE_CLIENT') %}
+                    <p class='commande-compte'>{{ 'demande.merci.compte'|trans({ lien: '<a href="' ~ path('app_compte_demandes') ~ '">', fin: '</a>' })|raw }}</p>
+                {% endif %}
+                <p class='panier-actions panier-actions--vide'>
+                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>{{ 'commande.merci.retour_boutique'|trans }}</a>
+                </p>
+            </div>
+        </section>
+    </div>
+{% endblock %}

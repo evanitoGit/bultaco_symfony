@@ -1,0 +1,40 @@
+{% extends 'compte/_layout.html.twig' %}
+
+{% block title %}{{ 'compte.onglet.demandes'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+
+{% block contenu %}
+    <div class='compte-bloc'>
+        <h2 class='compte-titre'>{{ 'compte.onglet.demandes'|trans }}</h2>
+        <p class='compte-intro'>{{ 'demande.compte.intro'|trans }}</p>
+
+        {% if demandes is empty %}
+            {% include '_partials/_empty.html.twig' with { icone: '📨', message: 'demande.compte.aucune'|trans } %}
+        {% else %}
+            <ul class='compte-demandes'>
+                {% for demande in demandes %}
+                    <li class='compte-demande'>
+                        <div class='compte-demande-entete'>
+                            <strong>{{ 'demande.compte.numero'|trans({ numero: demande.id }) }}</strong>
+                            <span>{{ demande.date_demande|date('d/m/Y') }}</span>
+                            <span class='statut statut--demande-{{ demande.statut }}'>{{ ('demande.statut.' ~ demande.statut)|trans }}</span>
+                        </div>
+                        <p class='compte-demande-moto'>🏍️ {{ demande.modele_affiche ?: 'demande.compte.modele_inconnu'|trans }}{% if demande.annee %} · {{ demande.annee }}{% endif %}
+                            {% if demande.photos is not empty %} · 📷 {{ 'demande.compte.photos'|trans({ n: demande.photos|length }) }}{% endif %}</p>
+                        <p class='compte-demande-description'>{{ demande.description|nl2br }}</p>
+                        {% if demande.reponse %}
+                            <div class='compte-demande-reponse'>
+                                <p class='compte-demande-reponse-titre'>{{ 'demande.compte.reponse'|trans }}{% if demande.date_reponse %} · {{ demande.date_reponse|date('d/m/Y') }}{% endif %}</p>
+                                <p>{{ demande.reponse|nl2br }}</p>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <p class='panier-actions panier-actions--vide'>
+            <a href='{{ path('app_demande_piece') }}' class='btn-commander'>{{ 'demande.compte.nouvelle'|trans }}</a>
+        </p>
+    </div>
+{% endblock %}
+{% block footer %} {% endblock %}

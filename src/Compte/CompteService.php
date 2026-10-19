@@ -2,6 +2,7 @@
 
 namespace App\Compte;
 
+use App\Boutique\DemandePiece;
 use App\Entity\Client;
 use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
@@ -32,6 +33,7 @@ final class CompteService
         private readonly LoggerInterface $logger,
         private readonly Contenu $contenu,
         private readonly TranslatorInterface $translator,
+        private readonly DemandePiece $demandes,
         #[Autowire('%env(MAILER_FROM)%')]
         private readonly string $expediteur,
     ) {
@@ -159,6 +161,7 @@ final class CompteService
                 'SELECT p.nom AS piece, a.langue, a.date_demande, a.date_envoi FROM alertes_stock a INNER JOIN pieces_detachees p ON p.id = a.piece_id WHERE a.email = ? ORDER BY a.date_demande',
                 [$client->getEmail()]
             ),
+            'demandes_pieces' => $this->demandes->exporter($client),
         ];
     }
 
@@ -170,6 +173,7 @@ final class CompteService
     {
         $this->connection->executeStatement('UPDATE commandes SET client_id = NULL WHERE client_id = ?', [$client->getId()]);
         $this->connection->executeStatement('DELETE FROM alertes_stock WHERE email = ?', [$client->getEmail()]);
+        $this->demandes->supprimerPourClient($client); // avec leurs photos
         // le panier sauvegardé et les demandes de réinitialisation suivent (ON DELETE CASCADE)
         $this->entityManager->remove($client);
         $this->entityManager->flush();

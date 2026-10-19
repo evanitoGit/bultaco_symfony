@@ -1,0 +1,16 @@
+<div style="font-family: Arial, sans-serif; color: #474747; max-width: 600px;">
+    <h1 style="font-size: 20px;">Demande de pièce n° {{ demande.id }}</h1>
+    <p>
+        <strong>{{ demande.nom }}</strong>{% if demande.client_id %} (compte client){% endif %}<br>
+        <a href="mailto:{{ demande.email }}">{{ demande.email }}</a>{% if demande.telephone %} — {{ demande.telephone }}{% endif %}
+    </p>
+    {% if demande.langue != 'fr' %}
+        <p>Langue du client : <strong>{{ langues()[demande.langue] ?? demande.langue }}</strong> — pensez à lui répondre dans cette langue.</p>
+    {% endif %}
+
+    {% include 'emails/_demande_resume.html.twig' %}
+
+    {% if demande.photos is not empty %}<p>Les photos sont jointes à cet e-mail.</p>{% endif %}
+    <p>« Répondre » écrit directement au client. Vous pouvez aussi lui répondre et suivre la demande depuis
+        <a href="{{ url('app_admin_edit', { resource: 'demandes', id: demande.id }) }}">l'administration</a>.</p>
+</div>

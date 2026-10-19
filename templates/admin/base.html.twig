@@ -27,6 +27,10 @@
             {% for key, item in resources %}
                 <a href="{{ path('app_admin_list', { resource: key }) }}" class="admin-nav-link{{ current_resource == key ? ' active' }}">
                     <span class="admin-nav-icon" aria-hidden="true">{{ item.icon }}</span> {{ item.label }}
+                    {% if item.badge_sql is defined %}
+                        {% set nouveaux = admin_badge(key) %}
+                        {% if nouveaux > 0 %}<span class="admin-nav-badge" title="{{ nouveaux }} nouvelle{{ nouveaux > 1 ? 's' }}">{{ nouveaux }}</span>{% endif %}
+                    {% endif %}
                 </a>
             {% endfor %}
         {% endfor %}

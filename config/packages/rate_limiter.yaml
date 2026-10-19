@@ -16,3 +16,8 @@ framework:
             policy: 'fixed_window'
             limit: 10
             interval: '1 hour'
+        # demandes « Vous ne trouvez pas votre pièce ? » (par adresse IP)
+        demande_piece:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '1 hour'

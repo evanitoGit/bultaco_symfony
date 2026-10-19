@@ -2,6 +2,7 @@
 
 namespace App\Admin;
 
+use App\Boutique\DemandePiece;
 use App\Commande\CommandeService;
 use App\I18n\Contenu;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ResourceRegistry
 {
     /** Pour la contrainte de route (doit lister toutes les clés de RESOURCES). */
-    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|modeles-moto|alertes-stock|commandes|clients|admins';
+    public const ROUTE_REQUIREMENT = 'textes|modeles|pilotes|restaurations|logos|pressbook|categories|sous-categories|pieces|modeles-moto|alertes-stock|demandes|commandes|clients|admins';
 
     /** Libellés lisibles des sections de la table `textes`, avec la page qui les affiche. */
     public const TEXT_SECTIONS = [
@@ -350,6 +351,37 @@ final class ResourceRegistry
             ],
             'fields' => [],
             'delete_warning' => 'Cette personne ne sera pas prévenue du retour de la pièce.',
+        ],
+        'demandes' => [
+            'table' => 'demandes_pieces',
+            'group' => 'Boutique',
+            'label' => 'Demandes de pièces',
+            'singular' => 'une demande',
+            'icon' => '📨',
+            'can_create' => false, // les demandes viennent du formulaire « Vous ne trouvez pas votre pièce ? »
+            'description' => 'Pièces recherchées par les visiteurs, avec leurs photos. Ouvrez une demande pour voir le détail, changer son statut et répondre : la réponse est envoyée par e-mail au demandeur.',
+            'order' => 'date_demande DESC',
+            'title' => ['nom'],
+            'list_sql' => "SELECT d.*, COALESCE(m.nom, d.modele_autre, '—') AS modele, JSON_LENGTH(COALESCE(d.photos, '[]')) AS nb_photos
+                FROM demandes_pieces d LEFT JOIN modeles_moto m ON m.id = d.modele_id
+                ORDER BY d.statut = 'nouvelle' DESC, d.date_demande DESC, d.id DESC",
+            'list' => [
+                'date_demande' => ['label' => 'Date', 'format' => 'date'],
+                'nom' => ['label' => 'Nom'],
+                'modele' => ['label' => 'Moto'],
+                'description' => ['label' => 'Pièce recherchée', 'format' => 'excerpt'],
+                'nb_photos' => ['label' => 'Photos'],
+                'statut' => ['label' => 'Statut', 'format' => 'choice'],
+            ],
+            'fields' => [
+                'statut' => ['type' => 'choice', 'label' => 'Statut de la demande', 'required' => true, 'choices' => DemandePiece::STATUTS],
+                'reponse' => ['type' => 'textarea', 'label' => 'Réponse au demandeur', 'rows' => 7,
+                    'help' => 'Dès que vous enregistrez une réponse nouvelle ou modifiée, elle est envoyée par e-mail au demandeur (avec un rappel de sa demande, dans sa langue). Il peut aussi la retrouver dans son compte.'],
+            ],
+            'detail_template' => 'admin/demandes/_detail.html.twig',
+            'detail_sql' => "SELECT COALESCE(m.nom, d.modele_autre) AS modele, JSON_LENGTH(COALESCE(d.photos, '[]')) AS nb_photos FROM demandes_pieces d LEFT JOIN modeles_moto m ON m.id = d.modele_id WHERE d.id = :id",
+            'badge_sql' => "SELECT COUNT(*) FROM demandes_pieces WHERE statut = 'nouvelle'",
+            'delete_warning' => 'Ses photos seront aussi supprimées.',
         ],
         'commandes' => [
             'table' => 'commandes',

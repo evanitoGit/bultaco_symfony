@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Admin\ImageUploader;
 use App\Admin\ResourceRegistry;
 use App\Boutique\AlerteStock;
+use App\Boutique\DemandePiece;
 use App\Commande\CommandeService;
 use App\Entity\Admin;
 use App\Form\AdminResourceType;
@@ -33,6 +34,7 @@ class AdminController extends AbstractController
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly CommandeService $commandes,
         private readonly AlerteStock $alertes,
+        private readonly DemandePiece $demandes,
     ) {
     }
 
@@ -143,6 +145,10 @@ class AdminController extends AbstractController
         foreach ($images as $image) {
             $this->uploader->remove($image);
         }
+        // photos des demandes de pièces, rangées hors du dossier public
+        if ($resource === 'demandes') {
+            $this->demandes->supprimerFichiers($id);
+        }
 
         $this->addFlash('success', sprintf('« %s » a été supprimé.', $this->rowTitle($config, $row)));
 
@@ -201,6 +207,14 @@ class AdminController extends AbstractController
             // pièce de nouveau en stock : les visiteurs qui l'attendaient sont prévenus
             if ($config['key'] === 'pieces') {
                 $alertesEnvoyees = $this->alertes->envoyerDisponibles([$id]);
+            }
+            // nouvelle réponse à une demande de pièce : envoyée au demandeur
+            if ($config['key'] === 'demandes' && ($values['reponse'] ?? null) !== null && $values['reponse'] !== trim((string) ($row['reponse'] ?? ''))) {
+                if ($this->demandes->envoyerReponse($id)) {
+                    $this->addFlash('success', sprintf('✉️ Réponse envoyée par e-mail à %s.', $row['email']));
+                } else {
+                    $this->addFlash('error', 'La réponse est enregistrée, mais l\'e-mail n\'a pas pu être envoyé.');
+                }
             }
             if (($alertesEnvoyees ?? 0) > 0) {
                 $this->addFlash('success', sprintf('🔔 %d alerte%s « de retour en stock » envoyée%2$s par e-mail.', $alertesEnvoyees, $alertesEnvoyees > 1 ? 's' : ''));

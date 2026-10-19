@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Boutique\DemandePiece;
 use App\Commande\CommandeService;
 use App\Compte\CompteService;
 use App\Compte\ReinitialisationMotDePasse;
@@ -32,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Espace client : connexion, inscription, vérification de l'e-mail, mot de passe oublié,
- * commandes, informations du compte et données personnelles.
+ * commandes, demandes de pièces, informations du compte et données personnelles.
  * L'accès à /compte (hors pages publiques) est réservé à ROLE_CLIENT (security.yaml).
  */
 #[Route('/compte')]
@@ -252,6 +253,14 @@ class CompteController extends AbstractController
 
         return $this->render('compte/commande.html.twig', [
             'commande' => $commande,
+        ]);
+    }
+
+    #[Route('/demandes', name: 'app_compte_demandes', methods: ['GET'])]
+    public function demandes(DemandePiece $demandes): Response
+    {
+        return $this->render('compte/demandes.html.twig', [
+            'demandes' => $demandes->demandesDuClient($this->client()),
         ]);
     }
 

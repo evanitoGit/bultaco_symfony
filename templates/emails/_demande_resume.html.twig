@@ -1,0 +1,8 @@
+{# Résumé d'une demande de pièce (e-mails) #}
+<table cellpadding="6" cellspacing="0" width="100%" style="margin: 16px 0; border-collapse: collapse; background: #fdfaf6; border-radius: 8px;">
+    <tr><td width="35%" style="color: #8a7a6a;">{{ 'demande.form.modele'|trans }}</td><td><strong>{{ demande.modele_affiche ?: '—' }}</strong>{{ demande.annee ? ' (' ~ demande.annee ~ ')' }}</td></tr>
+    <tr><td style="color: #8a7a6a; vertical-align: top;">{{ 'demande.form.description'|trans }}</td><td>{{ demande.description|nl2br }}</td></tr>
+    {% if demande.photos is not empty %}
+        <tr><td style="color: #8a7a6a;">{{ 'demande.form.photos'|trans }}</td><td>{{ demande.photos|length }}</td></tr>
+    {% endif %}
+</table>

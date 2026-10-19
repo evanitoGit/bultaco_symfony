@@ -1,0 +1,12 @@
+<div style="font-family: Arial, sans-serif; color: #474747; max-width: 600px; margin: 0 auto;">
+    {% include 'emails/_entete.html.twig' %}
+    <div style="padding: 24px;">
+        <h1 style="font-size: 22px;">{{ 'email.demande.reponse_titre'|trans({ numero: demande.id }) }}</h1>
+        <p>{{ 'email.bonjour'|trans({ prenom: demande.nom }) }}</p>
+        <div style="margin: 20px 0; padding: 16px 18px; border-left: 4px solid #ccaf92; background: #fdfaf6; line-height: 1.6;">{{ demande.reponse|nl2br }}</div>
+        <p style="font-size: 13px; color: #8a7a6a;">{{ 'email.demande.rappel'|trans }}</p>
+        {% include 'emails/_demande_resume.html.twig' %}
+        <p>{{ 'email.demande.repondre'|trans }}</p>
+        <p>{{ 'email.a_bientot'|trans }}<br>Le Bultaco Club France</p>
+    </div>
+</div>
