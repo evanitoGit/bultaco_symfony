@@ -2,7 +2,7 @@
 
 {% block title %}{{ resource.label }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ path('app_admin') }}">Tableau de bord</a> <span aria-hidden="true">›</span> <span>{{ resource.label }}</span>
+    <a href="{{ path('app_admin') }}">Tableau de bord</a> {{ icone('chevron-droite', 'separateur') }} <span>{{ resource.label }}</span>
 {% endblock %}
 
 {% block body %}
@@ -13,7 +13,7 @@
         </div>
         <div class="admin-page-actions">
             {% if resource.public_route is defined %}
-                <a href="{{ path(resource.public_route) }}" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Voir la page ↗</a>
+                <a href="{{ path(resource.public_route) }}" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Voir la page {{ icone('externe') }}</a>
             {% endif %}
             {% if resource.can_create ?? true %}
                 <a href="{{ path('app_admin_new', { resource: resource.key }) }}" class="admin-btn">+ Ajouter {{ resource.singular }}</a>

@@ -74,7 +74,7 @@
                         <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
                         <button type='submit' class='panier-vider'>{{ 'panier.vider'|trans }}</button>
                     </form>
-                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ 'panier.continuer'|trans }}</a>
+                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ icone('fleche-gauche') }} {{ 'panier.continuer'|trans }}</a>
                     <a href='{{ path('app_commande') }}' class='btn-commander'>{{ 'panier.passer_commande'|trans }}</a>
                 </div>
             {% endif %}

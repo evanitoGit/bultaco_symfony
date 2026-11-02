@@ -58,9 +58,9 @@
         <section class='piece-page'>
             <nav class='fil-ariane' aria-label='{{ 'piece.fil_ariane'|trans }}'>
                 <a href='{{ path('app_boutique_pieces') }}'>{{ 'nav.boutique'|trans }}</a>
-                <span aria-hidden='true'>›</span>
+                {{ icone('chevron-droite', 'separateur') }}
                 <a href='{{ path('app_boutique_pieces') }}#cat-{{ piece.categorie_id }}'>{{ piece.categorie }}</a>
-                <span aria-hidden='true'>›</span>
+                {{ icone('chevron-droite', 'separateur') }}
                 <span>{{ piece.sous_categorie }}</span>
             </nav>
 
@@ -76,7 +76,7 @@
                     {% if piece.photos is not empty %}
                         <button type='button' class='piece-photo-principale' aria-label='{{ 'piece.agrandir'|trans }}'>
                             <img src='{{ asset(piece.photos|first) }}' alt='{{ piece.nom }}' id='photoPrincipale'>
-                            <span class='zoom-hint' aria-hidden='true'>⤢</span>
+                            <span class='zoom-hint' aria-hidden='true'>{{ icone('agrandir') }}</span>
                         </button>
                         {% if piece.photos|length > 1 %}
                             <ul class='piece-vignettes'>
@@ -214,7 +214,7 @@
                 </div>
             {% endif %}
 
-            <p><a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ 'piece.retour'|trans }}</a></p>
+            <p><a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ icone('fleche-gauche') }} {{ 'piece.retour'|trans }}</a></p>
         </section>
     </div>
 

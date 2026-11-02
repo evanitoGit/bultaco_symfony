@@ -3,7 +3,7 @@
 {% block title %}{{ 'compte.commande.titre'|trans({ reference: commande.reference }) }} - {{ 'meta.suffixe'|trans }}{% endblock %}
 
 {% block contenu %}
-    <p><a href='{{ path('app_compte') }}' class='panier-continuer'>{{ 'compte.commande.toutes'|trans }}</a></p>
+    <p><a href='{{ path('app_compte') }}' class='panier-continuer'>{{ icone('fleche-gauche') }} {{ 'compte.commande.toutes'|trans }}</a></p>
 
     <div class='compte-bloc commande-merci'>
         <div class='compte-entete'>

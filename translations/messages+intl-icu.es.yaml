@@ -60,7 +60,7 @@ commande:
     mode:
         cheque: "Cheque"
         virement: "Transferencia bancaria"
-    modifier_panier: "← Modificar mi cesta"
+    modifier_panier: "Modificar mi cesta"
     paiement: "Pago"
     statut:
         annulee: "Cancelado"
@@ -76,16 +76,16 @@ commun:
     fermer: "Cerrar"
     le_a: "el {date} a las {heure}"
     non_renseigne: "N/D"
-    retour_site: "← Volver al sitio"
+    retour_site: "Volver al sitio"
     session_expiree: "Su sesión ha caducado, inténtelo de nuevo."
     total: "Total"
-    voir_source: "Ver la fuente original ↗"
+    voir_source: "Ver la fuente original"
 compte:
     commande:
         livraison: "Entrega"
         passee: "Realizado el {date} a las {heure}; pago por {paiement}."
         titre: "Pedido {reference}"
-        toutes: "← Todos mis pedidos"
+        toutes: "Todos mis pedidos"
     connexion:
         afficher_mdp: "Mostrar la contraseña"
         oubli: "¿Ha olvidado su contraseña?"
@@ -131,7 +131,7 @@ compte:
             statut: "Estado"
         connecte: "Sesión iniciada con {email}; cliente desde el {date}."
         sans_compte: "{n, plural, one {Un pedido realizado sin cuenta con esta dirección aparecerá aquí en cuanto la confirme.} other {# pedidos realizados sin cuenta con esta dirección aparecerán aquí en cuanto la confirme.}}"
-        voir_detail: "Ver el detalle →"
+        voir_detail: "Ver el detalle"
     informations:
         a_confirmer: "pendiente de confirmar"
         adresse_actuelle: "Dirección actual"
@@ -163,7 +163,7 @@ compte:
         mot_de_passe: "Contraseña"
     oubli:
         bouton: "Recibir el enlace"
-        retour_connexion: "← Volver a iniciar sesión"
+        retour_connexion: "Volver a iniciar sesión"
         sous_titre: "Indique el correo de su cuenta: le enviaremos un enlace para elegir una nueva contraseña."
     reinitialiser:
         bouton: "Guardar la contraseña"
@@ -346,7 +346,7 @@ panier:
         quantite: "Cantidad"
         sous_total: "Subtotal"
     confirmer_vider: "¿Vaciar la cesta?"
-    continuer: "← Seguir comprando"
+    continuer: "Seguir comprando"
     flash:
         ajoute: "«{nom}» se ha añadido a la cesta."
         deja_tout_le_stock: "Solo quedan {stock} «{nom}» en stock, ya en su cesta."
@@ -387,7 +387,7 @@ piece:
     pas_indiquee: "Esta pieza no figura como compatible con su {moto}."
     photo_n: "Foto {n} de {total}"
     reference: "Referencia original"
-    retour: "← Volver a la tienda"
+    retour: "Volver a la tienda"
     similaires: "En la misma categoría"
     universelle_texte: "Pieza universal: compatible con todas las motos Bultaco."
     voir_pieces_modele: "Ver las piezas para la {moto}"
@@ -445,8 +445,8 @@ restaurations:
     texte_defaut: "Descubra algunos ejemplos de restauraciones de motos Bultaco realizadas por los socios del club."
     titre: "Restauraciones"
 vitrine:
-    titre: "Tienda en modo consulta."
-    texte: "La venta en línea está suspendida temporalmente. ¿Le interesa una pieza? Póngase en contacto con el club y le responderemos rápidamente."
     contacter: "Contactar con el club"
-    vente_suspendue: "La venta en línea está suspendida temporalmente: póngase en contacto con el club para cualquier pieza que le interese."
     interesse_par: "Hola, me interesa la pieza «{nom}»."
+    texte: "La venta en línea está suspendida temporalmente. ¿Le interesa una pieza? Póngase en contacto con el club y le responderemos rápidamente."
+    titre: "Tienda en modo consulta."
+    vente_suspendue: "La venta en línea está suspendida temporalmente: póngase en contacto con el club para cualquier pieza que le interese."
