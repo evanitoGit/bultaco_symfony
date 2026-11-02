@@ -692,6 +692,7 @@ a { color: inherit; }
 /* ---------- Mode de la boutique (tableau de bord) ---------- */
 .admin-mode-boutique {
     display: flex;
+    flex-direction: row; /* .admin-form-card empile en colonne */
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;

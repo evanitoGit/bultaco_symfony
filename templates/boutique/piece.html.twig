@@ -21,26 +21,31 @@
     {% if piece.photos is not empty %}
         <meta property="og:image" content="{{ absolute_url(asset(piece.photos|first)) }}">
     {% endif %}
-    <meta property="product:price:amount" content="{{ piece.prix }}">
-    <meta property="product:price:currency" content="EUR">
+    {% if prix_visibles() %}
+        <meta property="product:price:amount" content="{{ piece.prix }}">
+        <meta property="product:price:currency" content="EUR">
+    {% endif %}
     {# Données « Produit » pour les moteurs de recherche (prix et disponibilité dans les résultats) #}
-    <script type="application/ld+json">
-        {{ {
+    {% set produit = {
             '@context': 'https://schema.org',
             '@type': 'Product',
             name: piece.nom,
             description: resume,
             sku: piece.reference_origine ?: 'BCF-' ~ piece.id,
             category: piece.categorie ~ ' > ' ~ piece.sous_categorie,
-            image: piece.photos|map(photo => absolute_url(asset(photo))),
-            offers: {
+            image: piece.photos|map(photo => absolute_url(asset(photo)))
+    } %}
+    {% if vente_ouverte() %}
+        {% set produit = produit|merge({ offers: {
                 '@type': 'Offer',
                 url: url_absolue,
                 priceCurrency: 'EUR',
                 price: piece.prix,
                 availability: rupture ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock'
-            }
-        }|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}
+        } }) %}
+    {% endif %}
+    <script type="application/ld+json">
+        {{ produit|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}
     </script>
 {% endblock %}
 
@@ -62,6 +67,8 @@
             {% for message in app.flashes('panier') %}
                 <p class='panier-message' role='status'>{{ message }}</p>
             {% endfor %}
+
+            {% include '_partials/_vitrine.html.twig' %}
 
             <div class='piece-fiche'>
                 {# ----- Photos ----- #}
@@ -98,8 +105,13 @@
                         <p class='piece-resume'>{{ piece.description }}</p>
                     {% endif %}
 
-                    <p class='piece-page-prix'>{{ piece.prix|euros }}</p>
-                    {% if rupture %}
+                    {% if prix_visibles() %}
+                        <p class='piece-page-prix'>{{ piece.prix|euros }}</p>
+                    {% endif %}
+                    {% if not vente_ouverte() %}
+                        {# boutique en mode vitrine : pas de stock ni de panier, contact du club #}
+                        <a href='{{ path('app_demande_piece', { piece: piece.id }) }}' class='btn-commander piece-achat'>{{ 'vitrine.contacter'|trans }}</a>
+                    {% elseif rupture %}
                         <p class='piece-stock piece-stock--rupture'>{{ 'boutique.rupture'|trans }}</p>
                     {% elseif piece.stock is not null and piece.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
                         <p class='piece-stock piece-stock--faible'>{{ 'boutique.plus_que'|trans({ n: piece.stock }) }}</p>
@@ -107,7 +119,9 @@
                         <p class='piece-stock piece-stock--ok'>✓ {{ 'piece.en_stock'|trans }}</p>
                     {% endif %}
 
-                    {% if rupture %}
+                    {% if not vente_ouverte() %}
+                        {# mode vitrine : ni alerte de stock ni panier #}
+                    {% elseif rupture %}
                         {# « Prévenez-moi quand elle revient » #}
                         <div class='piece-alerte' id='alerte'>
                             {% for message in app.flashes('alerte') %}

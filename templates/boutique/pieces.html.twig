@@ -21,10 +21,12 @@
             <p class='panier-message' role='status'>{{ message }}</p>
         {% endfor %}
 
+        {% include '_partials/_vitrine.html.twig' %}
+
         {# Filtre « Ma moto » : ne garder que les pièces compatibles #}
         {% if modeles_moto is not empty %}
             <form method='get' action='{{ path('app_boutique_pieces') }}' class='filtre-moto'>
-                <label for='filtreMoto'></label>
+                <label for='filtreMoto'>{{ 'boutique.ma_moto'|trans }}</label>
                 <select name='moto' id='filtreMoto' onchange='this.form.submit()'>
                     <option value='0'>{{ 'boutique.toutes_motos'|trans }}</option>
                     {% for modele in modeles_moto %}
@@ -101,7 +103,12 @@
                                                             {% endif %}
                                                             {% if vente_ouverte() %}
                                                                 <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
-                                                                    … (le contenu actuel du formulaire, inchangé)
+                                                                    <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                                                                    {% if rupture %}
+                                                                        <a href='{{ piece.url }}#alerte' class='btn-commander btn-alerte'>{{ 'alerte.me_prevenir'|trans }}</a>
+                                                                    {% else %}
+                                                                        <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
+                                                                    {% endif %}
                                                                 </form>
                                                             {% else %}
                                                                 <a href='{{ path('app_demande_piece', { piece: piece.id }) }}' class='btn-commander'>{{ 'vitrine.contacter'|trans }}</a>
