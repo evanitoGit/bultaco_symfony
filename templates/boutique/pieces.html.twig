@@ -21,10 +21,12 @@
             <p class='panier-message' role='status'>{{ message }}</p>
         {% endfor %}
 
+        {% include '_partials/_vitrine.html.twig' %}
+
         {# Filtre « Ma moto » : ne garder que les pièces compatibles #}
         {% if modeles_moto is not empty %}
             <form method='get' action='{{ path('app_boutique_pieces') }}' class='filtre-moto'>
-                <label for='filtreMoto'></label>
+                <label for='filtreMoto'>{{ 'boutique.ma_moto'|trans }}</label>
                 <select name='moto' id='filtreMoto' onchange='this.form.submit()'>
                     <option value='0'>{{ 'boutique.toutes_motos'|trans }}</option>
                     {% for modele in modeles_moto %}
@@ -70,7 +72,7 @@
                                         <div class='pieces-grid'>
                                             {% for piece in sousCategorie.pieces %}
                                                 {% set rupture = piece.stock is not null and piece.stock <= 0 %}
-                                                <article class='piece-card{{ rupture ? ' piece-card--rupture' }}' data-id='{{ piece.id }}'>
+                                                <article class='piece-card{{ rupture and vente_ouverte() ? ' piece-card--rupture' }}' data-id='{{ piece.id }}'>
                                                     <a href='{{ piece.url }}' class='piece-media' tabindex='-1' aria-hidden='true'>
                                                         {% if piece.image_path %}
                                                             <img src='{{ asset(piece.image_path) }}' alt='' loading='lazy'>
@@ -88,21 +90,29 @@
                                                         {% if piece.description %}
                                                             <p class='piece-description'>{{ piece.description }}</p>
                                                         {% endif %}
-                                                        {% if rupture %}
-                                                            <p class='piece-stock piece-stock--rupture'>{{ 'boutique.rupture'|trans }}</p>
-                                                        {% elseif piece.stock is not null and piece.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
-                                                            <p class='piece-stock piece-stock--faible'>{{ 'boutique.plus_que'|trans({ n: piece.stock }) }}</p>
+                                                        {% if vente_ouverte() %}
+                                                            {% if rupture %}
+                                                                <p class='piece-stock piece-stock--rupture'>{{ 'boutique.rupture'|trans }}</p>
+                                                            {% elseif piece.stock is not null and piece.stock <= constant('App\\Cart\\Cart::STOCK_FAIBLE') %}
+                                                                <p class='piece-stock piece-stock--faible'>{{ 'boutique.plus_que'|trans({ n: piece.stock }) }}</p>
+                                                            {% endif %}
                                                         {% endif %}
                                                         <div class='piece-footer'>
-                                                            <span class='piece-prix'>{{ piece.prix|euros }}</span>
-                                                            <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
-                                                                <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
-                                                                {% if rupture %}
-                                                                    <a href='{{ piece.url }}#alerte' class='btn-commander btn-alerte'>{{ 'alerte.me_prevenir'|trans }}</a>
-                                                                {% else %}
-                                                                    <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
-                                                                {% endif %}
-                                                            </form>
+                                                            {% if prix_visibles() %}
+                                                                <span class='piece-prix'>{{ piece.prix|euros }}</span>
+                                                            {% endif %}
+                                                            {% if vente_ouverte() %}
+                                                                <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
+                                                                    <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                                                                    {% if rupture %}
+                                                                        <a href='{{ piece.url }}#alerte' class='btn-commander btn-alerte'>{{ 'alerte.me_prevenir'|trans }}</a>
+                                                                    {% else %}
+                                                                        <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
+                                                                    {% endif %}
+                                                                </form>
+                                                            {% else %}
+                                                                <a href='{{ path('app_demande_piece', { piece: piece.id }) }}' class='btn-commander'>{{ 'vitrine.contacter'|trans }}</a>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                 </article>
@@ -160,7 +170,7 @@
             data       : pieces,
             fields     : ['description', 'categorie', 'sous_categorie', 'reference_origine'],
             labelField : 'nom',
-            metaFields : p => [`${p.categorie} › ${p.sous_categorie}`, formatPrix(p.prix)],
+            metaFields : p => [`${p.categorie} › ${p.sous_categorie}`{% if prix_visibles() %}, formatPrix(p.prix){% endif %}],
             emptyText  : {{ 'boutique.aucune_trouvee'|trans|json_encode|raw }},
             emptyLink  : { texte: {{ 'demande.encart.bouton'|trans|json_encode|raw }}, url: {{ path('app_demande_piece')|json_encode|raw }} },
             // résultat choisi : ouverture de la page de la pièce

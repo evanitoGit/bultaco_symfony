@@ -445,3 +445,9 @@ restaurations:
     sous_titre: "Quelques exemples"
     texte_defaut: "Découvrez quelques exemples de restaurations de motos Bultaco réalisées par les membres du club."
     titre: "Restaurations"
+vitrine:
+    titre: "Boutique en consultation."
+    texte: "La vente en ligne est momentanément suspendue. Une pièce vous intéresse ? Contactez le club, nous vous répondrons rapidement."
+    contacter: "Contacter le club"
+    vente_suspendue: "La vente en ligne est momentanément suspendue : contactez le club pour toute pièce qui vous intéresse."
+    interesse_par: "Bonjour, je suis intéressé par la pièce « {nom} »."

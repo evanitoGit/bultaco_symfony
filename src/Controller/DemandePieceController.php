@@ -42,6 +42,16 @@ class DemandePieceController extends AbstractController
             'modele' => in_array($request->query->getInt('moto'), $modeles) ? (string) $request->query->getInt('moto') : null,
         ];
 
+        // « Contacter le club » depuis une pièce (boutique en mode vitrine)
+        if ($request->query->getInt('piece') > 0 && $piece = $catalogue->piece($request->query->getInt('piece'))) {
+            $nom = $piece['reference_origine'] ? sprintf('%s (%s)', $piece['nom'], $piece['reference_origine']) : $piece['nom'];
+            $donnees['description'] = $translator->trans('vitrine.interesse_par', ['nom' => $nom]);
+            // un seul modèle compatible : il est présélectionné
+            if (count($piece['modeles']) === 1 && $donnees['modele'] === null) {
+                $donnees['modele'] = (string) $piece['modeles'][0]['id'];
+            }
+        }
+
         $form = $this->createForm(DemandePieceType::class, $donnees, ['modeles' => array_map('strval', $modeles)]);
         $form->handleRequest($request);
 

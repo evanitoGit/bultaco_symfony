@@ -2791,3 +2791,18 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
 .statut--demande-en_cours { background-color: #fff3cd; color: #8a6d1b; }
 .statut--demande-trouvee { background-color: #e3f1e6; color: #2e7d4f; }
 .statut--demande-introuvable { background-color: #f3e5e5; color: #a94442; }
+
+/* ---------- Boutique en mode vitrine ---------- */
+.vitrine-bandeau {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin: 20px 0;
+    padding: 18px 22px;
+    border-left: 5px solid #d4a017;
+    border-radius: var(--radius);
+    background-color: #fffbea;
+}
+.vitrine-bandeau p { margin: 0; flex: 1 1 320px; line-height: 1.6; }

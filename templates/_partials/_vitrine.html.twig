@@ -1,0 +1,7 @@
+{# Boutique en mode vitrine (bascule dans l'administration) : message et contact du club #}
+{% if not vente_ouverte() %}
+    <div class='vitrine-bandeau' role='note'>
+        <p><strong>{{ 'vitrine.titre'|trans }}</strong> {{ 'vitrine.texte'|trans }}</p>
+        <a href='{{ path('app_demande_piece') }}' class='btn-commander'>{{ 'vitrine.contacter'|trans }}</a>
+    </div>
+{% endif %}

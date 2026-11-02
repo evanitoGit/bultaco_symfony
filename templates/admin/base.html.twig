@@ -20,7 +20,7 @@
 
     <nav class="admin-nav" aria-label="Administration">
         <a href="{{ path('app_admin') }}" class="admin-nav-link{{ current_route == 'app_admin' ? ' active' }}">
-            <span class="admin-nav-icon" aria-hidden="true">🏠</span> Tableau de bord
+            <span class="admin-nav-icon" aria-hidden="true"></span> Tableau de bord
         </a>
         {% for group, resources in groups %}
             <p class="admin-nav-group">{{ group }}</p>
@@ -46,10 +46,10 @@
 <div class="admin-main">
     <header class="admin-topbar">
         <button type="button" class="admin-menu-toggle" aria-label="Ouvrir le menu" aria-controls="adminSidebar" aria-expanded="false"
-                onclick="const o = document.body.classList.toggle('sidebar-open'); this.setAttribute('aria-expanded', o);">☰</button>
+                onclick="const o = document.body.classList.toggle('sidebar-open'); this.setAttribute('aria-expanded', o);"></button>
         <div class="admin-breadcrumb">{% block breadcrumb %}{% endblock %}</div>
         <div class="admin-user">
-            <span class="admin-user-name">👤 {{ app.user.userIdentifier }}</span>
+            <span class="admin-user-name">{{ app.user.userIdentifier }}</span>
             <a href="{{ path('app_logout') }}" class="admin-btn admin-btn--ghost admin-btn--small">Se déconnecter</a>
         </div>
     </header>

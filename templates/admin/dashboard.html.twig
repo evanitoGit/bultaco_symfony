@@ -11,6 +11,27 @@
         </div>
     </div>
 
+    {% set vitrine = not vente_ouverte() %}
+    <form method="post" action="{{ path('app_admin_boutique_mode') }}"
+          class="admin-form-card admin-mode-boutique{{ vitrine ? ' admin-mode-boutique--vitrine' }}"
+          onsubmit="return confirm({{ (vitrine ? 'Réactiver la vente en ligne ?' : 'Passer la boutique en mode vitrine ? Les visiteurs ne pourront plus commander.')|json_encode }});">
+        <input type="hidden" name="_token" value="{{ csrf_token('boutique_mode') }}">
+        <input type="hidden" name="mode" value="{{ vitrine ? 'vente' : 'vitrine' }}">
+        <div>
+            <h2>{{ vitrine ? '🟡 Boutique : vitrine' : '🟢 Boutique : vente en ligne' }}</h2>
+            <p class="admin-muted">
+                {{ vitrine
+                ? 'Les pièces sont visibles, mais le panier et la commande sont fermés.'
+                : 'Les visiteurs peuvent ajouter des pièces au panier et commander.' }}
+            </p>
+            <label class="admin-mode-prix">
+                <input type="checkbox" name="prix" value="1"{{ reglage('vitrine_prix', '1') == '1' ? ' checked' }}>
+                Afficher les prix en mode vitrine
+            </label>
+        </div>
+        <button type="submit" class="admin-btn">{{ vitrine ? 'Réactiver la vente' : 'Passer en mode vitrine' }}</button>
+    </form>
+
     {% for group, resources in groups %}
         <section class="admin-group">
             <h2 class="admin-group-title">{{ group }}</h2>
