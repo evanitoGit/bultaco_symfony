@@ -6,6 +6,7 @@ use App\Admin\ImageUploader;
 use App\Admin\ResourceRegistry;
 use App\Boutique\AlerteStock;
 use App\Boutique\DemandePiece;
+use App\Boutique\Reglages;
 use App\Commande\CommandeService;
 use App\Entity\Admin;
 use App\Form\AdminResourceType;
@@ -51,6 +52,26 @@ class AdminController extends AbstractController
             'groups' => $this->registry->grouped(),
             'counts' => $counts,
         ]);
+    }
+
+    #[Route('/boutique/mode', name: 'app_admin_boutique_mode', methods: ['POST'])]
+    public function modeBoutique(Request $request, Reglages $reglages): Response
+    {
+        if (!$this->isCsrfTokenValid('boutique_mode', $request->getPayload()->getString('_token'))) {
+            $this->addFlash('error', 'La demande a expiré, veuillez réessayer.');
+
+            return $this->redirectToRoute('app_admin');
+        }
+
+        $vitrine = $request->getPayload()->getString('mode') === Reglages::VITRINE;
+        $reglages->set('boutique_mode', $vitrine ? Reglages::VITRINE : Reglages::VENTE);
+        $reglages->set('vitrine_prix', $request->getPayload()->getBoolean('prix') ? '1' : '0');
+
+        $this->addFlash('success', $vitrine
+            ? '🟡 La boutique est en mode vitrine : les visiteurs voient les pièces mais ne peuvent plus commander.'
+            : '🟢 La vente en ligne est ouverte.');
+
+        return $this->redirectToRoute('app_admin');
     }
 
     #[Route('/{resource}', name: 'app_admin_list', requirements: ['resource' => ResourceRegistry::ROUTE_REQUIREMENT], methods: ['GET'])]
