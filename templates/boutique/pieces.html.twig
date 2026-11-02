@@ -24,7 +24,7 @@
         {# Filtre « Ma moto » : ne garder que les pièces compatibles #}
         {% if modeles_moto is not empty %}
             <form method='get' action='{{ path('app_boutique_pieces') }}' class='filtre-moto'>
-                <label for='filtreMoto'>🏍️ {{ 'boutique.ma_moto'|trans }}</label>
+                <label for='filtreMoto'></label>
                 <select name='moto' id='filtreMoto' onchange='this.form.submit()'>
                     <option value='0'>{{ 'boutique.toutes_motos'|trans }}</option>
                     {% for modele in modeles_moto %}
@@ -48,7 +48,7 @@
                         <div class='categorie-header' role='button' tabindex='0' aria-expanded='{{ moto ? 'true' : 'false' }}' aria-controls='cat-{{ categorie.id }}'
                              onclick="toggleBloc('cat-{{ categorie.id }}')">
                             <h3>
-                                <span class='arrow' aria-hidden='true'>▶</span>
+                                <span class='arrow' aria-hidden='true'></span>
                                 {{ categorie.nom }}
                                 <span class='badge'>{{ 'boutique.nb_pieces'|trans({ n: categorie.nb_pieces }) }}</span>
                             </h3>
@@ -60,7 +60,7 @@
                                     <div class='sous-categorie-header' role='button' tabindex='0' aria-expanded='{{ moto ? 'true' : 'false' }}' aria-controls='sous-cat-{{ sousCategorie.id }}'
                                          onclick="toggleBloc('sous-cat-{{ sousCategorie.id }}')">
                                         <h4>
-                                            <span class='arrow' aria-hidden='true'>▶</span>
+                                            <span class='arrow' aria-hidden='true'></span>
                                             {{ sousCategorie.nom }}
                                             <span class='badge-small'>{{ sousCategorie.pieces|length }}</span>
                                         </h4>
@@ -75,7 +75,7 @@
                                                         {% if piece.image_path %}
                                                             <img src='{{ asset(piece.image_path) }}' alt='' loading='lazy'>
                                                         {% else %}
-                                                            <div class='no-image'>📦</div>
+                                                            <div class='no-image'></div>
                                                         {% endif %}
                                                     </a>
                                                     <div class='piece-info'>
@@ -98,7 +98,7 @@
                                                             <form method='post' action='{{ path('app_panier_ajouter', { id: piece.id }) }}' class='form-panier'>
                                                                 <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
                                                                 {% if rupture %}
-                                                                    <a href='{{ piece.url }}#alerte' class='btn-commander btn-alerte'>🔔 {{ 'alerte.me_prevenir'|trans }}</a>
+                                                                    <a href='{{ piece.url }}#alerte' class='btn-commander btn-alerte'>{{ 'alerte.me_prevenir'|trans }}</a>
                                                                 {% else %}
                                                                     <button type='submit' class='btn-commander'>{{ 'boutique.ajouter'|trans }}</button>
                                                                 {% endif %}

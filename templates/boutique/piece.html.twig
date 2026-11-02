@@ -114,9 +114,9 @@
                                 <p class='panier-message{{ message[0] == 'erreur' ? ' compte-alerte' }}' role='status'>{{ message[1] }}</p>
                             {% endfor %}
                             {% if alerte_en_attente %}
-                                <p class='piece-alerte-ok'>🔔 {{ 'alerte.deja_inscrit'|trans({ email: app.user.email }) }}</p>
+                                <p class='piece-alerte-ok'>{{ 'alerte.deja_inscrit'|trans({ email: app.user.email }) }}</p>
                             {% else %}
-                                <p class='piece-alerte-titre'>🔔 {{ 'alerte.titre'|trans }}</p>
+                                <p class='piece-alerte-titre'>{{ 'alerte.titre'|trans }}</p>
                                 <p class='piece-alerte-texte'>{{ 'alerte.texte'|trans }}</p>
                                 <form method='post' action='{{ path('app_alerte_stock', { id: piece.id }) }}' class='piece-alerte-form'>
                                     <input type='hidden' name='_token' value='{{ csrf_token('alerte_stock') }}'>
