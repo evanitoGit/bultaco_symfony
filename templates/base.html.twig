@@ -77,7 +77,7 @@
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'>{{ 'compte.onglet.informations'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'>{{ 'compte.onglet.mot_de_passe'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_donnees') }}'>{{ 'compte.onglet.donnees'|trans }}</a></li>
-                                <li role='none' class='menu-compte-separation'><a role='menuitem' href='{{ path('app_logout') }}' class='menu-compte-deconnexion'><span aria-hidden='true'>↪</span>{{ 'compte.onglet.deconnexion'|trans }}</a></li>
+                                <li role='none' class='menu-compte-separation'><a role='menuitem' href='{{ path('app_logout') }}' class='menu-compte-deconnexion'>{{ icone('deconnexion') }}{{ 'compte.onglet.deconnexion'|trans }}</a></li>
                             </ul>
                         {% else %}
                             <p class='menu-compte-entete'>

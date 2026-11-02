@@ -105,6 +105,11 @@ a { color: inherit; }
 
 .admin-nav-icon { width: 22px; text-align: center; }
 
+/* Icônes SVG ({{ icone('…') }}) : taille et couleur du texte qui les entoure */
+.icone { display: inline-block; flex-shrink: 0; vertical-align: -0.125em; }
+.admin-nav-icon .icone { vertical-align: -0.15em; }
+.admin-breadcrumb .separateur { margin: 0 4px; vertical-align: -0.15em; opacity: 0.7; }
+
 /* Pastille « nouveau » (demandes de pièces) */
 .admin-nav-badge {
     margin-left: auto;
@@ -152,8 +157,11 @@ a { color: inherit; }
     border-radius: 8px;
     width: 40px;
     height: 40px;
-    font-size: 1.2em;
+    font-size: 1.4em;
+    color: var(--carbone);
     cursor: pointer;
+    align-items: center;
+    justify-content: center;
 }
 
 .admin-breadcrumb {
@@ -603,7 +611,7 @@ a { color: inherit; }
     body.sidebar-open .admin-backdrop { opacity: 1; visibility: visible; }
 
     .admin-main { margin-left: 0; }
-    .admin-menu-toggle { display: block; }
+    .admin-menu-toggle { display: inline-flex; }
     .admin-topbar { padding: 10px 16px; }
     .admin-content { padding: 20px 16px; }
     .admin-user-name { display: none; }

@@ -91,7 +91,7 @@
                     ${logo.description ? `<div class='press-description'><p>${nl2br(logo.description)}</p></div>` : ''}
                     ${logo.lien_externe ? `
                     <div class='press-link'>
-                        <a href='${escapeHtml(logo.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>{{ 'commun.voir_source'|trans }}</a>
+                        <a href='${escapeHtml(logo.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>{{ 'commun.voir_source'|trans }} {{ icone('externe') }}</a>
                     </div>` : ''}
                 </div>
             `);

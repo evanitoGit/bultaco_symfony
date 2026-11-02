@@ -127,7 +127,7 @@
                     ${item.description ? `<div class='press-description'><p>${nl2br(item.description)}</p></div>` : ''}
                     ${item.lien_externe ? `
                     <div class='press-link'>
-                        <a href='${escapeHtml(item.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>{{ 'commun.voir_source'|trans }}</a>
+                        <a href='${escapeHtml(item.lien_externe)}' target='_blank' rel='noopener' class='btn-external'>{{ 'commun.voir_source'|trans }} {{ icone('externe') }}</a>
                     </div>` : ''}
                 </div>
             `);

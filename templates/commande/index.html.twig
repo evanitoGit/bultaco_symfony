@@ -62,7 +62,7 @@
                         </ul>
                         <p class='commande-total'><span>{{ 'commun.total'|trans }}</span><strong>{{ total|prix }}</strong></p>
                         <button type='submit' class='btn-commander'>{{ 'commande.valider'|trans }}</button>
-                        <a href='{{ path('app_panier') }}' class='panier-continuer'>{{ 'commande.modifier_panier'|trans }}</a>
+                        <a href='{{ path('app_panier') }}' class='panier-continuer'>{{ icone('fleche-gauche') }} {{ 'commande.modifier_panier'|trans }}</a>
                     </aside>
                 </div>
             {{ form_end(form) }}
