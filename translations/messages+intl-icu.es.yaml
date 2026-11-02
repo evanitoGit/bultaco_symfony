@@ -446,7 +446,7 @@ restaurations:
     titre: "Restauraciones"
 vitrine:
     titre: "Tienda en modo consulta."
-    texte: "La venta en línea está suspendida temporalmente. ¿Le interesa una pieza? Póngase en contacto con el club y le responderemos rápidamente."
+    texte: "¿Le interesa una pieza? Póngase en contacto con el club y le responderemos rápidamente."
     contacter: "Contactar con el club"
     vente_suspendue: "La venta en línea está suspendida temporalmente: póngase en contacto con el club para cualquier pieza que le interese."
     interesse_par: "Hola, me interesa la pieza «{nom}»."
