@@ -25,7 +25,7 @@
                 {% endif %}
                 <p class='alerte-annuler-liens'>
                     {% if piece %}<a href='{{ piece.url }}' class='panier-continuer'>{{ 'email.alerte.voir_piece'|trans }}</a>{% endif %}
-                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ 'piece.retour'|trans }}</a>
+                    <a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ icone('fleche-gauche') }} {{ 'piece.retour'|trans }}</a>
                 </p>
             </div>
         </section>

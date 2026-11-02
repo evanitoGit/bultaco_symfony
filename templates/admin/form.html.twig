@@ -6,8 +6,8 @@
 
 {% block title %}{{ page_title }} - {{ resource.label }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ path('app_admin') }}">Tableau de bord</a> <span aria-hidden="true">›</span>
-    <a href="{{ path('app_admin_list', { resource: resource.key }) }}">{{ resource.label }}</a> <span aria-hidden="true">›</span>
+    <a href="{{ path('app_admin') }}">Tableau de bord</a> {{ icone('chevron-droite', 'separateur') }}
+    <a href="{{ path('app_admin_list', { resource: resource.key }) }}">{{ resource.label }}</a> {{ icone('chevron-droite', 'separateur') }}
     <span>{{ is_new ? 'Ajout' : 'Modification' }}</span>
 {% endblock %}
 
@@ -18,7 +18,7 @@
             {% if not is_new and resource.key == 'textes' %}
                 {% set info = constant('App\\Admin\\ResourceRegistry::TEXT_SECTIONS')[row.section] ?? null %}
                 <p class="admin-page-intro">Page : <strong>{{ info ? info.label : row.section }}</strong>
-                    {% if info %} — <a href="{{ path(info.route) }}" target="_blank" rel="noopener">voir la page ↗</a>{% endif %}</p>
+                    {% if info %} — <a href="{{ path(info.route) }}" target="_blank" rel="noopener">voir la page {{ icone('externe') }}</a>{% endif %}</p>
             {% endif %}
         </div>
     </div>

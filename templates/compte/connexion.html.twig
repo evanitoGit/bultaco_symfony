@@ -46,7 +46,7 @@
                     {{ 'compte.connexion.pas_de_compte'|trans }}
                     <a href='{{ path('app_compte_inscription', app.request.query.get('retour') == 'commande' ? { retour: 'commande' } : {}) }}'>{{ 'compte.menu.creer_compte'|trans }}</a>
                 </p>
-                <a href='{{ path('app_home') }}' class='login-back'>{{ 'commun.retour_site'|trans }}</a>
+                <a href='{{ path('app_home') }}' class='login-back'>{{ icone('fleche-gauche') }} {{ 'commun.retour_site'|trans }}</a>
             </form>
         </section>
     </div>

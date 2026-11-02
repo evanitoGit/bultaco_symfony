@@ -29,7 +29,7 @@
                                         aria-label='{{ 'restaurations.agrandir'|trans({ nom: photo.nom_modele }) }}' onclick='openPhotoModal({{ photo.id }})'>
                                     <div class='album-photo-wrap'>
                                         <img class='restau-photo' src='{{ asset(photo.image_path) }}' alt='{{ photo.nom_modele }}' loading='lazy'>
-                                        <span class='zoom-hint' aria-hidden='true'>⤢</span>
+                                        <span class='zoom-hint' aria-hidden='true'>{{ icone('agrandir') }}</span>
                                     </div>
                                     <figcaption class='album-info'>
                                         <h3>{{ photo.nom_modele }}</h3>

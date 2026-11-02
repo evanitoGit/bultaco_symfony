@@ -50,7 +50,7 @@
                         <div class='categorie-header' role='button' tabindex='0' aria-expanded='{{ moto ? 'true' : 'false' }}' aria-controls='cat-{{ categorie.id }}'
                              onclick="toggleBloc('cat-{{ categorie.id }}')">
                             <h3>
-                                <span class='arrow' aria-hidden='true'></span>
+                                <span class='arrow' aria-hidden='true'>{{ icone('chevron-droite') }}</span>
                                 {{ categorie.nom }}
                                 <span class='badge'>{{ 'boutique.nb_pieces'|trans({ n: categorie.nb_pieces }) }}</span>
                             </h3>
@@ -62,7 +62,7 @@
                                     <div class='sous-categorie-header' role='button' tabindex='0' aria-expanded='{{ moto ? 'true' : 'false' }}' aria-controls='sous-cat-{{ sousCategorie.id }}'
                                          onclick="toggleBloc('sous-cat-{{ sousCategorie.id }}')">
                                         <h4>
-                                            <span class='arrow' aria-hidden='true'></span>
+                                            <span class='arrow' aria-hidden='true'>{{ icone('chevron-droite') }}</span>
                                             {{ sousCategorie.nom }}
                                             <span class='badge-small'>{{ sousCategorie.pieces|length }}</span>
                                         </h4>
@@ -170,7 +170,7 @@
             data       : pieces,
             fields     : ['description', 'categorie', 'sous_categorie', 'reference_origine'],
             labelField : 'nom',
-            metaFields : p => [`${p.categorie} › ${p.sous_categorie}`{% if prix_visibles() %}, formatPrix(p.prix){% endif %}],
+            metaFields : p => [`${p.categorie} / ${p.sous_categorie}`{% if prix_visibles() %}, formatPrix(p.prix){% endif %}],
             emptyText  : {{ 'boutique.aucune_trouvee'|trans|json_encode|raw }},
             emptyLink  : { texte: {{ 'demande.encart.bouton'|trans|json_encode|raw }}, url: {{ path('app_demande_piece')|json_encode|raw }} },
             // résultat choisi : ouverture de la page de la pièce

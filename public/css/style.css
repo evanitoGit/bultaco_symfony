@@ -28,6 +28,11 @@
 
 html { scroll-behavior: smooth; }
 
+/* Icônes SVG ({{ icone('…') }}) : taille et couleur du texte qui les entoure */
+.icone { display: inline-block; flex-shrink: 0; vertical-align: -0.125em; }
+.fil-ariane .separateur { align-self: center; opacity: 0.6; }
+.menu-compte-liens a .icone { width: 20px; height: 1.1em; }
+
 :focus-visible {
     outline: 3px solid var(--sepia);
     outline-offset: 3px;
@@ -1261,8 +1266,8 @@ body.page-restau .restau-section { padding-top: 120px; }
 .sous-categorie-header h4 { font-size: 1.2em; }
 
 .arrow {
-    display: inline-block;
-    font-size: 0.6em;
+    display: inline-flex;
+    font-size: 0.75em;
     transition: transform 0.3s var(--ease);
 }
 

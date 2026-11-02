@@ -38,7 +38,7 @@
 
     <div class="admin-sidebar-footer">
         <a href="{{ path('app_home') }}" class="admin-nav-link" target="_blank" rel="noopener">
-            <span class="admin-nav-icon" aria-hidden="true">↗</span> Voir le site
+            <span class="admin-nav-icon">{{ icone('externe') }}</span> Voir le site
         </a>
     </div>
 </aside>
@@ -46,7 +46,7 @@
 <div class="admin-main">
     <header class="admin-topbar">
         <button type="button" class="admin-menu-toggle" aria-label="Ouvrir le menu" aria-controls="adminSidebar" aria-expanded="false"
-                onclick="const o = document.body.classList.toggle('sidebar-open'); this.setAttribute('aria-expanded', o);"></button>
+                onclick="const o = document.body.classList.toggle('sidebar-open'); this.setAttribute('aria-expanded', o);">{{ icone('menu') }}</button>
         <div class="admin-breadcrumb">{% block breadcrumb %}{% endblock %}</div>
         <div class="admin-user">
             <span class="admin-user-name">{{ app.user.userIdentifier }}</span>

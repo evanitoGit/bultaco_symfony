@@ -37,7 +37,7 @@
                             <td data-label='{{ 'compte.index.col.articles'|trans }}'>{{ commande.nb_articles }}</td>
                             <td data-label='{{ 'commun.total'|trans }}'><strong>{{ commande.total|euros }}</strong></td>
                             <td data-label='{{ 'compte.index.col.statut'|trans }}'><span class='statut statut--{{ commande.statut }}'>{{ ('commande.statut.' ~ commande.statut)|trans }}</span></td>
-                            <td class='compte-col-detail'><a href='{{ path('app_compte_commande', { reference: commande.reference }) }}'>{{ 'compte.index.voir_detail'|trans }}</a></td>
+                            <td class='compte-col-detail'><a href='{{ path('app_compte_commande', { reference: commande.reference }) }}'>{{ 'compte.index.voir_detail'|trans }} {{ icone('fleche-droite') }}</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
