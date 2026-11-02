@@ -444,3 +444,9 @@ restaurations:
     sous_titre: "A few examples"
     texte_defaut: "Discover a few examples of Bultaco motorcycle restorations carried out by club members."
     titre: "Restorations"
+vitrine:
+    titre: "Browse-only shop."
+    texte: "Online sales are temporarily suspended. Interested in a part? Contact the club and we will get back to you quickly."
+    contacter: "Contact the club"
+    vente_suspendue: "Online sales are temporarily suspended: please contact the club about any part you are interested in."
+    interesse_par: "Hello, I am interested in the part “{nom}”."
