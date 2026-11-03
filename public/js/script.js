@@ -92,3 +92,22 @@ function scrollAndHighlight(element) {
     document.addEventListener('click', e => { if (!header.contains(e.target)) setMenu(false); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 })();
+
+// Adresse du pied de page : carte dans une fenêtre (Ctrl+clic ou sans JavaScript : nouvel onglet)
+document.querySelectorAll('[data-carte]').forEach(lien => {
+    const fenetre = document.getElementById(lien.dataset.carte);
+    if (!fenetre?.showModal) return;
+
+    lien.addEventListener('click', e => {
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        const iframe = fenetre.querySelector('iframe');
+        if (!iframe.src) iframe.src = iframe.dataset.src; // Google n'est contacté qu'ici
+        fenetre.showModal();
+    });
+
+    // fermeture : bouton × ou clic à côté de la fenêtre (Échap est géré par le navigateur)
+    fenetre.addEventListener('click', e => {
+        if (e.target === fenetre || e.target.closest('[data-fermer]')) fenetre.close();
+    });
+});
