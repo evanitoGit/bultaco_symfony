@@ -13,8 +13,7 @@
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            sous_titre: 'boutique.catalogue'|trans,
-            placeholder: 'boutique.recherche'|trans
+            sous_titre: 'boutique.catalogue'|trans
         } %}
 
         {% for message in app.flashes('panier') %}
@@ -149,9 +148,6 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const pieces = {{ pieces|json_encode(constant('JSON_HEX_TAG'))|raw }};
-        const formatPrix = prix => parseFloat(prix || 0).toLocaleString(window.I18N.locale, { style: 'currency', currency: 'EUR' });
-
         function setBloc(id, ouvert) {
             const content = document.getElementById(id);
             const header = document.querySelector(`[aria-controls='${id}']`);
@@ -167,17 +163,5 @@
             const content = document.getElementById(id);
             if (content) setBloc(id, content.hidden);
         }
-
-        window.searchConfig = {
-            data       : pieces,
-            fields     : ['description', 'categorie', 'sous_categorie', 'reference_origine'],
-            labelField : 'nom',
-            metaFields : p => [`${p.categorie} / ${p.sous_categorie}`{% if prix_visibles() %}, formatPrix(p.prix){% endif %}],
-            emptyText  : {{ 'boutique.aucune_trouvee'|trans|json_encode|raw }},
-            emptyLink  : { texte: {{ 'demande.encart.bouton'|trans|json_encode|raw }}, url: {{ path('app_demande_piece')|json_encode|raw }} },
-            // résultat choisi : ouverture de la page de la pièce
-            onSelect   : item => { window.location.href = item.url; }
-        };
     </script>
-    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}

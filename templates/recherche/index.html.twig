@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ q ? 'recherche.titre_resultats'|trans({ q: q }) : 'recherche.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block body_class %}page-recherche{% endblock %}
+
+{% block meta %}
+    <meta name='robots' content='noindex'>
+{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <h1>{{ 'recherche.titre'|trans }}</h1>
+    </div>
+
+    <div class='container'>
+        <section class='recherche-page'>
+            <form method='get' action='{{ path('app_recherche') }}' class='recherche-form' role='search'>
+                <label for='recherchePage' class='sr-only'>{{ 'recherche.titre'|trans }}</label>
+                {{ icone('loupe') }}
+                <input type='search' name='q' id='recherchePage' value='{{ q }}' placeholder='{{ 'recherche.placeholder'|trans }}' autocomplete='off'>
+                <button type='submit' class='btn-commander'>{{ 'recherche.bouton'|trans }}</button>
+            </form>
+
+            {% if q|length >= constant('App\\Recherche\\RechercheGlobale::LONGUEUR_MIN') %}
+                {% if groupes is empty %}
+                    {% include 'recherche/_aucun.html.twig' %}
+                {% else %}
+                    <p class='recherche-compte' role='status'>{{ 'recherche.nb'|trans({ n: groupes|reduce((somme, g) => somme + g.total, 0), q: q }) }}</p>
+                    {% include 'recherche/_groupes.html.twig' with { prefixe: 'page', afficher_total: true } %}
+                {% endif %}
+            {% elseif q %}
+                <p class='recherche-aide'>{{ 'recherche.aide'|trans }}</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

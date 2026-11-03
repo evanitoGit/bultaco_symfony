@@ -1,8 +1,7 @@
-{# Introduction commune des sous-pages : texte, sous-titre et recherche #}
+{# Introduction commune des sous-pages : texte et sous-titre (la recherche est dans l'en-tête, pour tout le site) #}
 <section class='hero'>
     <p class='hero-text'>{{ texte }}</p>
     {% if sous_titre is defined %}
         <h2>{{ sous_titre }}</h2>
     {% endif %}
-    {% include '_partials/_search.html.twig' %}
 </section>

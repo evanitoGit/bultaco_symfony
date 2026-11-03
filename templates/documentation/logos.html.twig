@@ -12,8 +12,7 @@
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
-            texte: texte_presentation,
-            placeholder: 'logos.recherche'|trans
+            texte: texte_presentation
         } %}
 
         <section class='pressbook-section'>
@@ -53,15 +52,6 @@
     <script>
         const logos = {{ logos|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
-        window.searchConfig = {
-            data       : logos,
-            fields     : ['description', 'source', 'date_publication'],
-            labelField : 'titre',
-            metaFields : ['date_publication', 'source'],
-            emptyText  : {{ 'logos.aucun_trouve'|trans|json_encode|raw }},
-            onSelect   : item => openLogoModal(item.id)
-        };
-
         function openLogoModal(id) {
             const logo = logos.find(l => l.id == id);
             if (!logo) return;
@@ -96,6 +86,8 @@
                 </div>
             `);
         }
+
+        // arrivée depuis la recherche globale (ou un lien partagé) : l'élément s'ouvre
+        ouvrirDepuisAncre(/^#logo-(\d+)$/, openLogoModal);
     </script>
-    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}

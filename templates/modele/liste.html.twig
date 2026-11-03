@@ -12,8 +12,7 @@
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
-            texte: texte_presentation,
-            placeholder: 'modeles.recherche'|trans
+            texte: texte_presentation
         } %}
 
         <section class='emblemes-section'>
@@ -51,15 +50,6 @@
     <script>
         const modeles = {{ modeles|json_encode(constant('JSON_HEX_TAG'))|raw }};
 
-        window.searchConfig = {
-            data       : modeles,
-            fields     : ['type_moto', 'cylindree', 'description'],
-            labelField : 'nom',
-            metaFields : m => [m.type_moto, (m.annee_debut || m.annee_fin) ? `${m.annee_debut || '?'} – ${m.annee_fin || '?'}` : null],
-            emptyText  : {{ 'modeles.aucun_trouve'|trans|json_encode|raw }},
-            onSelect   : item => openModeleModal(item.id)
-        };
-
         function openModeleModal(id) {
             const modele = modeles.find(m => m.id == id);
             if (!modele) return;
@@ -96,6 +86,8 @@
                 </div>
             `);
         }
+
+        // arrivée depuis la recherche globale (ou un lien partagé) : l'élément s'ouvre
+        ouvrirDepuisAncre(/^#modele-(\d+)$/, openModeleModal);
     </script>
-    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}

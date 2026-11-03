@@ -315,3 +315,130 @@ document.addEventListener('click', e => {
     PiecesVues.ecrire([]);
     bouton.closest('[data-vues-recentes]').hidden = true;
 });
+
+// Ouvre un élément de la page désigné par l'adresse (#modele-12, #pilote-3…), à l'arrivée sur la page
+// et quand l'ancre change (résultat de la recherche globale qui pointe vers la page affichée)
+function ouvrirDepuisAncre(motif, ouvrir) {
+    const essayer = () => {
+        const trouve = location.hash.match(motif);
+        if (trouve) ouvrir(trouve[1]);
+    };
+    essayer();
+    window.addEventListener('hashchange', essayer);
+}
+
+// Recherche globale dans l'en-tête : la loupe (ou Ctrl+K / ⌘K, ou « / ») déploie le champ,
+// les résultats s'affichent dessous pendant la frappe, ↑ ↓ pour les parcourir.
+// Entrée, ou la loupe une fois le champ rempli : page de tous les résultats (/recherche).
+(function () {
+    const zone = document.querySelector('[data-recherche]');
+    if (!zone) return;
+    const champ = zone.querySelector('input[name=q]');
+    const bouton = zone.querySelector('[data-recherche-bouton]');
+    const panneau = zone.querySelector('.recherche-panneau');
+    const resultats = zone.querySelector('[data-recherche-resultats]');
+    const aide = resultats.innerHTML;
+    let minuterie = null;
+    let requete = null;
+    let derniere = null;
+
+    const ouverte = () => zone.classList.contains('ouverte');
+
+    function ouvrir() {
+        if (!ouverte()) {
+            zone.classList.add('ouverte');
+            document.querySelector('header.nav')?.classList.add('recherche-active');
+            champ.tabIndex = 0;
+            champ.setAttribute('aria-expanded', 'true');
+            panneau.hidden = false;
+        }
+        champ.focus();
+    }
+
+    function fermer(rendreLaMain = true) {
+        if (!ouverte()) return;
+        zone.classList.remove('ouverte');
+        document.querySelector('header.nav')?.classList.remove('recherche-active');
+        champ.tabIndex = -1;
+        champ.setAttribute('aria-expanded', 'false');
+        panneau.hidden = true;
+        if (rendreLaMain && zone.contains(document.activeElement)) bouton.focus();
+    }
+
+    async function chercher() {
+        const texte = champ.value.trim();
+        if (texte === derniere) return;
+        derniere = texte;
+        requete?.abort();
+        if (texte.length < 2) {
+            resultats.innerHTML = aide;
+            return;
+        }
+        requete = new AbortController();
+        try {
+            const reponse = await fetch(`${zone.dataset.url}?q=${encodeURIComponent(texte)}`, {
+                signal: requete.signal,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            if (reponse.ok && texte === champ.value.trim()) resultats.innerHTML = await reponse.text();
+        } catch { /* requête remplacée par une plus récente, ou hors ligne */ }
+    }
+
+    // la loupe : déploie le champ ; une fois du texte tapé, lance la page de résultats (envoi normal du formulaire)
+    bouton.addEventListener('click', e => {
+        if (!ouverte() || champ.value.trim() === '') {
+            e.preventDefault();
+            ouvrir();
+        }
+    });
+    zone.querySelector('[data-recherche-fermer]').addEventListener('click', () => fermer());
+
+    champ.addEventListener('input', () => {
+        clearTimeout(minuterie);
+        minuterie = setTimeout(chercher, 200); // pas une requête à chaque lettre
+    });
+
+    document.addEventListener('keydown', e => {
+        const enSaisie = e.target.closest('input, textarea, select, [contenteditable="true"]');
+        if (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            ouvrir();
+        } else if (e.key === '/' && !enSaisie && !document.querySelector('dialog[open]')) {
+            e.preventDefault();
+            ouvrir();
+        }
+    });
+
+    zone.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            e.stopPropagation();
+            fermer();
+            return;
+        }
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        const liens = [...resultats.querySelectorAll('a')];
+        if (liens.length === 0) return;
+        e.preventDefault();
+        const position = liens.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown') (liens[position + 1] || liens[0]).focus();
+        else if (position <= 0) champ.focus();
+        else liens[position - 1].focus();
+    });
+
+    // clic ailleurs sur la page : la recherche se replie (le texte tapé est gardé)
+    document.addEventListener('click', e => {
+        if (ouverte() && !zone.contains(e.target)) fermer(false);
+    });
+
+    resultats.addEventListener('click', e => {
+        const lien = e.target.closest('a');
+        if (!lien) return;
+        fermer(false);
+        // résultat sur la page affichée avec la même ancre : le navigateur ne signale rien, on le fait
+        const cible = new URL(lien.href, location.href);
+        if (cible.pathname === location.pathname && cible.search === location.search && cible.hash === location.hash) {
+            e.preventDefault();
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
+        }
+    });
+})();
