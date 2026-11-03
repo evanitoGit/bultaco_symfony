@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{#
+    Page « introuvable » (erreur 404), affichée seulement en production.
+    En développement, aperçu à l'adresse /_error/404.
+    Image : à remplacer par une photo de Bultaco (moto en panne, au fossé…) dans public/img/
+#}
+{% set image_404 = 'img/logo_rond.png' %}
+
+{% block title %}{{ 'erreur.404.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block body_class %}page-erreur{% endblock %}
+
+{% block meta %}
+    <meta name='robots' content='noindex'>
+{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <h1>404</h1>
+    </div>
+
+    <div class='container'>
+        <section class='erreur-page'>
+            <img src='{{ asset(image_404) }}' alt='' class='erreur-image'>
+            <h2>{{ 'erreur.404.titre'|trans }}</h2>
+            <p class='erreur-texte'>{{ 'erreur.404.texte'|trans }}</p>
+            <p>{{ 'erreur.404.aide'|trans }}</p>
+
+            <form method='get' action='{{ path('app_recherche') }}' class='recherche-form' role='search'>
+                <label for='recherche404' class='sr-only'>{{ 'recherche.ouvrir'|trans }}</label>
+                {{ icone('loupe') }}
+                <input type='search' name='q' id='recherche404' placeholder='{{ 'recherche.placeholder'|trans }}' autocomplete='off'>
+                <button type='submit' class='btn-commander'>{{ 'recherche.bouton'|trans }}</button>
+            </form>
+
+            <p>{{ 'erreur.404.liens'|trans }}</p>
+            <ul class='erreur-liens'>
+                <li><a href='{{ path('app_home') }}' class='btn-commander'>{{ 'erreur.accueil'|trans }}</a></li>
+                <li><a href='{{ path('app_boutique_pieces') }}'>{{ 'nav.pieces_detachees'|trans }}</a></li>
+                <li><a href='{{ path('app_modeles_liste') }}'>{{ 'nav.modeles'|trans }}</a></li>
+                <li><a href='{{ path('app_demande_piece') }}'>{{ 'demande.encart.pied'|trans }}</a></li>
+            </ul>
+        </section>
+    </div>
+{% endblock %}

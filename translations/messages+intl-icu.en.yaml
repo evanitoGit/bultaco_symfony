@@ -262,6 +262,17 @@ email:
         texte: "To confirm {email} as the address of your Bultaco Club France account, click the button below:"
         titre: "Confirm your e-mail address"
         validite: "This link is valid for 24 hours. If you did not make this request, simply ignore this e-mail."
+erreur:
+    404:
+        aide: "The address may be mistyped, or the page has moved. Search for what you need:"
+        liens: "Or get back on the road:"
+        texte: "This page must have snapped its chain somewhere between Barcelona and Reims…"
+        titre: "Page not found"
+    accueil: "Back to the home page"
+    generique:
+        code: "Error code: {code}"
+        texte: "The site has stalled. We are already under the bonnet: please try again in a moment."
+        titre: "Temporary breakdown"
 form:
     accord: "I have checked my order and agree to be contacted by the club to finalise it."
     adresse: "Address"
@@ -386,11 +397,14 @@ piece:
     partager: "Share:"
     pas_indiquee: "This part is not listed as compatible with your {moto}."
     photo_n: "Photo {n} of {total}"
+    precedente: "Previous part"
     reference: "Original part number"
     retour: "Back to the shop"
     similaires: "In the same category"
+    suivante: "Next part"
     universelle_texte: "Universal part: fits all Bultaco motorcycles."
     voir_pieces_modele: "See parts for the {moto}"
+    voisines: "Other parts in {rayon}"
 pied:
     adresse: "ADDRESS"
     carte_ouvrir: "Open in Google Maps"

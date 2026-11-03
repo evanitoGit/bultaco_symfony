@@ -193,6 +193,28 @@
                 </div>
             {% endif %}
 
+            {# Pièces précédente / suivante du même rayon (sous-catégorie) #}
+            {% if voisines.precedente or voisines.suivante %}
+                <nav class='piece-voisines' aria-label='{{ 'piece.voisines'|trans({ rayon: piece.sous_categorie }) }}'>
+                    {% for sens, voisine in { precedente: voisines.precedente, suivante: voisines.suivante } %}
+                        {% if voisine %}
+                            <a href='{{ voisine.url }}' class='piece-voisine piece-voisine--{{ sens }}' rel='{{ sens == 'precedente' ? 'prev' : 'next' }}'>
+                                {{ icone(sens == 'precedente' ? 'chevron-gauche' : 'chevron-droite') }}
+                                {% if voisine.image_path %}
+                                    <img src='{{ asset(voisine.image_path) }}' alt='' loading='lazy'>
+                                {% endif %}
+                                <span>
+                                    <small>{{ ('piece.' ~ sens)|trans }}</small>
+                                    <strong>{{ voisine.nom }}</strong>
+                                </span>
+                            </a>
+                        {% else %}
+                            <span aria-hidden='true'></span>
+                        {% endif %}
+                    {% endfor %}
+                </nav>
+            {% endif %}
+
             {% if similaires is not empty %}
                 <div class='piece-bloc'>
                     <h2>{{ 'piece.similaires'|trans }}</h2>

@@ -117,6 +117,31 @@ final class Catalogue
         return $pieces;
     }
 
+    /**
+     * Pièces précédente et suivante dans la même sous-catégorie, dans l'ordre de la boutique.
+     * Avec le filtre « Ma moto » actif, on ne passe que par les pièces compatibles
+     * (sauf si la pièce affichée n'en fait pas partie : on parcourt alors toute la sous-catégorie).
+     *
+     * @return array{precedente: ?array, suivante: ?array}
+     */
+    public function voisines(array $piece, ?int $modeleId = null): array
+    {
+        $rayon = array_values(array_filter(
+            $this->pieces($modeleId),
+            fn (array $p) => (int) $p['sous_categorie_id'] === (int) $piece['sous_categorie_id']
+        ));
+        $position = array_search((int) $piece['id'], array_map(fn (array $p) => (int) $p['id'], $rayon), true);
+
+        if ($position === false) {
+            return $modeleId ? $this->voisines($piece) : ['precedente' => null, 'suivante' => null];
+        }
+
+        return [
+            'precedente' => $rayon[$position - 1] ?? null,
+            'suivante' => $rayon[$position + 1] ?? null,
+        ];
+    }
+
     /** Modèles de motos du menu « Ma moto » */
     public function modelesMoto(): array
     {

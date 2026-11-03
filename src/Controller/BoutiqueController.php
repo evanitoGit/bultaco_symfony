@@ -117,10 +117,13 @@ class BoutiqueController extends AbstractController
             array_map(fn (string $langue) => $this->catalogue->url($piece, $langue), array_keys(Contenu::LANGUES))
         ));
 
+        $moto = $this->motoChoisie($request, false);
+
         return $this->render('boutique/piece.html.twig', [
             'piece' => $piece,
             'similaires' => $this->catalogue->similaires($piece),
-            'moto' => $this->motoChoisie($request, false),
+            'voisines' => $this->catalogue->voisines($piece, $moto['id'] ?? null),
+            'moto' => $moto,
             // client connecté déjà inscrit à l'alerte de retour en stock
             'alerte_en_attente' => $this->getUser() instanceof Client && !AlerteStock::disponible($piece)
                 && $alertes->enAttente($piece['id'], $this->getUser()->getEmail()),

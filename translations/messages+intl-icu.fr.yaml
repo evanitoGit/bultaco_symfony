@@ -263,6 +263,17 @@ email:
         texte: "Pour confirmer l'adresse {email} de votre compte Bultaco Club France, cliquez sur le bouton ci-dessous :"
         titre: "Confirmez votre adresse e-mail"
         validite: "Ce lien est valable 24 heures. Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail."
+erreur:
+    404:
+        aide: "L'adresse est peut-être mal tapée, ou la page a été déplacée. Cherchez ce qui vous intéresse :"
+        liens: "Ou reprenez la route :"
+        texte: "Cette page a dû casser sa chaîne quelque part entre Barcelone et Reims…"
+        titre: "Page introuvable"
+    accueil: "Retour à l'accueil"
+    generique:
+        code: "Code de l'erreur : {code}"
+        texte: "Le site a calé. Nous sommes déjà sous le capot : réessayez dans quelques instants."
+        titre: "Panne passagère"
 form:
     accord: "J'ai vérifié ma commande et j'accepte d'être contacté par le club pour la finaliser."
     adresse: "Adresse"
@@ -387,11 +398,14 @@ piece:
     partager: "Partager :"
     pas_indiquee: "Cette pièce n'est pas indiquée comme compatible avec votre {moto}."
     photo_n: "Photo {n} sur {total}"
+    precedente: "Pièce précédente"
     reference: "Référence d'origine"
     retour: "Retour à la boutique"
     similaires: "Dans la même catégorie"
+    suivante: "Pièce suivante"
     universelle_texte: "Pièce universelle : compatible avec toutes les motos Bultaco."
     voir_pieces_modele: "Voir les pièces pour {moto}"
+    voisines: "Autres pièces du rayon {rayon}"
 pied:
     adresse: "ADRESSE"
     carte_ouvrir: "Ouvrir dans Google Maps"
