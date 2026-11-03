@@ -153,8 +153,17 @@
 
         <div class='coord-bloc contact'>
             <h3>{{ 'pied.contact'|trans }}</h3>
-            <p><a href='tel:+33675068320'>06 75 06 83 20</a></p>
-            <p><a href='mailto:bultaco.club.france@gmail.com'>bultaco.club.france@gmail.com</a></p>
+            {# Bouton « copier » à droite du texte, qui reste centré #}
+            <p class='contact-ligne'>
+                <a href='tel:+33675068320'>06 75 06 83 20</a>
+                <button type='button' class='bouton-copier' data-copier='+33 6 75 06 83 20' data-copie='{{ 'pied.telephone_copie'|trans }}'
+                        aria-label='{{ 'pied.copier_telephone'|trans }}' title='{{ 'pied.copier_telephone'|trans }}'>{{ icone('copier') }}{{ icone('coche') }}</button>
+            </p>
+            <p class='contact-ligne'>
+                <a href='mailto:bultaco.club.france@gmail.com'>bultaco.club.france<wbr>@gmail.com</a>
+                <button type='button' class='bouton-copier' data-copier='bultaco.club.france@gmail.com' data-copie='{{ 'pied.email_copie'|trans }}'
+                        aria-label='{{ 'pied.copier_email'|trans }}' title='{{ 'pied.copier_email'|trans }}'>{{ icone('copier') }}{{ icone('coche') }}</button>
+            </p>
             <p><a href='{{ path('app_demande_piece') }}'>{{ 'demande.encart.pied'|trans }}</a></p>
         </div>
 
@@ -187,11 +196,20 @@
         </div>
         <iframe title='{{ 'pied.carte_titre'|trans }}' allowfullscreen loading='lazy'
                 data-src='https://maps.google.com/maps?q=4%20Chemin%20du%20Glais-Malet%2C%2051220%20Merfy%2C%20France&z=15&output=embed&hl={{ app.request.locale }}'></iframe>
-        <a href='https://www.google.com/maps/search/?api=1&query=4+Chemin+du+Glais-Malet+51220+Merfy+France'
-           target='_blank' rel='noopener' class='carte-dialog-lien'>{{ 'pied.carte_ouvrir'|trans }} {{ icone('externe') }}</a>
+        <div class='carte-dialog-actions'>
+            {# Itinéraire : c'est Google qui demande la position du visiteur, pas le site #}
+            <a href='https://www.google.com/maps/dir/?api=1&destination=4+Chemin+du+Glais-Malet+51220+Merfy+France'
+               target='_blank' rel='noopener' class='btn-commander carte-dialog-itineraire'>{{ icone('itineraire') }} {{ 'pied.itineraire'|trans }}</a>
+            <a href='https://www.google.com/maps/search/?api=1&query=4+Chemin+du+Glais-Malet+51220+Merfy+France'
+               target='_blank' rel='noopener' class='carte-dialog-lien'>{{ 'pied.carte_ouvrir'|trans }} {{ icone('externe') }}</a>
+        </div>
     </dialog>
 </footer>
 {% endblock %}
+
+{# Retour en haut : apparaît après avoir fait défiler (script.js) #}
+<button type='button' class='haut-de-page' data-haut-de-page hidden
+        aria-label='{{ 'commun.haut_de_page'|trans }}' title='{{ 'commun.haut_de_page'|trans }}'>{{ icone('fleche-haut') }}</button>
 
 {% if is_granted('ROLE_ADMIN') %}
     <a href="{{ path('app_admin') }}" class='admin-shortcut'>⚙ Administration</a>

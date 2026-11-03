@@ -21,6 +21,33 @@ function mediaUrl(path) {
     return (document.body.dataset.basePath || '') + '/' + path;
 }
 
+// Petit message en bas de l'écran (ajout au panier, copie…)
+function afficherToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'panier-toast';
+    toast.setAttribute('role', 'status');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+}
+
+// Copie dans le presse-papiers ; repli pour les sites sans HTTPS, où navigator.clipboard est absent
+async function copier(texte) {
+    try {
+        await navigator.clipboard.writeText(texte);
+        return true;
+    } catch {
+        const zone = Object.assign(document.createElement('textarea'), { value: texte, readOnly: true });
+        zone.style.cssText = 'position: fixed; top: 0; opacity: 0;';
+        document.body.appendChild(zone);
+        zone.select();
+        let copie = false;
+        try { copie = document.execCommand('copy'); } catch { /* navigateur trop ancien */ }
+        zone.remove();
+        return copie;
+    }
+}
+
 function pluriel(nombre, singulier, pluriel) {
     return `${nombre} ${nombre > 1 ? (pluriel || singulier + 's') : singulier}`;
 }
@@ -111,3 +138,41 @@ document.querySelectorAll('[data-carte]').forEach(lien => {
         if (e.target === fenetre || e.target.closest('[data-fermer]')) fenetre.close();
     });
 });
+
+// Boutons « copier » : <button data-copier="texte à copier" data-copie="message affiché">
+// (icônes copier/coche : la coche remplace l'icône pendant 2 secondes)
+document.addEventListener('click', async e => {
+    const bouton = e.target.closest('[data-copier]');
+    if (!bouton) return;
+    e.preventDefault();
+    if (!(await copier(bouton.dataset.copier))) {
+        window.prompt('', bouton.dataset.copier); // dernier recours : texte sélectionné à copier à la main
+        return;
+    }
+    bouton.classList.add('copie-ok');
+    setTimeout(() => bouton.classList.remove('copie-ok'), 2000);
+    if (bouton.dataset.copie) afficherToast(bouton.dataset.copie);
+});
+
+// Bouton « retour en haut » : visible après avoir fait défiler, masqué quand le logo du pied de page est à l'écran
+(function () {
+    const bouton = document.querySelector('[data-haut-de-page]');
+    if (!bouton) return;
+    bouton.hidden = false;
+
+    let logoVisible = false;
+    const maj = () => bouton.classList.toggle('visible', window.scrollY > window.innerHeight * 1.5 && !logoVisible);
+    const logo = document.querySelector('.logorond');
+    if (logo && 'IntersectionObserver' in window) {
+        new IntersectionObserver(([entree]) => { logoVisible = entree.isIntersecting; maj(); }).observe(logo);
+    }
+    window.addEventListener('scroll', maj, { passive: true });
+    maj();
+
+    bouton.addEventListener('click', () => {
+        const animations = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: animations ? 'smooth' : 'instant' });
+        // le clavier repart aussi du haut de la page
+        document.querySelector('header a')?.focus({ preventScroll: true });
+    });
+})();

@@ -61,7 +61,7 @@ commande:
     mode:
         cheque: "Chèque"
         virement: "Virement bancaire"
-    modifier_panier: "← Modifier mon panier"
+    modifier_panier: "Modifier mon panier"
     paiement: "Paiement"
     statut:
         annulee: "Annulée"
@@ -75,18 +75,19 @@ commun:
     aucun_resultat: "Aucun résultat trouvé"
     chargement: "Chargement…"
     fermer: "Fermer"
+    haut_de_page: "Retour en haut de la page"
     le_a: "le {date} à {heure}"
     non_renseigne: "N/A"
-    retour_site: "← Retour au site"
+    retour_site: "Retour au site"
     session_expiree: "Votre session a expiré, veuillez réessayer."
     total: "Total"
-    voir_source: "Voir la source originale ↗"
+    voir_source: "Voir la source originale"
 compte:
     commande:
         livraison: "Livraison"
         passee: "Passée le {date} à {heure} — paiement par {paiement}."
         titre: "Commande {reference}"
-        toutes: "← Toutes mes commandes"
+        toutes: "Toutes mes commandes"
     connexion:
         afficher_mdp: "Afficher le mot de passe"
         oubli: "Mot de passe oublié ?"
@@ -132,7 +133,7 @@ compte:
             statut: "Statut"
         connecte: "Connecté avec {email} — client depuis le {date}."
         sans_compte: "{n, plural, one {Une commande passée sans compte avec cette adresse apparaîtra ici dès que vous l'aurez confirmée.} other {# commandes passées sans compte avec cette adresse apparaîtront ici dès que vous l'aurez confirmée.}}"
-        voir_detail: "Voir le détail →"
+        voir_detail: "Voir le détail"
     informations:
         a_confirmer: "à confirmer"
         adresse_actuelle: "Adresse actuelle"
@@ -164,7 +165,7 @@ compte:
         mot_de_passe: "Mot de passe"
     oubli:
         bouton: "Recevoir le lien"
-        retour_connexion: "← Retour à la connexion"
+        retour_connexion: "Retour à la connexion"
         sous_titre: "Indiquez l'adresse de votre compte : nous vous enverrons un lien pour choisir un nouveau mot de passe."
     reinitialiser:
         bouton: "Enregistrer le mot de passe"
@@ -347,7 +348,7 @@ panier:
         quantite: "Quantité"
         sous_total: "Sous-total"
     confirmer_vider: "Vider le panier ?"
-    continuer: "← Continuer mes achats"
+    continuer: "Continuer mes achats"
     flash:
         ajoute: "« {nom} » a été ajouté au panier."
         deja_tout_le_stock: "Il ne reste que {stock} « {nom} » en stock, déjà dans votre panier."
@@ -388,7 +389,7 @@ piece:
     pas_indiquee: "Cette pièce n'est pas indiquée comme compatible avec votre {moto}."
     photo_n: "Photo {n} sur {total}"
     reference: "Référence d'origine"
-    retour: "← Retour à la boutique"
+    retour: "Retour à la boutique"
     similaires: "Dans la même catégorie"
     universelle_texte: "Pièce universelle : compatible avec toutes les motos Bultaco."
     voir_pieces_modele: "Voir les pièces pour {moto}"
@@ -397,11 +398,16 @@ pied:
     carte_ouvrir: "Ouvrir dans Google Maps"
     carte_titre: "Le club sur la carte"
     contact: "CONTACT"
+    copier_email: "Copier l'adresse e-mail"
+    copier_telephone: "Copier le numéro de téléphone"
+    email_copie: "Adresse e-mail copiée"
     espace_admin: "Espace administrateur"
     groupe_facebook: "Groupe Bultaco Club France"
+    itineraire: "Itinéraire"
     pays: "France"
     reseaux: "RÉSEAUX SOCIAUX"
     slogan: "Passion Bultaco depuis 1958"
+    telephone_copie: "Numéro de téléphone copié"
 pilotes:
     aucun: "Aucun pilote pour le moment"
     aucun_trouve: "Aucun pilote trouvé"
@@ -448,8 +454,8 @@ restaurations:
     texte_defaut: "Découvrez quelques exemples de restaurations de motos Bultaco réalisées par les membres du club."
     titre: "Restaurations"
 vitrine:
-    titre: "Boutique en consultation."
-    texte: "Une pièce vous intéresse ? Contactez le club, nous vous répondrons rapidement."
     contacter: "Contacter le club"
-    vente_suspendue: "La vente en ligne est momentanément suspendue : contactez le club pour toute pièce qui vous intéresse."
     interesse_par: "Bonjour, je suis intéressé par la pièce « {nom} »."
+    texte: "Une pièce vous intéresse ? Contactez le club, nous vous répondrons rapidement."
+    titre: "Boutique en consultation."
+    vente_suspendue: "La vente en ligne est momentanément suspendue : contactez le club pour toute pièce qui vous intéresse."
