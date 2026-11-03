@@ -393,6 +393,8 @@ piece:
     voir_pieces_modele: "Ver las piezas para la {moto}"
 pied:
     adresse: "DIRECCIÓN"
+    carte_ouvrir: "Abrir en Google Maps"
+    carte_titre: "El club en el mapa"
     contact: "CONTACTO"
     espace_admin: "Área de administración"
     groupe_facebook: "Grupo Bultaco Club France"

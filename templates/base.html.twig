@@ -142,9 +142,13 @@
     <div class='coord-content'>
         <div class='coord-bloc adresse'>
             <h3>{{ 'pied.adresse'|trans }}</h3>
-            <p>4 Chemin du Glais-Malet</p>
-            <p>51220 Merfy</p>
-            <p>{{ 'pied.pays'|trans }}</p>
+            {# Sans JavaScript (ou Ctrl+clic) : Google Maps dans un nouvel onglet ; sinon : carte dans une fenêtre #}
+            <a href='https://www.google.com/maps/search/?api=1&query=4+Chemin+du+Glais-Malet+51220+Merfy+France'
+               target='_blank' rel='noopener' data-carte='carteClub'>
+                <p>4 Chemin du Glais-Malet</p>
+                <p>51220 Merfy</p>
+                <p>{{ 'pied.pays'|trans }}</p>
+            </a>
         </div>
 
         <div class='coord-bloc contact'>
@@ -175,6 +179,17 @@
     <a href="{{ path('app_login') }}" class='logorond-link' aria-label='{{ 'pied.espace_admin'|trans }}'>
         <img src="{{ asset('img/logo_rond.png') }}" alt='' class='logorond'>
     </a>
+    {# Carte du club : la carte Google n'est chargée qu'à l'ouverture de la fenêtre #}
+    <dialog class='carte-dialog' id='carteClub' aria-labelledby='carteClubTitre'>
+        <div class='carte-dialog-entete'>
+            <h2 id='carteClubTitre'>{{ 'pied.carte_titre'|trans }}</h2>
+            <button type='button' class='carte-dialog-fermer' aria-label='{{ 'commun.fermer'|trans }}' data-fermer>&times;</button>
+        </div>
+        <iframe title='{{ 'pied.carte_titre'|trans }}' allowfullscreen loading='lazy'
+                data-src='https://maps.google.com/maps?q=4%20Chemin%20du%20Glais-Malet%2C%2051220%20Merfy%2C%20France&z=15&output=embed&hl={{ app.request.locale }}'></iframe>
+        <a href='https://www.google.com/maps/search/?api=1&query=4+Chemin+du+Glais-Malet+51220+Merfy+France'
+           target='_blank' rel='noopener' class='carte-dialog-lien'>{{ 'pied.carte_ouvrir'|trans }} {{ icone('externe') }}</a>
+    </dialog>
 </footer>
 {% endblock %}
 

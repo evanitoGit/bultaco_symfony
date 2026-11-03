@@ -2811,3 +2811,54 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
     background-color: #fffbea;
 }
 .vitrine-bandeau p { margin: 0; flex: 1 1 320px; line-height: 1.6; }
+
+/* lien qui entoure plusieurs lignes (adresse) : même espacement que sans lien */
+.coord-bloc > a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.coord-bloc > a:hover p { color: var(--sepia); }
+
+/* --- Carte du club (fenêtre ouverte depuis l'adresse du pied de page) --- */
+.carte-dialog {
+    width: min(720px, calc(100% - 32px));
+    margin: auto; /* centrage (annulé par la remise à zéro des marges du site) */
+    padding: 0;
+    border: none;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background-color: var(--beige);
+    box-shadow: var(--shadow-lg);
+}
+.carte-dialog::backdrop { background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(3px); }
+.carte-dialog-entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 8px 8px 20px;
+    background-color: var(--carbone);
+}
+.carte-dialog-entete h2 {
+    margin: 0;
+    color: var(--beige);
+    -webkit-text-stroke: 0;
+    font-size: 1.1em;
+    letter-spacing: 0.08em;
+    text-align: left;
+}
+.carte-dialog-fermer {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--beige);
+    font-size: 1.8em;
+    line-height: 1;
+    cursor: pointer;
+}
+.carte-dialog-fermer:hover { background-color: rgba(255, 255, 255, 0.12); }
+.carte-dialog iframe { display: block; width: 100%; height: min(60vh, 450px); border: 0; }
+.carte-dialog-lien { display: block; padding: 14px 20px; color: var(--carbone); font-weight: bold; text-align: center; }
