@@ -2571,7 +2571,7 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
 }
 
 @media (max-width: 992px) {
-    .coord-content { grid-template-columns: 1fr; max-width: 500px; gap: 20px; }
+    .coord-content { grid-template-columns: minmax(0, 1fr); max-width: 500px; gap: 20px; }
     .coord-bloc { min-height: 0; }
     .logorond { position: static; display: block; margin: 30px auto 0; width: 100px; height: auto; }
     body.page-index .presentation .txt_pres { font-size: 1.2em; width: 90%; }
@@ -2862,3 +2862,92 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
 .carte-dialog-fermer:hover { background-color: rgba(255, 255, 255, 0.12); }
 .carte-dialog iframe { display: block; width: 100%; height: min(60vh, 450px); border: 0; }
 .carte-dialog-lien { display: block; padding: 14px 20px; color: var(--carbone); font-weight: bold; text-align: center; }
+
+/* --- Boutons « copier » (pied de page, partage d'une pièce) --- */
+[data-copier] .icone-coche,
+[data-copier].copie-ok .icone-copier { display: none; }
+[data-copier].copie-ok .icone-coche { display: inline-block; }
+
+.coord-bloc .contact-ligne { position: relative; }
+.bouton-copier {
+    /* à droite du texte, sans le décentrer */
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-left: 6px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--beige);
+    font-size: 0.95em;
+    opacity: 0.55;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+.bouton-copier:hover,
+.bouton-copier:focus-visible { opacity: 1; background-color: rgba(255, 255, 255, 0.1); color: var(--sepia); }
+.bouton-copier.copie-ok { opacity: 1; color: #8fd19e; }
+.contact-ligne a[href^='mailto:'] { overflow-wrap: anywhere; }
+
+/* écrans très étroits : le bouton se place juste après le texte (plus de place à droite) */
+@media (max-width: 400px) {
+    .coord-bloc { padding: 30px 16px; }
+    .bouton-copier { position: static; transform: none; width: 28px; height: 28px; margin-block: -6px; vertical-align: middle; }
+}
+
+.piece-partage-bouton { display: inline-flex; align-items: center; gap: 6px; }
+.piece-partage-bouton.copie-ok { border-color: #2e7d4f; color: #2e7d4f; }
+
+/* --- Carte du club : itinéraire --- */
+.carte-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 20px;
+    padding: 14px 20px;
+}
+.carte-dialog-actions .carte-dialog-lien { padding: 0; }
+.carte-dialog-itineraire { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+
+/* --- Retour en haut de la page --- */
+.haut-de-page {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 2px solid var(--sepia);
+    border-radius: 50%;
+    background-color: var(--carbone);
+    color: var(--beige);
+    font-size: 1.3em;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s var(--ease), visibility 0.3s, background-color 0.2s ease;
+}
+.haut-de-page.visible { opacity: 1; visibility: visible; transform: none; }
+.haut-de-page:hover { background-color: var(--sepia); color: var(--carbone); }
+.haut-de-page:focus-visible { outline: 3px solid var(--sepia); outline-offset: 3px; }
+
+@media (max-width: 700px) {
+    .haut-de-page { right: 16px; bottom: 16px; width: 44px; height: 44px; font-size: 1.2em; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .haut-de-page { transition: none; }
+}

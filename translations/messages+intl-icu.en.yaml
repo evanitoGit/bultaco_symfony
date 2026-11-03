@@ -60,7 +60,7 @@ commande:
     mode:
         cheque: "Cheque"
         virement: "Bank transfer"
-    modifier_panier: "← Edit my cart"
+    modifier_panier: "Edit my cart"
     paiement: "Payment"
     statut:
         annulee: "Cancelled"
@@ -74,18 +74,19 @@ commun:
     aucun_resultat: "No results found"
     chargement: "Loading…"
     fermer: "Close"
+    haut_de_page: "Back to top"
     le_a: "on {date} at {heure}"
     non_renseigne: "N/A"
-    retour_site: "← Back to the site"
+    retour_site: "Back to the site"
     session_expiree: "Your session has expired, please try again."
     total: "Total"
-    voir_source: "View the original source ↗"
+    voir_source: "View the original source"
 compte:
     commande:
         livraison: "Delivery"
         passee: "Placed on {date} at {heure} — payment by {paiement}."
         titre: "Order {reference}"
-        toutes: "← All my orders"
+        toutes: "All my orders"
     connexion:
         afficher_mdp: "Show password"
         oubli: "Forgotten your password?"
@@ -131,7 +132,7 @@ compte:
             statut: "Status"
         connecte: "Signed in as {email} — customer since {date}."
         sans_compte: "{n, plural, one {An order placed without an account using this address will appear here once you have confirmed it.} other {# orders placed without an account using this address will appear here once you have confirmed it.}}"
-        voir_detail: "View details →"
+        voir_detail: "View details"
     informations:
         a_confirmer: "not confirmed"
         adresse_actuelle: "Current address"
@@ -163,7 +164,7 @@ compte:
         mot_de_passe: "Password"
     oubli:
         bouton: "Send me the link"
-        retour_connexion: "← Back to sign in"
+        retour_connexion: "Back to sign in"
         sous_titre: "Enter your account e-mail address: we will send you a link to choose a new password."
     reinitialiser:
         bouton: "Save password"
@@ -346,7 +347,7 @@ panier:
         quantite: "Quantity"
         sous_total: "Subtotal"
     confirmer_vider: "Empty your cart?"
-    continuer: "← Continue shopping"
+    continuer: "Continue shopping"
     flash:
         ajoute: "“{nom}” has been added to your cart."
         deja_tout_le_stock: "Only {stock} “{nom}” left in stock, already in your cart."
@@ -387,7 +388,7 @@ piece:
     pas_indiquee: "This part is not listed as compatible with your {moto}."
     photo_n: "Photo {n} of {total}"
     reference: "Original part number"
-    retour: "← Back to the shop"
+    retour: "Back to the shop"
     similaires: "In the same category"
     universelle_texte: "Universal part: fits all Bultaco motorcycles."
     voir_pieces_modele: "See parts for the {moto}"
@@ -396,11 +397,16 @@ pied:
     carte_ouvrir: "Open in Google Maps"
     carte_titre: "The club on the map"
     contact: "CONTACT"
+    copier_email: "Copy the e-mail address"
+    copier_telephone: "Copy the phone number"
+    email_copie: "E-mail address copied"
     espace_admin: "Administration area"
     groupe_facebook: "Bultaco Club France group"
+    itineraire: "Directions"
     pays: "France"
     reseaux: "SOCIAL MEDIA"
     slogan: "Bultaco passion since 1958"
+    telephone_copie: "Phone number copied"
 pilotes:
     aucun: "No riders yet"
     aucun_trouve: "No rider found"
@@ -447,8 +453,8 @@ restaurations:
     texte_defaut: "Discover a few examples of Bultaco motorcycle restorations carried out by club members."
     titre: "Restorations"
 vitrine:
-    titre: "Browse-only shop."
-    texte: "Interested in a part? Contact the club and we will get back to you quickly."
     contacter: "Contact the club"
-    vente_suspendue: "Online sales are temporarily suspended: please contact the club about any part you are interested in."
     interesse_par: "Hello, I am interested in the part “{nom}”."
+    texte: "Interested in a part? Contact the club and we will get back to you quickly."
+    titre: "Browse-only shop."
+    vente_suspendue: "Online sales are temporarily suspended: please contact the club about any part you are interested in."

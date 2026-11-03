@@ -179,7 +179,7 @@
                     {# ----- Partage ----- #}
                     <div class='piece-partage'>
                         <span>{{ 'piece.partager'|trans }}</span>
-                        <button type='button' class='piece-partage-bouton' data-copier='{{ url_absolue }}' data-copie='{{ 'piece.lien_copie'|trans }}'>🔗 {{ 'piece.copier_lien'|trans }}</button>
+                        <button type='button' class='piece-partage-bouton' data-copier='{{ url_absolue }}' data-copie='{{ 'piece.lien_copie'|trans }}'>{{ icone('copier') }}{{ icone('coche') }} {{ 'piece.copier_lien'|trans }}</button>
                         <a class='piece-partage-bouton' href='https://www.facebook.com/sharer/sharer.php?u={{ url_absolue|url_encode }}' target='_blank' rel='noopener'>Facebook</a>
                         <a class='piece-partage-bouton' href='mailto:?subject={{ piece.nom|url_encode }}&amp;body={{ ('piece.email_corps'|trans({ nom: piece.nom }) ~ ' ' ~ url_absolue)|url_encode }}'>✉ {{ 'piece.email'|trans }}</a>
                     </div>
@@ -239,19 +239,6 @@
         // Zoom : photo en grand dans la fenêtre
         document.querySelector('button.piece-photo-principale')?.addEventListener('click', () => {
             openModal(`<div class='carte-identite'><img src='${escapeHtml(photoPrincipale.src)}' alt='${escapeHtml(photoPrincipale.alt)}' class='carte-photo carte-photo--large'></div>`);
-        });
-
-        // Partage : copie du lien
-        document.querySelector('[data-copier]')?.addEventListener('click', async function () {
-            try {
-                await navigator.clipboard.writeText(this.dataset.copier);
-            } catch {
-                window.prompt('', this.dataset.copier); // navigateur sans accès au presse-papiers
-                return;
-            }
-            const libelle = this.textContent;
-            this.textContent = '✓ ' + this.dataset.copie;
-            setTimeout(() => { this.textContent = libelle; }, 2000);
         });
     </script>
 {% endblock %}

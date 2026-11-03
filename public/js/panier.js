@@ -78,12 +78,3 @@ function majBadge(nombre) {
     void panierBouton.offsetWidth; // relance l'animation
     panierBouton.classList.add('panier-pulse');
 }
-
-function afficherToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'panier-toast';
-    toast.setAttribute('role', 'status');
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2500);
-}

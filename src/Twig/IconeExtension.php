@@ -22,6 +22,10 @@ class IconeExtension extends AbstractExtension
         'externe' => '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
         'deconnexion' => '<path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3M16 16l4-4-4-4M20 12H10"/>',
         'agrandir' => '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',
+        'fleche-haut' => '<path d="M12 19V5M6 11l6-6 6 6"/>',
+        'itineraire' => '<path d="m3 11 19-9-9 19-2-8-8-2z"/>',
+        'copier' => '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>',
+        'coche' => '<path d="M20 6 9 17l-5-5"/>',
     ];
 
     public function getFunctions(): array
