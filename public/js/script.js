@@ -315,3 +315,103 @@ document.addEventListener('click', e => {
     PiecesVues.ecrire([]);
     bouton.closest('[data-vues-recentes]').hidden = true;
 });
+
+// Ouvre un élément de la page désigné par l'adresse (#modele-12, #pilote-3…), à l'arrivée sur la page
+// et quand l'ancre change (résultat de la recherche globale qui pointe vers la page affichée)
+function ouvrirDepuisAncre(motif, ouvrir) {
+    const essayer = () => {
+        const trouve = location.hash.match(motif);
+        if (trouve) ouvrir(trouve[1]);
+    };
+    essayer();
+    window.addEventListener('hashchange', essayer);
+}
+
+// Recherche globale (fenêtre de la loupe) : Ctrl+K / ⌘K ou « / » pour l'ouvrir,
+// résultats pendant la frappe, ↑ ↓ pour les parcourir, Entrée : page de tous les résultats
+(function () {
+    const fenetre = document.getElementById('rechercheGlobale');
+    if (!fenetre?.showModal) return; // sans <dialog> : la loupe mène à la page /recherche
+    const champ = fenetre.querySelector('input[name=q]');
+    const zone = fenetre.querySelector('[data-recherche-resultats]');
+    const aide = zone.innerHTML;
+    let minuterie = null;
+    let requete = null;
+    let derniere = null;
+
+    async function chercher() {
+        const texte = champ.value.trim();
+        if (texte === derniere) return;
+        derniere = texte;
+        requete?.abort();
+        if (texte.length < 2) {
+            zone.innerHTML = aide;
+            return;
+        }
+        requete = new AbortController();
+        try {
+            const reponse = await fetch(`${fenetre.dataset.url}?q=${encodeURIComponent(texte)}`, {
+                signal: requete.signal,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            if (reponse.ok && texte === champ.value.trim()) zone.innerHTML = await reponse.text();
+        } catch { /* requête remplacée par une plus récente, ou hors ligne */ }
+    }
+
+    function ouvrir() {
+        if (!fenetre.open) fenetre.showModal();
+        champ.focus();
+        champ.select();
+    }
+
+    document.addEventListener('click', e => {
+        const bouton = e.target.closest('[data-recherche-ouvrir]');
+        if (!bouton || e.ctrlKey || e.metaKey || e.shiftKey) return;
+        e.preventDefault();
+        ouvrir();
+    });
+
+    document.addEventListener('keydown', e => {
+        const enSaisie = e.target.closest('input, textarea, select, [contenteditable="true"]');
+        if (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            ouvrir();
+        } else if (e.key === '/' && !enSaisie && !document.querySelector('dialog[open]')) {
+            e.preventDefault();
+            ouvrir();
+        }
+    });
+
+    champ.addEventListener('input', () => {
+        clearTimeout(minuterie);
+        minuterie = setTimeout(chercher, 200); // pas une requête à chaque lettre
+    });
+
+    // ↑ ↓ : du champ aux résultats et entre les résultats
+    fenetre.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        const liens = [...zone.querySelectorAll('a')];
+        if (liens.length === 0) return;
+        e.preventDefault();
+        const position = liens.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown') (liens[position + 1] || liens[0]).focus();
+        else if (position <= 0) champ.focus();
+        else liens[position - 1].focus();
+    });
+
+    fenetre.addEventListener('click', e => {
+        if (e.target === fenetre || e.target.closest('[data-fermer]')) {
+            fenetre.close();
+            return;
+        }
+        const lien = e.target.closest('.recherche-resultats a');
+        if (!lien) return;
+        fenetre.close();
+        // résultat sur la page affichée avec la même ancre : le navigateur ne signale rien, on le fait
+        const cible = new URL(lien.href, location.href);
+        if (cible.pathname === location.pathname && cible.search === location.search && cible.hash === location.hash) {
+            e.preventDefault();
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
+        }
+    });
+})();

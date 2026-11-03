@@ -13,8 +13,7 @@
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
             texte: texte_presentation,
-            sous_titre: 'restaurations.sous_titre'|trans,
-            placeholder: 'modeles.recherche'|trans
+            sous_titre: 'restaurations.sous_titre'|trans
         } %}
 
         <section class='restau-section'>
@@ -59,14 +58,6 @@
             apres: r.photo_apres ? asset(r.photo_apres) : null
         })|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};
 
-        window.searchConfig = {
-            data       : restaurations,
-            fields     : ['titre'],
-            labelField : 'titre',
-            emptyText  : {{ 'modeles.aucun_trouve'|trans|json_encode|raw }},
-            onSelect   : item => scrollAndHighlight(document.querySelector(`.restau-carte[data-id='${item.id}']`))
-        };
-
         // En grand : comparateur pour chaque restauration, flèches pour passer à la suivante
         function ouvrirRestauration(id) {
             ouvrirGalerie(
@@ -76,6 +67,8 @@
                 restaurations.findIndex(r => r.id == id)
             );
         }
+
+        // arrivée depuis la recherche globale (ou un lien partagé) : l'élément s'ouvre
+        ouvrirDepuisAncre(/^#restauration-(\d+)$/, id => scrollAndHighlight(document.querySelector(`.restau-carte[data-id='${id}']`)));
     </script>
-    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}

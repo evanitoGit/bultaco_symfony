@@ -1,0 +1,10 @@
+{% for groupe, contenu in groupes %}
+    <section class='recherche-groupe' aria-labelledby='recherche-{{ prefixe }}-{{ groupe }}'>
+        <h3 id='recherche-{{ prefixe }}-{{ groupe }}'>{{ ('recherche.groupe.' ~ groupe)|trans }}{% if afficher_total ?? false %} <small>({{ contenu.total }})</small>{% endif %}</h3>
+        <ul>
+            {% for resultat in contenu.resultats %}
+                {% include 'recherche/_resultat.html.twig' %}
+            {% endfor %}
+        </ul>
+    </section>
+{% endfor %}

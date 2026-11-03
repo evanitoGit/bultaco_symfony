@@ -1,0 +1,12 @@
+{# Contenu de la fenêtre de recherche, rafraîchi pendant la frappe #}
+{% if q|length < constant('App\\Recherche\\RechercheGlobale::LONGUEUR_MIN') %}
+    <p class='recherche-aide'>{{ 'recherche.aide'|trans }}</p>
+{% elseif groupes is empty %}
+    {% include 'recherche/_aucun.html.twig' %}
+{% else %}
+    <p class='sr-only' role='status'>{{ 'recherche.nb'|trans({ n: total, q: q }) }}</p>
+    {% include 'recherche/_groupes.html.twig' with { prefixe: 'fenetre' } %}
+    <p class='recherche-tout'>
+        <a href='{{ path('app_recherche', { q: q }) }}'>{{ complet ? 'recherche.voir_page'|trans : 'recherche.voir_tout'|trans({ n: total }) }} {{ icone('fleche-droite') }}</a>
+    </p>
+{% endif %}

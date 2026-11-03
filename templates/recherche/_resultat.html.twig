@@ -1,0 +1,21 @@
+{# Un résultat de recherche (fenêtre de la loupe et page /recherche) #}
+<li>
+    <a href='{{ resultat.url }}' class='recherche-resultat'>
+        {% if resultat.image %}
+            <img src='{{ asset(resultat.image) }}' alt='' loading='lazy'>
+        {% else %}
+            <span class='recherche-resultat-icone' aria-hidden='true'>{{ icone(groupe == 'motos' ? 'chevron-droite' : 'loupe') }}</span>
+        {% endif %}
+        <span class='recherche-resultat-texte'>
+            <strong>{{ resultat.titre }}</strong>
+            {% if groupe == 'motos' %}
+                <small>{{ 'recherche.moto_pieces'|trans }}{{ resultat.sous_titre ? ' · ' ~ resultat.sous_titre }}</small>
+            {% elseif resultat.sous_titre %}
+                <small>{{ resultat.sous_titre }}</small>
+            {% endif %}
+        </span>
+        {% if resultat.prix is not null and prix_visibles() %}
+            <span class='recherche-resultat-prix'>{{ resultat.prix|euros }}</span>
+        {% endif %}
+    </a>
+</li>

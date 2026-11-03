@@ -51,6 +51,12 @@
                 </li>
             {% endfor %}
 
+            {# Recherche sur tout le site (sans JavaScript : la page /recherche) #}
+            <li class='recherche-lien'>
+                <a href='{{ path('app_recherche') }}' class='recherche-bouton' data-recherche-ouvrir
+                   aria-label='{{ 'recherche.ouvrir'|trans }}' title='{{ 'recherche.ouvrir'|trans }} (Ctrl+K)'>{{ icone('loupe') }}</a>
+            </li>
+
             {% set client_connecte = is_granted('ROLE_CLIENT') %}
             <li class='compte-lien'>
                 {# Sans JavaScript, le bouton reste un lien vers l'espace client #}
@@ -207,6 +213,21 @@
 </footer>
 {% endblock %}
 
+{# Fenêtre de recherche (loupe de l'en-tête, Ctrl+K ou « / ») : résultats pendant la frappe #}
+<dialog class='recherche-dialog' id='rechercheGlobale' aria-labelledby='rechercheGlobaleTitre' data-url='{{ path('app_recherche_suggestions') }}'>
+    <form method='get' action='{{ path('app_recherche') }}' class='recherche-form' role='search'>
+        <label for='rechercheGlobaleChamp' id='rechercheGlobaleTitre' class='sr-only'>{{ 'recherche.ouvrir'|trans }}</label>
+        {{ icone('loupe') }}
+        <input type='search' name='q' id='rechercheGlobaleChamp' placeholder='{{ 'recherche.placeholder'|trans }}'
+               autocomplete='off' enterkeyhint='search' aria-describedby='rechercheGlobaleAstuce'>
+        <button type='button' class='recherche-fermer' data-fermer aria-label='{{ 'commun.fermer'|trans }}'>&times;</button>
+    </form>
+    <div class='recherche-resultats' data-recherche-resultats>
+        <p class='recherche-aide'>{{ 'recherche.aide'|trans }}</p>
+    </div>
+    <p class='recherche-astuce' id='rechercheGlobaleAstuce'>{{ 'recherche.astuce'|trans }}</p>
+</dialog>
+
 {# Galerie plein écran, commune à tout le site : ouvrirGalerie(photos, position) dans script.js #}
 <dialog class='galerie' id='galerie' aria-label='{{ 'galerie.titre'|trans }}'
         data-compteur='{{ 'galerie.compteur'|trans({ n: '__N__', total: '__TOTAL__' }) }}'>
@@ -239,7 +260,6 @@
         fermerMenu: 'nav.fermer_menu'|trans,
         ajoute: 'panier.js.ajoute'|trans,
         erreurPanier: 'panier.js.erreur_chargement'|trans,
-        aucunResultat: 'commun.aucun_resultat'|trans,
         locale: { fr: 'fr-FR', en: 'en-GB', es: 'es-ES' }[app.request.locale] ?? 'fr-FR'
     }|json_encode(constant('JSON_HEX_TAG'))|raw }};
 </script>

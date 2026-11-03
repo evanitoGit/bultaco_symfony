@@ -12,8 +12,7 @@
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
-            texte: texte_presentation,
-            placeholder: 'pilotes.recherche'|trans
+            texte: texte_presentation
         } %}
 
         <section class='emblemes-section'>
@@ -54,15 +53,6 @@
         const nomComplet = p => [p.prenom, p.nom].filter(Boolean).join(' ');
         const periode = p => p.date_naissance ? `${p.date_naissance}${p.date_deces ? ' – ' + p.date_deces : ''}` : null;
 
-        window.searchConfig = {
-            data       : pilotes,
-            fields     : ['nationalite', 'description', 'palmares'],
-            labelField : nomComplet,
-            metaFields : p => [p.nationalite, periode(p)],
-            emptyText  : {{ 'pilotes.aucun_trouve'|trans|json_encode|raw }},
-            onSelect   : item => openPiloteModal(item.id)
-        };
-
         function openPiloteModal(id) {
             const pilote = pilotes.find(p => p.id == id);
             if (!pilote) return;
@@ -98,6 +88,8 @@
                 </div>
             `);
         }
+
+        // arrivée depuis la recherche globale (ou un lien partagé) : l'élément s'ouvre
+        ouvrirDepuisAncre(/^#pilote-(\d+)$/, openPiloteModal);
     </script>
-    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}

@@ -16,8 +16,7 @@
 
     <div class='container'>
         {% include '_partials/_hero.html.twig' with {
-            texte: texte_presentation,
-            placeholder: 'pressbook.recherche'|trans
+            texte: texte_presentation
         } %}
 
         <section class='pressbook-section'>
@@ -74,15 +73,6 @@
             photo        : 'pressbook.libelle.photo'|trans,
             illustration : 'pressbook.libelle.illustration'|trans
         }|json_encode(constant('JSON_HEX_TAG'))|raw }};
-
-        window.searchConfig = {
-            data       : items,
-            fields     : ['description', 'source', 'date_publication', 'type_contenu'],
-            labelField : 'titre',
-            metaFields : i => [typeLabels[i.type_contenu] || i.type_contenu, i.date_publication, i.source],
-            emptyText  : {{ 'commun.aucun_resultat'|trans|json_encode|raw }},
-            onSelect   : item => openItemModal(item.id)
-        };
 
         // Filtres par type de document
         document.querySelectorAll('.filtre').forEach(bouton => {
@@ -143,6 +133,8 @@
                 </div>
             `);
         }
+
+        // arrivée depuis la recherche globale (ou un lien partagé) : l'élément s'ouvre
+        ouvrirDepuisAncre(/^#doc-(\d+)$/, openItemModal);
     </script>
-    <script src="{{ asset('js/search.js') }}"></script>
 {% endblock %}
