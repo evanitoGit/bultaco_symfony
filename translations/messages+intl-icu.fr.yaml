@@ -469,3 +469,7 @@ vitrine:
     texte: "Une pièce vous intéresse ? Contactez le club, nous vous répondrons rapidement."
     titre: "Boutique en consultation."
     vente_suspendue: "La vente en ligne est momentanément suspendue : contactez le club pour toute pièce qui vous intéresse."
+vues:
+    effacer: "Effacer"
+    effacer_aide: "Effacer la liste des pièces consultées"
+    titre: "Vous avez consulté récemment"

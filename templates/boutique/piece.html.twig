@@ -198,21 +198,13 @@
                     <h2>{{ 'piece.similaires'|trans }}</h2>
                     <ul class='piece-similaires'>
                         {% for autre in similaires %}
-                            <li>
-                                <a href='{{ autre.url }}'>
-                                    {% if autre.image_path %}
-                                        <img src='{{ asset(autre.image_path) }}' alt='' loading='lazy'>
-                                    {% else %}
-                                        <span class='no-image' aria-hidden='true'>📦</span>
-                                    {% endif %}
-                                    <strong>{{ autre.nom }}</strong>
-                                    <span>{{ autre.prix|euros }}</span>
-                                </a>
-                            </li>
+                            {% include '_partials/_piece_mini.html.twig' with { piece: autre } only %}
                         {% endfor %}
                     </ul>
                 </div>
             {% endif %}
+
+            {% include '_partials/_vues_recentes.html.twig' with { piece_courante: piece.id } %}
 
             <p><a href='{{ path('app_boutique_pieces') }}' class='panier-continuer'>{{ icone('fleche-gauche') }} {{ 'piece.retour'|trans }}</a></p>
         </section>

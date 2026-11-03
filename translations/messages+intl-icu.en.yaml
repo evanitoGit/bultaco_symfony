@@ -468,3 +468,7 @@ vitrine:
     texte: "Interested in a part? Contact the club and we will get back to you quickly."
     titre: "Browse-only shop."
     vente_suspendue: "Online sales are temporarily suspended: please contact the club about any part you are interested in."
+vues:
+    effacer: "Clear"
+    effacer_aide: "Clear the list of viewed parts"
+    titre: "Recently viewed"

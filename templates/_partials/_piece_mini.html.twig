@@ -1,0 +1,14 @@
+{# Petite carte d'une pièce (« Dans la même catégorie », « Vous avez consulté récemment ») #}
+<li data-id='{{ piece.id }}'>
+    <a href='{{ piece.url }}'>
+        {% if piece.image_path %}
+            <img src='{{ asset(piece.image_path) }}' alt='' loading='lazy'>
+        {% else %}
+            <span class='no-image' aria-hidden='true'>📦</span>
+        {% endif %}
+        <strong>{{ piece.nom }}</strong>
+        {% if prix_visibles() %}
+            <span>{{ piece.prix|euros }}</span>
+        {% endif %}
+    </a>
+</li>
