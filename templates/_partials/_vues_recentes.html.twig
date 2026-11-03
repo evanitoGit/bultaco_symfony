@@ -1,0 +1,13 @@
+{#
+    « Vous avez consulté récemment » : la liste est mémorisée dans le navigateur du visiteur
+    (localStorage, voir script.js), rien n'est enregistré sur le serveur. Caché tant qu'elle est vide.
+    Variable facultative : piece_courante (page d'une pièce : notée comme vue, et pas affichée)
+#}
+<section class='piece-bloc vues-recentes' data-vues-recentes hidden aria-labelledby='vuesRecentesTitre'
+         data-url='{{ path('app_boutique_pieces_vues') }}' data-piece-courante='{{ piece_courante ?? '' }}'>
+    <div class='vues-recentes-entete'>
+        <h2 id='vuesRecentesTitre'>{{ 'vues.titre'|trans }}</h2>
+        <button type='button' class='vues-recentes-effacer' data-vues-effacer aria-label='{{ 'vues.effacer_aide'|trans }}'>{{ 'vues.effacer'|trans }}</button>
+    </div>
+    <ul class='piece-similaires vues-recentes-liste' data-vues-liste></ul>
+</section>

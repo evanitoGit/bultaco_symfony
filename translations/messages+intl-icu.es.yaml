@@ -468,3 +468,7 @@ vitrine:
     texte: "¿Le interesa una pieza? Póngase en contacto con el club y le responderemos rápidamente."
     titre: "Tienda en modo consulta."
     vente_suspendue: "La venta en línea está suspendida temporalmente: póngase en contacto con el club para cualquier pieza que le interese."
+vues:
+    effacer: "Borrar"
+    effacer_aide: "Borrar la lista de piezas vistas"
+    titre: "Vistas recientemente"

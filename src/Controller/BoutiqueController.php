@@ -79,6 +79,24 @@ class BoutiqueController extends AbstractController
      * Page d'une pièce : /boutique/pieces/12-piston-50mm-sherpa-t
      * Seul le numéro compte : si le nom a changé, l'ancienne adresse redirige vers la nouvelle.
      */
+    /**
+     * « Vous avez consulté récemment » : petites cartes des pièces demandées (?ids=3,12,7),
+     * dans cet ordre. La liste vient du navigateur du visiteur ; les pièces supprimées sont ignorées.
+     */
+    #[Route('/boutique/pieces/vues', name: 'app_boutique_pieces_vues', methods: ['GET'])]
+    public function piecesVues(Request $request): Response
+    {
+        $ids = array_slice(array_unique(array_filter(array_map('intval', explode(',', $request->query->getString('ids'))))), 0, 12);
+        $pieces = array_column($this->catalogue->pieces(), null, 'id');
+
+        $response = $this->render('boutique/_pieces_vues.html.twig', [
+            'pieces' => array_values(array_filter(array_map(fn (int $id) => $pieces[$id] ?? null, $ids))),
+        ]);
+        $response->headers->set('X-Robots-Tag', 'noindex');
+
+        return $response;
+    }
+
     #[Route('/boutique/pieces/{id}-{slug}', name: 'app_boutique_piece', requirements: ['id' => '\d+', 'slug' => '[a-z0-9-]*'], methods: ['GET'])]
     public function piece(int $id, string $slug, Request $request, AlerteStock $alertes): Response
     {

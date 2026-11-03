@@ -268,3 +268,50 @@ const ouvrirGalerie = (function () {
         fenetre.querySelector(photos.length > 1 ? '.galerie-suivante' : '.galerie-fermer').focus();
     };
 })();
+
+// « Vous avez consulté récemment » (_partials/_vues_recentes.html.twig) : les dernières pièces vues
+// sont mémorisées uniquement dans le navigateur du visiteur (localStorage), sans cookie ni compte
+const PiecesVues = {
+    cle: 'bultaco.pieces_vues',
+    max: 6,
+    lire() {
+        try {
+            const ids = JSON.parse(localStorage.getItem(this.cle));
+            return Array.isArray(ids) ? ids.filter(Number.isInteger) : [];
+        } catch {
+            return []; // navigation privée, stockage désactivé…
+        }
+    },
+    ecrire(ids) {
+        try {
+            if (ids.length) localStorage.setItem(this.cle, JSON.stringify(ids.slice(0, this.max + 1)));
+            else localStorage.removeItem(this.cle);
+        } catch { /* stockage indisponible : tant pis */ }
+    },
+};
+
+document.querySelectorAll('[data-vues-recentes]').forEach(async bloc => {
+    const courante = Number(bloc.dataset.pieceCourante) || 0;
+    // page d'une pièce : elle passe en tête de l'historique (mais n'est pas affichée)
+    if (courante) PiecesVues.ecrire([courante, ...PiecesVues.lire().filter(id => id !== courante)]);
+
+    const ids = PiecesVues.lire().filter(id => id !== courante).slice(0, PiecesVues.max);
+    if (ids.length === 0) return;
+    try {
+        const reponse = await fetch(`${bloc.dataset.url}?ids=${ids.join(',')}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!reponse.ok) return;
+        const liste = bloc.querySelector('[data-vues-liste]');
+        liste.innerHTML = await reponse.text();
+        // pièces supprimées entre-temps : retirées de l'historique
+        const trouvees = [...liste.querySelectorAll('[data-id]')].map(li => Number(li.dataset.id));
+        PiecesVues.ecrire(PiecesVues.lire().filter(id => id === courante || trouvees.includes(id)));
+        bloc.hidden = trouvees.length === 0;
+    } catch { /* hors ligne : le bloc reste caché */ }
+});
+
+document.addEventListener('click', e => {
+    const bouton = e.target.closest('[data-vues-effacer]');
+    if (!bouton) return;
+    PiecesVues.ecrire([]);
+    bouton.closest('[data-vues-recentes]').hidden = true;
+});
