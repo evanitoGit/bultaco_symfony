@@ -177,8 +177,20 @@ document.addEventListener('click', async e => {
     });
 })();
 
+// Comparateur avant / après (_partials/_comparateur.html.twig) : le curseur déplace la séparation
+function placerComparateur(comparateur, valeur) {
+    const curseur = comparateur.querySelector('.comparateur-curseur');
+    curseur.value = valeur;
+    curseur.setAttribute('aria-valuetext', valeur + ' %');
+    comparateur.style.setProperty('--position', valeur + '%');
+}
+document.addEventListener('input', e => {
+    if (e.target.classList.contains('comparateur-curseur')) placerComparateur(e.target.closest('[data-comparateur]'), e.target.value);
+});
+
 // Galerie plein écran (fiche pièce, restaurations, pressbook) :
 // ouvrirGalerie([{ src, legende }, …], position) ; flèches, clavier ← →, glissement du doigt
+// Une entrée { avant, apres, legende } s'affiche avec le comparateur avant / après
 const ouvrirGalerie = (function () {
     const fenetre = document.getElementById('galerie');
     if (!fenetre?.showModal) {
@@ -186,6 +198,7 @@ const ouvrirGalerie = (function () {
         return (photos, position = 0) => window.open(photos[position]?.src, '_blank', 'noopener');
     }
     const image = fenetre.querySelector('.galerie-image');
+    const comparateur = fenetre.querySelector('.galerie-comparateur');
     const legende = fenetre.querySelector('.galerie-legende');
     const compteur = fenetre.querySelector('.galerie-compteur');
     let photos = [];
@@ -195,13 +208,28 @@ const ouvrirGalerie = (function () {
         position = (nouvelle + photos.length) % photos.length; // on boucle d'une extrémité à l'autre
         const photo = photos[position];
         const texte = (photo.legende || '').trim();
-        image.src = photo.src;
-        image.alt = texte;
+        const comparer = Boolean(photo.avant && photo.apres);
+        image.hidden = comparer;
+        comparateur.hidden = !comparer;
+        if (comparer) {
+            comparateur.querySelector('.comparateur-avant').src = photo.avant;
+            comparateur.querySelector('.comparateur-apres').src = photo.apres;
+            comparateur.querySelector('.comparateur-avant').alt = texte;
+            comparateur.querySelector('.comparateur-apres').alt = texte;
+            comparateur.querySelector('.comparateur-curseur').setAttribute('aria-label', comparateur.dataset.libelle.replace('__TITRE__', texte));
+            placerComparateur(comparateur, 50);
+        } else {
+            image.src = photo.src;
+            image.alt = texte;
+        }
         legende.textContent = texte;
         legende.hidden = texte === '';
         compteur.textContent = fenetre.dataset.compteur.replace('__N__', position + 1).replace('__TOTAL__', photos.length);
         // photos voisines préchargées : le passage à la suivante est immédiat
-        [position - 1, position + 1].forEach(i => { new Image().src = photos[(i + photos.length) % photos.length].src; });
+        [position - 1, position + 1].forEach(i => {
+            const voisine = photos[(i + photos.length) % photos.length];
+            [voisine.src, voisine.avant, voisine.apres].filter(Boolean).forEach(src => { new Image().src = src; });
+        });
     }
 
     fenetre.addEventListener('click', e => {
@@ -211,8 +239,10 @@ const ouvrirGalerie = (function () {
     });
 
     fenetre.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft') { e.preventDefault(); afficher(position - 1); }
-        if (e.key === 'ArrowRight') { e.preventDefault(); afficher(position + 1); }
+        // sur le comparateur, ← → déplacent la poignée (comportement normal du curseur)
+        const surCurseur = e.target.classList.contains('comparateur-curseur');
+        if (e.key === 'ArrowLeft' && !surCurseur) { e.preventDefault(); afficher(position - 1); }
+        if (e.key === 'ArrowRight' && !surCurseur) { e.preventDefault(); afficher(position + 1); }
         // Échap : ferme la galerie seulement (pas la fenêtre ouverte en dessous, ex. pressbook)
         if (e.key === 'Escape') e.stopPropagation();
     });
@@ -230,7 +260,7 @@ const ouvrirGalerie = (function () {
     image.addEventListener('pointercancel', () => { depart = null; });
 
     return function (liste, depuis = 0) {
-        photos = liste.filter(p => p && p.src);
+        photos = liste.filter(p => p && (p.src || (p.avant && p.apres)));
         if (photos.length === 0) return;
         fenetre.classList.toggle('galerie--unique', photos.length === 1);
         afficher(Math.max(0, Math.min(depuis, photos.length - 1)));

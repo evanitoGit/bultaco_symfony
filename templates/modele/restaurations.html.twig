@@ -18,53 +18,63 @@
         } %}
 
         <section class='restau-section'>
-            {% if photos is empty %}
+            {% if restaurations is empty %}
                 {% include '_partials/_empty.html.twig' with { icone: '🔧', message: 'restaurations.aucune'|trans } %}
             {% else %}
-                <div class='restau-grid'>
-                    {% for colonne in colonnes %}
-                        <div class='colonne'>
-                            {% for photo in colonne %}
-                                <figure class='album-card restau-item' data-id='{{ photo.id }}' role='button' tabindex='0'
-                                        aria-label='{{ 'restaurations.agrandir'|trans({ nom: photo.nom_modele }) }}' onclick='ouvrirPhoto({{ photo.id }})'>
-                                    <div class='album-photo-wrap'>
-                                        <img class='restau-photo' src='{{ asset(photo.image_path) }}' alt='{{ photo.nom_modele }}' loading='lazy'>
-                                        <span class='zoom-hint' aria-hidden='true'>{{ icone('agrandir') }}</span>
-                                    </div>
-                                    <figcaption class='album-info'>
-                                        <h3>{{ photo.nom_modele }}</h3>
-                                    </figcaption>
-                                </figure>
-                            {% endfor %}
-                        </div>
+                <div class='restau-liste'>
+                    {% for restauration in restaurations %}
+                        <figure class='restau-carte' data-id='{{ restauration.id }}'>
+                            <div class='restau-visuel'>
+                                {% if restauration.photo_avant and restauration.photo_apres %}
+                                    {% include '_partials/_comparateur.html.twig' with {
+                                        avant: asset(restauration.photo_avant),
+                                        apres: asset(restauration.photo_apres),
+                                        titre: restauration.titre
+                                    } %}
+                                {% else %}
+                                    {# une seule photo pour l'instant #}
+                                    <img class='restau-photo-seule' src='{{ asset(restauration.photo_avant ?: restauration.photo_apres) }}' alt='{{ restauration.titre }}' loading='lazy'>
+                                {% endif %}
+                                <button type='button' class='restau-agrandir zoom-hint' onclick='ouvrirRestauration({{ restauration.id }})'
+                                        aria-label='{{ 'restaurations.agrandir'|trans({ nom: restauration.titre }) }}' title='{{ 'restaurations.agrandir'|trans({ nom: restauration.titre }) }}'>{{ icone('agrandir') }}</button>
+                            </div>
+                            <figcaption class='restau-legende'>
+                                <h3>{{ restauration.titre }}</h3>
+                            </figcaption>
+                        </figure>
                     {% endfor %}
                 </div>
             {% endif %}
         </section>
     </div>
-
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const photos = {{ photos|json_encode(constant('JSON_HEX_TAG'))|raw }};
+        const restaurations = {{ restaurations|map(r => {
+            id: r.id,
+            titre: r.titre,
+            avant: r.photo_avant ? asset(r.photo_avant) : null,
+            apres: r.photo_apres ? asset(r.photo_apres) : null
+        })|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};
 
         window.searchConfig = {
-            data       : photos,
-            fields     : ['nom_modele'],
-            labelField : 'nom_modele',
+            data       : restaurations,
+            fields     : ['titre'],
+            labelField : 'titre',
             emptyText  : {{ 'modeles.aucun_trouve'|trans|json_encode|raw }},
-            onSelect   : item => scrollAndHighlight(document.querySelector(`.restau-item[data-id='${item.id}']`))
+            onSelect   : item => scrollAndHighlight(document.querySelector(`.restau-carte[data-id='${item.id}']`))
         };
 
-        // Galerie : toutes les photos, dans l'ordre « avant » puis « après » de chaque restauration
-        const photosGalerie = [...photos]
-            .sort((a, b) => (a.ordre - b.ordre) || ((a.colonne === 'droite') - (b.colonne === 'droite')) || (a.id - b.id))
-            .map(p => ({ id: p.id, src: mediaUrl(p.image_path), legende: p.nom_modele }));
-
-        function ouvrirPhoto(id) {
-            ouvrirGalerie(photosGalerie, photosGalerie.findIndex(p => p.id == id));
+        // En grand : comparateur pour chaque restauration, flèches pour passer à la suivante
+        function ouvrirRestauration(id) {
+            ouvrirGalerie(
+                restaurations.map(r => (r.avant && r.apres
+                    ? { avant: r.avant, apres: r.apres, legende: r.titre }
+                    : { src: r.avant || r.apres, legende: r.titre })),
+                restaurations.findIndex(r => r.id == id)
+            );
         }
     </script>
     <script src="{{ asset('js/search.js') }}"></script>

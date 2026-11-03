@@ -43,21 +43,14 @@ class ModeleController extends AbstractController
     #[Route('/modeles/restaurations', name: 'app_modeles_restaurations')]
     public function restaurations(): Response
     {
-        $photos = $this->connection
-            ->executeQuery('SELECT * FROM restauration_photos ORDER BY ordre ASC')
+        // Une restauration = une photo « avant » et une photo « après » (l'une des deux peut manquer)
+        $restaurations = $this->connection
+            ->executeQuery('SELECT * FROM restaurations WHERE photo_avant IS NOT NULL OR photo_apres IS NOT NULL ORDER BY ordre ASC, id ASC')
             ->fetchAllAssociative();
-        $photos = $this->contenu->traduireTout($photos, ['nom_modele']);
-
-        // Répartition des photos dans les deux colonnes définies en base
-        $colonnes = ['gauche' => [], 'droite' => []];
-        foreach ($photos as $photo) {
-            $colonnes[$photo['colonne'] === 'droite' ? 'droite' : 'gauche'][] = $photo;
-        }
 
         return $this->render('modele/restaurations.html.twig', [
             'texte_presentation' => $this->contenu->texte('restauration', $this->translator->trans('restaurations.texte_defaut')),
-            'colonnes' => $colonnes,
-            'photos' => $photos,
+            'restaurations' => $this->contenu->traduireTout($restaurations, ['titre']),
         ]);
     }
 
