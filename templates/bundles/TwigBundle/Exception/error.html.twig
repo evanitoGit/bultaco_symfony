@@ -1,0 +1,33 @@
+{#
+    Autres erreurs (500, 403…), affichées seulement en production (aperçu en développement : /_error/500).
+    Page autonome, sans la mise en page du site : elle doit s'afficher même si la base de données est en panne.
+#}
+<!DOCTYPE html>
+<html lang='{{ app.request.locale|default('fr') }}'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta name='robots' content='noindex'>
+    <title>{{ 'erreur.generique.titre'|trans }} - Bultaco Club France</title>
+    <style>
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
+               background-color: #FFF2E3; color: #474747; font-family: Arial, Helvetica, sans-serif; text-align: center; }
+        main { max-width: 560px; padding: 40px 30px; border: 3px solid #474747; border-radius: 15px; background-color: white; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); }
+        img { width: 110px; height: auto; }
+        h1 { margin: 18px 0 10px; font-size: 1.6em; letter-spacing: 0.04em; }
+        p { line-height: 1.6; }
+        small { color: #8a7a6a; }
+        a { display: inline-block; margin-top: 14px; padding: 12px 26px; border-radius: 50px; background-color: #474747; color: #FFF2E3; font-weight: bold; text-decoration: none; }
+        a:hover { background-color: #ccaf92; color: #474747; }
+    </style>
+</head>
+<body>
+    <main>
+        <img src='{{ asset('img/logo_rond.png') }}' alt='Bultaco Club France'>
+        <h1>{{ 'erreur.generique.titre'|trans }}</h1>
+        <p>{{ 'erreur.generique.texte'|trans }}</p>
+        <p><small>{{ 'erreur.generique.code'|trans({ code: status_code }) }}</small></p>
+        <a href='{{ path('app_home') }}'>{{ 'erreur.accueil'|trans }}</a>
+    </main>
+</body>
+</html>

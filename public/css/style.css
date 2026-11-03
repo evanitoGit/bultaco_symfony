@@ -3286,3 +3286,46 @@ header.recherche-active .header-nav > ul > li.categorie { opacity: 0; pointer-ev
     .recherche-page { padding: 20px 0; }
     .recherche-form { font-size: 1em; padding-left: 16px; }
 }
+
+/* ---------- Pièces précédente / suivante (fiche pièce) ---------- */
+.piece-voisines { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.piece-voisine {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 12px 16px;
+    border: 3px solid var(--carbone);
+    border-radius: 15px;
+    background-color: white;
+    color: var(--carbone);
+    text-decoration: none;
+    transition: border-color 0.2s ease, transform 0.2s var(--ease);
+}
+.piece-voisine:hover, .piece-voisine:focus-visible { border-color: var(--sepia); }
+.piece-voisine--precedente:hover { transform: translateX(-3px); }
+.piece-voisine--suivante { flex-direction: row-reverse; text-align: right; }
+.piece-voisine--suivante:hover { transform: translateX(3px); }
+.piece-voisine > .icone { flex-shrink: 0; font-size: 1.4em; }
+.piece-voisine img { width: 56px; height: 56px; flex-shrink: 0; border-radius: 8px; object-fit: cover; }
+.piece-voisine span { display: flex; flex-direction: column; min-width: 0; }
+.piece-voisine small { color: #8a7a6a; font-size: 0.82em; }
+.piece-voisine strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) {
+    .piece-voisines { gap: 10px; }
+    .piece-voisine { padding: 10px; gap: 8px; }
+    .piece-voisine img { display: none; }
+    /* nom sur deux lignes au plus */
+    .piece-voisine strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; white-space: normal; font-size: 0.92em; }
+}
+
+/* ---------- Page « introuvable » (404) ---------- */
+body.page-erreur { background-image: url("../img/pieces.png"); }
+.erreur-page { width: 100%; max-width: 680px; margin: 0 auto; padding: 50px 0 30px; text-align: center; }
+.erreur-image { width: 160px; height: auto; margin-bottom: 10px; }
+.erreur-page h2 { margin-bottom: 14px; color: var(--carbone); -webkit-text-stroke: 0; font-size: 1.7em; letter-spacing: 0.04em; }
+.erreur-page p { line-height: 1.6; }
+.erreur-texte { font-size: 1.15em; font-style: italic; }
+.erreur-page .recherche-form { margin: 18px 0 30px; text-align: left; }
+.erreur-liens { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 22px; margin: 14px 0 0; padding: 0; list-style: none; }
+.erreur-liens a:not(.btn-commander) { color: var(--carbone); font-weight: bold; }
