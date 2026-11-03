@@ -207,6 +207,21 @@
 </footer>
 {% endblock %}
 
+{# Galerie plein écran, commune à tout le site : ouvrirGalerie(photos, position) dans script.js #}
+<dialog class='galerie' id='galerie' aria-label='{{ 'galerie.titre'|trans }}'
+        data-compteur='{{ 'galerie.compteur'|trans({ n: '__N__', total: '__TOTAL__' }) }}'>
+    <div class='galerie-haut'>
+        <p class='galerie-compteur' aria-live='polite'></p>
+        <button type='button' class='galerie-fermer' aria-label='{{ 'commun.fermer'|trans }}' data-fermer>&times;</button>
+    </div>
+    <button type='button' class='galerie-nav galerie-precedente' aria-label='{{ 'galerie.precedente'|trans }}' data-galerie='-1'>{{ icone('chevron-gauche') }}</button>
+    <figure class='galerie-figure'>
+        <img class='galerie-image' src='' alt=''>
+        <figcaption class='galerie-legende'></figcaption>
+    </figure>
+    <button type='button' class='galerie-nav galerie-suivante' aria-label='{{ 'galerie.suivante'|trans }}' data-galerie='1'>{{ icone('chevron-droite') }}</button>
+</dialog>
+
 {# Retour en haut : apparaît après avoir fait défiler (script.js) #}
 <button type='button' class='haut-de-page' data-haut-de-page hidden
         aria-label='{{ 'commun.haut_de_page'|trans }}' title='{{ 'commun.haut_de_page'|trans }}'>{{ icone('fleche-haut') }}</button>

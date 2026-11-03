@@ -287,6 +287,12 @@ form:
     suppression_confirmation: "Entiendo que la eliminación es definitiva."
     telephone: "Teléfono"
     ville: "Ciudad"
+galerie:
+    agrandir: "Ampliar la imagen"
+    compteur: "{n} / {total}"
+    precedente: "Foto anterior"
+    suivante: "Foto siguiente"
+    titre: "Fotos en grande"
 logos:
     aucun: "Todavía no hay logotipos"
     aucun_trouve: "No se ha encontrado ningún logotipo"

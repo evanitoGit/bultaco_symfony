@@ -98,6 +98,14 @@
             });
         });
 
+        // Galerie : images des documents affichés (selon le filtre choisi), dans l'ordre de la page
+        function ouvrirImagesPressbook(id) {
+            const visibles = [...document.querySelectorAll('.masonry-item:not([hidden])')].map(el => items.find(i => i.id == el.dataset.id));
+            const avecImage = visibles.filter(i => i && i.image_path);
+            if (!avecImage.some(i => i.id == id)) avecImage.unshift(items.find(i => i.id == id));
+            ouvrirGalerie(avecImage.map(i => ({ src: mediaUrl(i.image_path), legende: i.titre })), avecImage.findIndex(i => i.id == id));
+        }
+
         function openItemModal(id) {
             const item = items.find(i => i.id == id);
             if (!item) return;
@@ -109,7 +117,10 @@
                         <span class='badge-modele'>${escapeHtml(typeLabels[item.type_contenu] || item.type_contenu)}</span>
                     </div>
                     ${item.image_path
-                        ? `<img src='${escapeHtml(mediaUrl(item.image_path))}' alt='${escapeHtml(item.titre)}' class='press-image'>`
+                        ? `<button type='button' class='press-image-zoom' onclick='ouvrirImagesPressbook(${item.id})' aria-label='{{ 'galerie.agrandir'|trans|e('js') }}'>
+                               <img src='${escapeHtml(mediaUrl(item.image_path))}' alt='${escapeHtml(item.titre)}' class='press-image'>
+                               <span class='zoom-hint' aria-hidden='true'>{{ icone('agrandir')|e('js') }}</span>
+                           </button>`
                         : ''}
                     ${(item.date_publication || item.source) ? `
                     <div class='info-grid'>

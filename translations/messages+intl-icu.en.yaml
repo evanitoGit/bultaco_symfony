@@ -287,6 +287,12 @@ form:
     suppression_confirmation: "I understand that deletion is permanent."
     telephone: "Phone"
     ville: "Town / city"
+galerie:
+    agrandir: "Enlarge the image"
+    compteur: "{n} / {total}"
+    precedente: "Previous photo"
+    suivante: "Next photo"
+    titre: "Full-size photos"
 logos:
     aucun: "No logos yet"
     aucun_trouve: "No logo found"
