@@ -594,8 +594,7 @@ h2 {
     transition: transform 0.6s var(--ease);
 }
 
-.album-card:hover .album-photo,
-.album-card:hover .restau-photo { transform: scale(1.06); }
+.album-card:hover .album-photo { transform: scale(1.06); }
 
 .album-info {
     padding: 20px;
@@ -881,15 +880,16 @@ textarea {
 /* Apparition progressive des éléments (fill-mode backwards : n'écrase pas le survol) */
 .container .hero,
 .album-card,
+.restau-carte,
 .masonry-item,
 .categorie-block {
     animation: fadeUp 0.6s var(--ease) backwards;
 }
 
-.album-grid > :nth-child(2), .masonry-grid > :nth-child(2), .categories-container > :nth-child(2), .colonne > :nth-child(2) { animation-delay: 0.06s; }
-.album-grid > :nth-child(3), .masonry-grid > :nth-child(3), .categories-container > :nth-child(3), .colonne > :nth-child(3) { animation-delay: 0.12s; }
-.album-grid > :nth-child(4), .masonry-grid > :nth-child(4), .categories-container > :nth-child(4), .colonne > :nth-child(4) { animation-delay: 0.18s; }
-.album-grid > :nth-child(n+5), .masonry-grid > :nth-child(n+5), .categories-container > :nth-child(n+5), .colonne > :nth-child(n+5) { animation-delay: 0.24s; }
+.album-grid > :nth-child(2), .masonry-grid > :nth-child(2), .categories-container > :nth-child(2), .restau-liste > :nth-child(2) { animation-delay: 0.06s; }
+.album-grid > :nth-child(3), .masonry-grid > :nth-child(3), .categories-container > :nth-child(3), .restau-liste > :nth-child(3) { animation-delay: 0.12s; }
+.album-grid > :nth-child(4), .masonry-grid > :nth-child(4), .categories-container > :nth-child(4), .restau-liste > :nth-child(4) { animation-delay: 0.18s; }
+.album-grid > :nth-child(n+5), .masonry-grid > :nth-child(n+5), .categories-container > :nth-child(n+5), .restau-liste > :nth-child(n+5) { animation-delay: 0.24s; }
 
 /* --- Introduction --- */
 .container .hero {
@@ -1147,33 +1147,6 @@ body.page-pieces .container .hero h2 { font-weight: normal; margin-top: 50px; }
     line-height: 1.8;
 }
 
-/* --- Restaurations (2 colonnes) --- */
-.restau-grid {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    width: 100%;
-    max-width: 1244px;
-    margin: 0 auto;
-    align-items: flex-start;
-}
-
-.colonne {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.restau-item { margin: 0; }
-
-.restau-photo {
-    width: 100%;
-    display: block;
-    transition: transform 0.6s var(--ease);
-}
-
 .zoom-hint {
     position: absolute;
     top: 12px;
@@ -1191,33 +1164,38 @@ body.page-pieces .container .hero h2 { font-weight: normal; margin-top: 50px; }
     transition: opacity 0.3s ease;
 }
 
-.restau-item:hover .zoom-hint { opacity: 1; }
-
-/* Restaurations : photo arrondie en haut + légende beige encadrée (site d'origine) */
-.restau-item {
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    overflow: visible;
+/* --- Restaurations : une carte par restauration, comparateur avant / après --- */
+.restau-liste {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr));
+    gap: 34px;
+    width: 100%;
+    max-width: 1244px;
+    margin: 0 auto;
 }
-
-.restau-item .album-photo-wrap {
+.restau-carte { margin: 0; }
+.restau-visuel {
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--carbone);
     border-bottom: none;
     border-radius: 10px 10px 0 0;
+    background-color: #e9e2d9;
 }
-
-.restau-item .album-info {
+.restau-visuel .comparateur { border-radius: 0; }
+.restau-photo-seule { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.restau-legende {
     padding: 12px 15px;
     background-color: var(--beige);
     border: 3px solid var(--carbone);
-    border-top: none;
     border-radius: 0 0 10px 10px;
-    transition: border-color 0.3s ease;
+    text-align: center;
 }
-
-.restau-item:hover .album-info { border-color: var(--sepia); }
-.restau-item .album-info h3 { font-size: 1.1em; font-weight: bold; margin: 0; }
+.restau-legende h3 { margin: 0; color: var(--carbone); font-size: 1.1em; font-weight: bold; }
+/* bouton « agrandir » : toujours visible (pas de survol sur les écrans tactiles) */
+.restau-agrandir { top: auto; bottom: 12px; z-index: 4; border: none; padding: 0; opacity: 0.85; cursor: zoom-in; } /* en bas : l'étiquette « Après » est en haut à droite */
+.restau-agrandir:hover, .restau-agrandir:focus-visible { opacity: 1; background-color: var(--carbone); }
+.restau-agrandir:focus-visible { outline: 3px solid var(--sepia); outline-offset: 2px; }
 
 body.page-restau .hero-text { margin-bottom: 100px; }
 body.page-restau .restau-section { padding-top: 120px; }
@@ -2714,10 +2692,9 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
     .search-container { margin: 25px auto; }
     .emblemes-section, .restau-section, .pieces-section, .pressbook-section { padding: 20px 16px; }
     .album-grid, .grille-modeles { padding: 0; gap: 20px; }
-    .restau-grid { flex-direction: column; gap: 20px; }
+    .restau-liste { gap: 24px; }
     body.page-restau .hero-text { margin-bottom: 30px; }
     body.page-restau .restau-section { padding-top: 20px; }
-    .colonne { width: 100%; }
 
     .categorie-header { padding: 16px 18px; }
     .categorie-header h3 { font-size: 1.3em; }
@@ -3055,3 +3032,106 @@ a.compte-enregistrer { display: inline-block; text-decoration: none; }
 .press-image-zoom .zoom-hint { opacity: 0.85; }
 .press-image-zoom:hover .zoom-hint,
 .press-image-zoom:focus-visible .zoom-hint { opacity: 1; }
+
+/* ---------- Comparateur avant / après (_partials/_comparateur.html.twig) ---------- */
+.comparateur {
+    --position: 50%;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    background-color: #e9e2d9;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.comparateur img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+/* la photo « avant » ne montre que la partie à gauche de la poignée */
+.comparateur-avant { clip-path: inset(0 calc(100% - var(--position)) 0 0); }
+/* ligne de séparation */
+.comparateur::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--position);
+    width: 3px;
+    transform: translateX(-50%);
+    background-color: var(--beige);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+}
+.comparateur-poignee {
+    position: absolute;
+    top: 50%;
+    left: var(--position);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    transform: translate(-50%, -50%);
+    border: 3px solid var(--carbone);
+    border-radius: 50%;
+    background-color: var(--beige);
+    color: var(--carbone);
+    font-size: 1.05em;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+.comparateur-poignee .icone { margin: 0 -3px; }
+.comparateur-etiquette {
+    position: absolute;
+    top: 12px;
+    z-index: 1;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background-color: rgba(30, 30, 30, 0.72);
+    color: var(--beige);
+    font-size: 0.8em;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+}
+.comparateur-etiquette--avant { left: 12px; }
+.comparateur-etiquette--apres { right: 12px; }
+/* le curseur, invisible, couvre toute la photo : clic ou glissement n'importe où */
+.comparateur-curseur {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    touch-action: pan-y; /* le défilement vertical de la page reste possible */
+    -webkit-appearance: none;
+    appearance: none;
+}
+.comparateur-curseur::-webkit-slider-thumb { -webkit-appearance: none; width: 2px; height: 100%; }
+.comparateur-curseur::-moz-range-thumb { width: 2px; height: 100%; border: none; }
+.comparateur:has(.comparateur-curseur:focus-visible) .comparateur-poignee { outline: 3px solid var(--sepia); outline-offset: 3px; }
+
+/* en grand dans la galerie */
+.galerie-comparateur {
+    width: min(100%, calc((100dvh - 190px) * 4 / 3));
+    flex-shrink: 0;
+    border-radius: 8px;
+}
+.galerie-comparateur[hidden] { display: none; }
+@media (max-width: 700px) {
+    .galerie-comparateur { width: 100%; }
+    .comparateur-poignee { width: 40px; height: 40px; }
+    .comparateur-etiquette { top: 8px; font-size: 0.7em; padding: 3px 9px; }
+    .comparateur-etiquette--avant { left: 8px; }
+    .comparateur-etiquette--apres { right: 8px; }
+}

@@ -217,6 +217,8 @@
     <button type='button' class='galerie-nav galerie-precedente' aria-label='{{ 'galerie.precedente'|trans }}' data-galerie='-1'>{{ icone('chevron-gauche') }}</button>
     <figure class='galerie-figure'>
         <img class='galerie-image' src='' alt=''>
+        {# restauration avec ses deux photos : comparateur en grand à la place de l'image #}
+        {% include '_partials/_comparateur.html.twig' with { avant: null, apres: null, titre: '', classe: 'galerie-comparateur' } %}
         <figcaption class='galerie-legende'></figcaption>
     </figure>
     <button type='button' class='galerie-nav galerie-suivante' aria-label='{{ 'galerie.suivante'|trans }}' data-galerie='1'>{{ icone('chevron-droite') }}</button>

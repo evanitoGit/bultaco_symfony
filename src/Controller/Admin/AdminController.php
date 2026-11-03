@@ -209,6 +209,7 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted()) {
             $this->validateUnique($config, $form, $id);
+            $this->validateAuMoinsUn($config, $form, $row);
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -321,6 +322,25 @@ class AdminController extends AbstractController
         }
 
         return $values;
+    }
+
+    /**
+     * 'au_moins_un' => [champs image] : il faut garder ou envoyer au moins une de ces images
+     * (ex. restauration : photo « avant » ou « après »).
+     */
+    private function validateAuMoinsUn(array $config, FormInterface $form, array $row): void
+    {
+        $champs = $config['au_moins_un'] ?? [];
+        foreach ($champs as $name) {
+            $supprimee = $form->has($name . '__remove') && $form->get($name . '__remove')->getData();
+            if ($form->get($name)->getData() || (!empty($row[$name]) && !$supprimee)) {
+                return;
+            }
+        }
+        if ($champs !== []) {
+            $libelles = array_map(fn (string $name) => $config['fields'][$name]['label'], $champs);
+            $form->get($champs[0])->addError(new FormError(sprintf('Ajoutez au moins une photo : %s.', implode(' ou ', $libelles))));
+        }
     }
 
     private function validateUnique(array $config, FormInterface $form, ?int $id): void

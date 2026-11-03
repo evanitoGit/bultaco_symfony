@@ -1,0 +1,15 @@
+{#
+    Comparateur « avant / après » : la photo « avant » recouvre la photo « après » jusqu'à la poignée.
+    Le curseur (input range invisible, sur toute la photo) gère la souris, le doigt et le clavier.
+    Variables : avant, apres (adresses des photos, vides pour la galerie), titre, classe (facultative)
+#}
+<div class='comparateur{{ classe is defined ? ' ' ~ classe }}' data-comparateur style='--position: 50%'
+     data-libelle='{{ 'restaurations.comparer'|trans({ titre: '__TITRE__' }) }}'>
+    <img class='comparateur-apres' {% if apres %}src='{{ apres }}'{% endif %} alt='{{ titre ? 'restaurations.photo_apres'|trans({ titre: titre }) }}' loading='lazy' draggable='false'>
+    <img class='comparateur-avant' {% if avant %}src='{{ avant }}'{% endif %} alt='{{ titre ? 'restaurations.photo_avant'|trans({ titre: titre }) }}' loading='lazy' draggable='false'>
+    <span class='comparateur-etiquette comparateur-etiquette--avant' aria-hidden='true'>{{ 'restaurations.avant'|trans }}</span>
+    <span class='comparateur-etiquette comparateur-etiquette--apres' aria-hidden='true'>{{ 'restaurations.apres'|trans }}</span>
+    <span class='comparateur-poignee' aria-hidden='true'>{{ icone('chevron-gauche') }}{{ icone('chevron-droite') }}</span>
+    <input type='range' class='comparateur-curseur' min='0' max='100' value='50'
+           aria-label='{{ 'restaurations.comparer'|trans({ titre: titre }) }}' aria-valuetext='50 %'>
+</div>
