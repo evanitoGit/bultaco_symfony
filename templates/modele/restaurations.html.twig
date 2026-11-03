@@ -26,7 +26,7 @@
                         <div class='colonne'>
                             {% for photo in colonne %}
                                 <figure class='album-card restau-item' data-id='{{ photo.id }}' role='button' tabindex='0'
-                                        aria-label='{{ 'restaurations.agrandir'|trans({ nom: photo.nom_modele }) }}' onclick='openPhotoModal({{ photo.id }})'>
+                                        aria-label='{{ 'restaurations.agrandir'|trans({ nom: photo.nom_modele }) }}' onclick='ouvrirPhoto({{ photo.id }})'>
                                     <div class='album-photo-wrap'>
                                         <img class='restau-photo' src='{{ asset(photo.image_path) }}' alt='{{ photo.nom_modele }}' loading='lazy'>
                                         <span class='zoom-hint' aria-hidden='true'>{{ icone('agrandir') }}</span>
@@ -43,7 +43,6 @@
         </section>
     </div>
 
-    {% include '_partials/_modal.html.twig' %}
 {% endblock %}
 
 {% block javascripts %}
@@ -59,19 +58,13 @@
             onSelect   : item => scrollAndHighlight(document.querySelector(`.restau-item[data-id='${item.id}']`))
         };
 
-        function openPhotoModal(id) {
-            const photo = photos.find(p => p.id == id);
-            if (!photo) return;
+        // Galerie : toutes les photos, dans l'ordre « avant » puis « après » de chaque restauration
+        const photosGalerie = [...photos]
+            .sort((a, b) => (a.ordre - b.ordre) || ((a.colonne === 'droite') - (b.colonne === 'droite')) || (a.id - b.id))
+            .map(p => ({ id: p.id, src: mediaUrl(p.image_path), legende: p.nom_modele }));
 
-            openModal(`
-                <div class='carte-identite'>
-                    <div class='carte-header'>
-                        <h2>${escapeHtml(photo.nom_modele)}</h2>
-                        <span class='badge-modele'>{{ 'restaurations.badge'|trans }}</span>
-                    </div>
-                    <img src='${escapeHtml(mediaUrl(photo.image_path))}' alt='${escapeHtml(photo.nom_modele)}' class='carte-photo carte-photo--large'>
-                </div>
-            `);
+        function ouvrirPhoto(id) {
+            ouvrirGalerie(photosGalerie, photosGalerie.findIndex(p => p.id == id));
         }
     </script>
     <script src="{{ asset('js/search.js') }}"></script>

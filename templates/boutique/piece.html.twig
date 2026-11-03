@@ -218,7 +218,6 @@
         </section>
     </div>
 
-    {% include '_partials/_modal.html.twig' %}
 {% endblock %}
 
 {% block javascripts %}
@@ -236,9 +235,11 @@
             });
         });
 
-        // Zoom : photo en grand dans la fenêtre
+        // Zoom : galerie plein écran, ouverte sur la photo affichée
+        const photosPiece = {{ piece.photos|map(photo => asset(photo))|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};
         document.querySelector('button.piece-photo-principale')?.addEventListener('click', () => {
-            openModal(`<div class='carte-identite'><img src='${escapeHtml(photoPrincipale.src)}' alt='${escapeHtml(photoPrincipale.alt)}' class='carte-photo carte-photo--large'></div>`);
+            const affichee = photosPiece.indexOf(photoPrincipale.getAttribute('src'));
+            ouvrirGalerie(photosPiece.map(src => ({ src, legende: photoPrincipale.alt })), Math.max(0, affichee));
         });
     </script>
 {% endblock %}

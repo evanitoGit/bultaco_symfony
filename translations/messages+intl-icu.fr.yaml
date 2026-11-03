@@ -288,6 +288,12 @@ form:
     suppression_confirmation: "Je comprends que la suppression est définitive."
     telephone: "Téléphone"
     ville: "Ville"
+galerie:
+    agrandir: "Agrandir l'image"
+    compteur: "{n} / {total}"
+    precedente: "Photo précédente"
+    suivante: "Photo suivante"
+    titre: "Photos en grand"
 logos:
     aucun: "Aucun logo pour le moment"
     aucun_trouve: "Aucun logo trouvé"
