@@ -51,10 +51,26 @@
                 </li>
             {% endfor %}
 
-            {# Recherche sur tout le site (sans JavaScript : la page /recherche) #}
-            <li class='recherche-lien'>
-                <a href='{{ path('app_recherche') }}' class='recherche-bouton' data-recherche-ouvrir
-                   aria-label='{{ 'recherche.ouvrir'|trans }}' title='{{ 'recherche.ouvrir'|trans }} (Ctrl+K)'>{{ icone('loupe') }}</a>
+            {#
+                Recherche sur tout le site : la loupe déploie un champ dans l'en-tête, les résultats
+                s'affichent dessous pendant la frappe (script.js). Entrée ou la loupe : page /recherche.
+                Sans JavaScript, la loupe mène directement à la page /recherche.
+            #}
+            <li class='recherche-lien' data-recherche data-url='{{ path('app_recherche_suggestions') }}'>
+                <form method='get' action='{{ path('app_recherche') }}' class='recherche-entete' role='search'>
+                    <label for='rechercheEntete' class='sr-only'>{{ 'recherche.ouvrir'|trans }}</label>
+                    <input type='search' name='q' id='rechercheEntete' class='recherche-entete-champ' placeholder='{{ 'recherche.placeholder'|trans }}'
+                           autocomplete='off' enterkeyhint='search' tabindex='-1' aria-controls='rechercheResultats' aria-expanded='false'>
+                    <button type='button' class='recherche-entete-fermer' data-recherche-fermer aria-label='{{ 'commun.fermer'|trans }}'>&times;</button>
+                    <button type='submit' class='recherche-bouton' data-recherche-bouton aria-label='{{ 'recherche.ouvrir'|trans }}'
+                            title='{{ 'recherche.ouvrir'|trans }} (Ctrl+K)'>{{ icone('loupe') }}</button>
+                </form>
+                <div class='recherche-panneau' id='rechercheResultats' hidden>
+                    <div class='recherche-resultats' data-recherche-resultats>
+                        <p class='recherche-aide'>{{ 'recherche.aide'|trans }}</p>
+                    </div>
+                    <p class='recherche-astuce'>{{ 'recherche.astuce'|trans }}</p>
+                </div>
             </li>
 
             {% set client_connecte = is_granted('ROLE_CLIENT') %}
@@ -212,21 +228,6 @@
     </dialog>
 </footer>
 {% endblock %}
-
-{# Fenêtre de recherche (loupe de l'en-tête, Ctrl+K ou « / ») : résultats pendant la frappe #}
-<dialog class='recherche-dialog' id='rechercheGlobale' aria-labelledby='rechercheGlobaleTitre' data-url='{{ path('app_recherche_suggestions') }}'>
-    <form method='get' action='{{ path('app_recherche') }}' class='recherche-form' role='search'>
-        <label for='rechercheGlobaleChamp' id='rechercheGlobaleTitre' class='sr-only'>{{ 'recherche.ouvrir'|trans }}</label>
-        {{ icone('loupe') }}
-        <input type='search' name='q' id='rechercheGlobaleChamp' placeholder='{{ 'recherche.placeholder'|trans }}'
-               autocomplete='off' enterkeyhint='search' aria-describedby='rechercheGlobaleAstuce'>
-        <button type='button' class='recherche-fermer' data-fermer aria-label='{{ 'commun.fermer'|trans }}'>&times;</button>
-    </form>
-    <div class='recherche-resultats' data-recherche-resultats>
-        <p class='recherche-aide'>{{ 'recherche.aide'|trans }}</p>
-    </div>
-    <p class='recherche-astuce' id='rechercheGlobaleAstuce'>{{ 'recherche.astuce'|trans }}</p>
-</dialog>
 
 {# Galerie plein écran, commune à tout le site : ouvrirGalerie(photos, position) dans script.js #}
 <dialog class='galerie' id='galerie' aria-label='{{ 'galerie.titre'|trans }}'

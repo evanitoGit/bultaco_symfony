@@ -327,17 +327,43 @@ function ouvrirDepuisAncre(motif, ouvrir) {
     window.addEventListener('hashchange', essayer);
 }
 
-// Recherche globale (fenêtre de la loupe) : Ctrl+K / ⌘K ou « / » pour l'ouvrir,
-// résultats pendant la frappe, ↑ ↓ pour les parcourir, Entrée : page de tous les résultats
+// Recherche globale dans l'en-tête : la loupe (ou Ctrl+K / ⌘K, ou « / ») déploie le champ,
+// les résultats s'affichent dessous pendant la frappe, ↑ ↓ pour les parcourir.
+// Entrée, ou la loupe une fois le champ rempli : page de tous les résultats (/recherche).
 (function () {
-    const fenetre = document.getElementById('rechercheGlobale');
-    if (!fenetre?.showModal) return; // sans <dialog> : la loupe mène à la page /recherche
-    const champ = fenetre.querySelector('input[name=q]');
-    const zone = fenetre.querySelector('[data-recherche-resultats]');
-    const aide = zone.innerHTML;
+    const zone = document.querySelector('[data-recherche]');
+    if (!zone) return;
+    const champ = zone.querySelector('input[name=q]');
+    const bouton = zone.querySelector('[data-recherche-bouton]');
+    const panneau = zone.querySelector('.recherche-panneau');
+    const resultats = zone.querySelector('[data-recherche-resultats]');
+    const aide = resultats.innerHTML;
     let minuterie = null;
     let requete = null;
     let derniere = null;
+
+    const ouverte = () => zone.classList.contains('ouverte');
+
+    function ouvrir() {
+        if (!ouverte()) {
+            zone.classList.add('ouverte');
+            document.querySelector('header.nav')?.classList.add('recherche-active');
+            champ.tabIndex = 0;
+            champ.setAttribute('aria-expanded', 'true');
+            panneau.hidden = false;
+        }
+        champ.focus();
+    }
+
+    function fermer(rendreLaMain = true) {
+        if (!ouverte()) return;
+        zone.classList.remove('ouverte');
+        document.querySelector('header.nav')?.classList.remove('recherche-active');
+        champ.tabIndex = -1;
+        champ.setAttribute('aria-expanded', 'false');
+        panneau.hidden = true;
+        if (rendreLaMain && zone.contains(document.activeElement)) bouton.focus();
+    }
 
     async function chercher() {
         const texte = champ.value.trim();
@@ -345,30 +371,31 @@ function ouvrirDepuisAncre(motif, ouvrir) {
         derniere = texte;
         requete?.abort();
         if (texte.length < 2) {
-            zone.innerHTML = aide;
+            resultats.innerHTML = aide;
             return;
         }
         requete = new AbortController();
         try {
-            const reponse = await fetch(`${fenetre.dataset.url}?q=${encodeURIComponent(texte)}`, {
+            const reponse = await fetch(`${zone.dataset.url}?q=${encodeURIComponent(texte)}`, {
                 signal: requete.signal,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
-            if (reponse.ok && texte === champ.value.trim()) zone.innerHTML = await reponse.text();
+            if (reponse.ok && texte === champ.value.trim()) resultats.innerHTML = await reponse.text();
         } catch { /* requête remplacée par une plus récente, ou hors ligne */ }
     }
 
-    function ouvrir() {
-        if (!fenetre.open) fenetre.showModal();
-        champ.focus();
-        champ.select();
-    }
+    // la loupe : déploie le champ ; une fois du texte tapé, lance la page de résultats (envoi normal du formulaire)
+    bouton.addEventListener('click', e => {
+        if (!ouverte() || champ.value.trim() === '') {
+            e.preventDefault();
+            ouvrir();
+        }
+    });
+    zone.querySelector('[data-recherche-fermer]').addEventListener('click', () => fermer());
 
-    document.addEventListener('click', e => {
-        const bouton = e.target.closest('[data-recherche-ouvrir]');
-        if (!bouton || e.ctrlKey || e.metaKey || e.shiftKey) return;
-        e.preventDefault();
-        ouvrir();
+    champ.addEventListener('input', () => {
+        clearTimeout(minuterie);
+        minuterie = setTimeout(chercher, 200); // pas une requête à chaque lettre
     });
 
     document.addEventListener('keydown', e => {
@@ -382,15 +409,14 @@ function ouvrirDepuisAncre(motif, ouvrir) {
         }
     });
 
-    champ.addEventListener('input', () => {
-        clearTimeout(minuterie);
-        minuterie = setTimeout(chercher, 200); // pas une requête à chaque lettre
-    });
-
-    // ↑ ↓ : du champ aux résultats et entre les résultats
-    fenetre.addEventListener('keydown', e => {
+    zone.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            e.stopPropagation();
+            fermer();
+            return;
+        }
         if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-        const liens = [...zone.querySelectorAll('a')];
+        const liens = [...resultats.querySelectorAll('a')];
         if (liens.length === 0) return;
         e.preventDefault();
         const position = liens.indexOf(document.activeElement);
@@ -399,14 +425,15 @@ function ouvrirDepuisAncre(motif, ouvrir) {
         else liens[position - 1].focus();
     });
 
-    fenetre.addEventListener('click', e => {
-        if (e.target === fenetre || e.target.closest('[data-fermer]')) {
-            fenetre.close();
-            return;
-        }
-        const lien = e.target.closest('.recherche-resultats a');
+    // clic ailleurs sur la page : la recherche se replie (le texte tapé est gardé)
+    document.addEventListener('click', e => {
+        if (ouverte() && !zone.contains(e.target)) fermer(false);
+    });
+
+    resultats.addEventListener('click', e => {
+        const lien = e.target.closest('a');
         if (!lien) return;
-        fenetre.close();
+        fermer(false);
         // résultat sur la page affichée avec la même ancre : le navigateur ne signale rien, on le fait
         const cible = new URL(lien.href, location.href);
         if (cible.pathname === location.pathname && cible.search === location.search && cible.hash === location.hash) {
