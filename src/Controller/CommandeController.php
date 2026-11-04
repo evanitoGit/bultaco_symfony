@@ -170,7 +170,11 @@ class CommandeController extends AbstractController
         } catch (\Throwable $e) {
             $this->logger->error('Ouverture du paiement par carte impossible', ['reference' => $commande['reference'], 'exception' => $e]);
             $carte->abandonner($commande);
-            $this->addFlash('panier', $translator->trans('commande.flash.carte_indisponible'));
+            $message = $translator->trans('commande.flash.carte_indisponible');
+            if ($this->getParameter('kernel.debug')) {
+                $message .= ' [dev] ' . $e->getMessage(); // raison technique, seulement en développement
+            }
+            $this->addFlash('panier', $message);
 
             return $this->redirectToRoute('app_commande');
         }

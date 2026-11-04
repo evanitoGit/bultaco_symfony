@@ -9,6 +9,9 @@
 
     <div class='container'>
         <section class='commande'>
+            {% for message in app.flashes('panier') %}
+                <p class='panier-message' role='status'>{{ message }}</p>
+            {% endfor %}
             {{ form_start(form, { attr: { class: 'commande-form', novalidate: 'novalidate' } }) }}
                 <div class='commande-colonnes'>
                     <div class='commande-bloc'>
