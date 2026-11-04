@@ -10,6 +10,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Paiement d'une commande par carte bancaire avec Stripe Checkout.
+ * Les moyens de paiement proposés (carte, Apple Pay, Google Pay…) se règlent dans le tableau de bord Stripe :
+ * Paramètres > Moyens de paiement.
  *
  * 1. demarrer()  : la commande est enregistrée « en attente », le client part payer sur la page de Stripe ;
  * 2. confirmer() : Stripe confirme le paiement (retour du client ET notification webhook, le premier arrivé
@@ -67,7 +69,6 @@ final class PaiementCarte
 
         $session = $this->stripe->creerSession([
             'mode' => 'payment',
-            'payment_method_types' => ['card'], // cartes, Apple Pay et Google Pay
             'line_items' => $lignes,
             'customer_email' => $commande['email'],
             'client_reference_id' => $commande['reference'],
