@@ -41,9 +41,11 @@ boutique:
 commande:
     adresse_livraison: "Adresse de livraison"
     aide_paiement: "Aucun paiement n'est demandé en ligne : vous recevrez par e-mail les instructions pour régler votre commande."
+    aide_paiement_carte: "Carte bancaire : paiement immédiat et sécurisé sur la page de notre partenaire Stripe (vos numéros de carte ne passent pas par notre site). Virement ou chèque : vous recevrez les instructions par e-mail."
     connecte: "Connecté avec {email} : la commande sera ajoutée à {lien}votre compte{fin}."
     coordonnees: "Vos coordonnées"
     flash:
+        carte_indisponible: "Le paiement par carte est momentanément indisponible. Votre panier est intact : choisissez un autre mode de paiement ou réessayez dans quelques minutes."
         panier_vide: "Votre panier est vide."
         stock_insuffisant: "{disponible, plural, =0 {Désolé, « {piece} » vient d'être commandé par un autre client et n'est plus disponible.} one {Désolé, il ne reste que # « {piece} » en stock : un autre client vient d'en commander.} other {Désolé, il ne reste que # « {piece} » en stock : un autre client vient d'en commander.}} Vérifiez votre panier avant de valider."
     invite: "Vous avez un compte ? {connexion}Connectez-vous{fin} pour retrouver vos informations — ou {inscription}créez un compte{fin}. Vous pouvez aussi commander sans compte."
@@ -57,10 +59,17 @@ commande:
         titre: "Merci !"
         titre_page: "Commande confirmée"
     mode:
+        carte: "Carte bancaire"
         cheque: "Chèque"
         virement: "Virement bancaire"
     modifier_panier: "Modifier mon panier"
     paiement: "Paiement"
+    paiement_annule:
+        autre_mode: "Choisir un autre mode de paiement"
+        reessayer: "Réessayer le paiement par carte"
+        reserve: "Les pièces restent réservées pendant 30 minutes. Passé ce délai, la commande sera annulée."
+        texte: "Le paiement de votre commande {reference} ({montant}) n'a pas été effectué. Aucun montant n'a été débité."
+        titre: "Paiement non effectué"
     statut:
         annulee: "Annulée"
         en_attente: "En attente de paiement"
@@ -342,10 +351,15 @@ nav:
     pressbook: "Pressbook"
     restaurations: "Restaurations"
 paiement:
+    carte:
+        en_attente: "Votre paiement de {montant} est en cours de confirmation. Vous recevrez un e-mail dès qu'il sera validé."
+        recu: "Votre paiement de {montant} par carte a bien été reçu le {date}. Merci !"
+        titre: "Paiement par carte"
     cheque:
         texte: "Merci d'envoyer un chèque de {montant} à l'ordre de {ordre}, en indiquant la référence {reference} au dos, à l'adresse :"
         titre: "Paiement par chèque"
     expedition: "Votre commande sera expédiée dès réception du paiement."
+    expedition_payee: "Votre commande sera préparée et expédiée dans les meilleurs délais."
     virement:
         texte: "Merci d'effectuer un virement de {montant} en indiquant la référence {reference} :"
         titre: "Paiement par virement"

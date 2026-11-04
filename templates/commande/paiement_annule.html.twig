@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'commande.paiement_annule.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block body_class %}page-pieces{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block body %}
+    <div class='head'><h1>{{ 'commande.paiement_annule.titre'|trans }}</h1></div>
+
+    <div class='container'>
+        <section class='commande commande-merci'>
+            <div class='commande-bloc'>
+                <p>{{ 'commande.paiement_annule.texte'|trans({ reference: '<strong>' ~ commande.reference|e ~ '</strong>', montant: '<strong>' ~ commande.total|euros ~ '</strong>' })|raw }}</p>
+                <p class='commande-aide'>{{ 'commande.paiement_annule.reserve'|trans }}</p>
+
+                <div class='panier-actions'>
+                    <form method='post' action='{{ path('app_commande_paiement_autre_mode', { reference: commande.reference }) }}'>
+                        <input type='hidden' name='_token' value='{{ csrf_token('paiement') }}'>
+                        <button type='submit' class='paiement-autre-mode'>{{ 'commande.paiement_annule.autre_mode'|trans }}</button>
+                    </form>
+                    <form method='post' action='{{ path('app_commande_paiement_relancer', { reference: commande.reference }) }}'>
+                        <input type='hidden' name='_token' value='{{ csrf_token('paiement') }}'>
+                        <button type='submit' class='btn-commander'>{{ 'commande.paiement_annule.reessayer'|trans }}</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

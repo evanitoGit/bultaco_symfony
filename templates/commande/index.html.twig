@@ -44,7 +44,7 @@
 
                         <h2 class='commande-titre'>{{ 'commande.paiement'|trans }}</h2>
                         {{ form_row(form.mode_paiement) }}
-                        <p class='commande-aide'>{{ 'commande.aide_paiement'|trans }}</p>
+                        <p class='commande-aide'>{{ (carte ? 'commande.aide_paiement_carte' : 'commande.aide_paiement')|trans }}</p>
 
                         {{ form_row(form.commentaire) }}
                         {{ form_row(form.accord) }}

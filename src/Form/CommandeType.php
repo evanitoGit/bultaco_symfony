@@ -40,7 +40,7 @@ class CommandeType extends AbstractType
             ->add('pays', TextType::class, ['label' => 'form.pays', 'constraints' => $obligatoire(100), 'attr' => ['autocomplete' => 'country-name']])
             ->add('mode_paiement', ChoiceType::class, [
                 'label' => 'form.mode_paiement',
-                'choices' => CommandeService::PAIEMENTS,
+                'choices' => $options['paiements'],
                 'choice_label' => fn (string $mode) => 'commande.mode.' . $mode,
                 'expanded' => true,
                 'constraints' => [new Assert\NotBlank(message: 'Choisissez un mode de paiement.')],
@@ -60,6 +60,10 @@ class CommandeType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => null]);
+        $resolver->setDefaults([
+            'data_class' => null,
+            'paiements' => CommandeService::PAIEMENTS, // modes proposés (la carte s'y ajoute si Stripe est configuré)
+        ]);
+        $resolver->setAllowedTypes('paiements', 'array');
     }
 }

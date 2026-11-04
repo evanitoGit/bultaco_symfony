@@ -27,10 +27,14 @@ final class CommandeService
         'Annulée' => 'annulee',
     ];
 
+    /** Modes de paiement hors ligne, toujours proposés */
     public const PAIEMENTS = [
         'Virement bancaire' => 'virement',
         'Chèque' => 'cheque',
     ];
+
+    /** Paiement en ligne, proposé seulement si Stripe est configuré (voir PaiementCarte) */
+    public const PAIEMENT_CARTE = ['Carte bancaire' => 'carte'];
 
     public function __construct(
         private readonly Connection $connection,
@@ -113,7 +117,10 @@ final class CommandeService
 
         $this->cart->clear();
         $commande = $this->trouver($id);
-        $this->envoyerEmails($commande);
+        // carte : les e-mails partent une fois le paiement confirmé par Stripe
+        if ($commande['mode_paiement'] !== 'carte') {
+            $this->envoyerEmails($commande);
+        }
 
         return $commande;
     }
@@ -226,7 +233,11 @@ final class CommandeService
         return array_flip(self::STATUTS);
     }
 
-    private function envoyerEmails(array $commande): void
+    /**
+     * Confirmation au client et notification au club.
+     * Appelé à la création de la commande, ou au paiement pour une commande réglée par carte.
+     */
+    public function envoyerEmails(array $commande): void
     {
         $from = new Address($this->expediteur, 'Bultaco Club France');
         $langue = $commande['langue'] ?? 'fr';

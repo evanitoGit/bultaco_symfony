@@ -40,9 +40,11 @@ boutique:
 commande:
     adresse_livraison: "Delivery address"
     aide_paiement: "No payment is taken online: you will receive payment instructions by e-mail."
+    aide_paiement_carte: "Card: instant, secure payment on the page of our partner Stripe (your card details never go through our site). Bank transfer or cheque: you will receive the instructions by e-mail."
     connecte: "Signed in as {email}: this order will be added to {lien}your account{fin}."
     coordonnees: "Your details"
     flash:
+        carte_indisponible: "Card payment is temporarily unavailable. Your cart is intact: choose another payment method or try again in a few minutes."
         panier_vide: "Your cart is empty."
         stock_insuffisant: "{disponible, plural, =0 {Sorry, “{piece}” has just been ordered by another customer and is no longer available.} one {Sorry, only # “{piece}” left in stock: another customer has just ordered some.} other {Sorry, only # “{piece}” left in stock: another customer has just ordered some.}} Please check your cart before placing your order."
     invite: "Already have an account? {connexion}Sign in{fin} to use your saved details — or {inscription}create an account{fin}. You can also order without an account."
@@ -56,10 +58,17 @@ commande:
         titre: "Thank you!"
         titre_page: "Order confirmed"
     mode:
+        carte: "Credit / debit card"
         cheque: "Cheque"
         virement: "Bank transfer"
     modifier_panier: "Edit my cart"
     paiement: "Payment"
+    paiement_annule:
+        autre_mode: "Choose another payment method"
+        reessayer: "Retry card payment"
+        reserve: "The parts remain reserved for 30 minutes. After that, the order will be cancelled."
+        texte: "The payment for your order {reference} ({montant}) was not completed. You have not been charged."
+        titre: "Payment not completed"
     statut:
         annulee: "Cancelled"
         en_attente: "Awaiting payment"
@@ -341,10 +350,15 @@ nav:
     pressbook: "Press book"
     restaurations: "Restorations"
 paiement:
+    carte:
+        en_attente: "Your payment of {montant} is being confirmed. You will receive an e-mail as soon as it is validated."
+        recu: "Your card payment of {montant} was received on {date}. Thank you!"
+        titre: "Card payment"
     cheque:
         texte: "Please send a cheque for {montant} payable to {ordre}, with the reference {reference} written on the back, to:"
         titre: "Payment by cheque"
     expedition: "Your order will be shipped as soon as payment is received."
+    expedition_payee: "Your order will be prepared and shipped as soon as possible."
     virement:
         texte: "Please make a bank transfer of {montant} quoting the reference {reference}:"
         titre: "Payment by bank transfer"

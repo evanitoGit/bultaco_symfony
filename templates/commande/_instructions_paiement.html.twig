@@ -1,7 +1,14 @@
 {# Partagé par la page de confirmation et l'e-mail au client #}
 {% set montant = '<strong>' ~ commande.total|euros ~ '</strong>' %}
 {% set reference = '<strong>' ~ commande.reference|e ~ '</strong>' %}
-{% if commande.mode_paiement == 'virement' %}
+{% if commande.mode_paiement == 'carte' %}
+    <h3>{{ 'paiement.carte.titre'|trans }}</h3>
+    {% if commande.date_paiement %}
+        <p>{{ 'paiement.carte.recu'|trans({ montant: montant, date: commande.date_paiement|date('d/m/Y') })|raw }}</p>
+    {% else %}
+        <p>{{ 'paiement.carte.en_attente'|trans({ montant: montant })|raw }}</p>
+    {% endif %}
+{% elseif commande.mode_paiement == 'virement' %}
     <h3>{{ 'paiement.virement.titre'|trans }}</h3>
     <p>{{ 'paiement.virement.texte'|trans({ montant: montant, reference: reference })|raw }}</p>
     <p>
@@ -14,4 +21,4 @@
     <p>{{ 'paiement.cheque.texte'|trans({ montant: montant, reference: reference, ordre: '<strong>Bultaco Club France</strong>' })|raw }}</p>
     <p>Bultaco Club France<br>4 Chemin du Glais-Malet<br>51220 Merfy<br>{{ 'pied.pays'|trans }}</p>
 {% endif %}
-<p>{{ 'paiement.expedition'|trans }}</p>
+<p>{{ (commande.date_paiement ? 'paiement.expedition_payee' : 'paiement.expedition')|trans }}</p>

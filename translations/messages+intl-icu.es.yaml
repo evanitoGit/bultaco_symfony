@@ -40,9 +40,11 @@ boutique:
 commande:
     adresse_livraison: "Dirección de entrega"
     aide_paiement: "No se solicita ningún pago en línea: recibirá por correo electrónico las instrucciones para pagar su pedido."
+    aide_paiement_carte: "Tarjeta: pago inmediato y seguro en la página de nuestro socio Stripe (los datos de su tarjeta no pasan por nuestra web). Transferencia o cheque: recibirá las instrucciones por correo electrónico."
     connecte: "Sesión iniciada con {email}: el pedido se añadirá a {lien}su cuenta{fin}."
     coordonnees: "Sus datos"
     flash:
+        carte_indisponible: "El pago con tarjeta no está disponible en este momento. Su carrito está intacto: elija otro método de pago o vuelva a intentarlo en unos minutos."
         panier_vide: "Su cesta está vacía."
         stock_insuffisant: "{disponible, plural, =0 {Lo sentimos, otro cliente acaba de pedir «{piece}» y ya no está disponible.} one {Lo sentimos, solo queda # «{piece}» en stock: otro cliente acaba de pedirlo.} other {Lo sentimos, solo quedan # «{piece}» en stock: otro cliente acaba de pedirlos.}} Revise su cesta antes de confirmar."
     invite: "¿Ya tiene una cuenta? {connexion}Inicie sesión{fin} para recuperar sus datos, o {inscription}cree una cuenta{fin}. También puede hacer el pedido sin cuenta."
@@ -56,10 +58,17 @@ commande:
         titre: "¡Gracias!"
         titre_page: "Pedido confirmado"
     mode:
+        carte: "Tarjeta bancaria"
         cheque: "Cheque"
         virement: "Transferencia bancaria"
     modifier_panier: "Modificar mi cesta"
     paiement: "Pago"
+    paiement_annule:
+        autre_mode: "Elegir otro método de pago"
+        reessayer: "Reintentar el pago con tarjeta"
+        reserve: "Las piezas quedan reservadas durante 30 minutos. Pasado ese plazo, el pedido se cancelará."
+        texte: "El pago de su pedido {reference} ({montant}) no se ha realizado. No se ha cobrado ningún importe."
+        titre: "Pago no realizado"
     statut:
         annulee: "Cancelado"
         en_attente: "Pendiente de pago"
@@ -341,10 +350,15 @@ nav:
     pressbook: "Pressbook"
     restaurations: "Restauraciones"
 paiement:
+    carte:
+        en_attente: "Su pago de {montant} se está confirmando. Recibirá un correo electrónico en cuanto se valide."
+        recu: "Hemos recibido su pago con tarjeta de {montant} el {date}. ¡Gracias!"
+        titre: "Pago con tarjeta"
     cheque:
         texte: "Envíe un cheque de {montant} a nombre de {ordre}, indicando la referencia {reference} en el reverso, a la dirección:"
         titre: "Pago con cheque"
     expedition: "Su pedido se enviará en cuanto recibamos el pago."
+    expedition_payee: "Su pedido se preparará y enviará lo antes posible."
     virement:
         texte: "Realice una transferencia de {montant} indicando la referencia {reference}:"
         titre: "Pago por transferencia"

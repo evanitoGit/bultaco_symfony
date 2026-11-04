@@ -11,7 +11,9 @@
         <section class='commande commande-merci'>
             <div class='commande-bloc'>
                 <p class='commande-ok'>✓ {{ 'commande.merci.enregistree'|trans({ reference: '<strong>' ~ commande.reference|e ~ '</strong>' })|raw }}</p>
+                {% if commande.mode_paiement != 'carte' or commande.date_paiement %}
                 <p>{{ 'commande.merci.email_envoye'|trans({ email: '<strong>' ~ commande.email|e ~ '</strong>' })|raw }}</p>
+                {% endif %}
 
                 {% include 'commande/_instructions_paiement.html.twig' %}
 

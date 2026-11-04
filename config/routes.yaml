@@ -12,7 +12,7 @@
 site:
     resource: ../src/Controller/
     type: attribute
-    exclude: '../src/Controller/{Admin,SecurityController.php,SitemapController.php}'
+    exclude: '../src/Controller/{Admin,SecurityController.php,SitemapController.php,StripeWebhookController.php}'
     prefix:
         fr: ''
         en: '/en'
@@ -31,4 +31,9 @@ securite:
 # Plan du site et robots.txt : à la racine, sans langue
 referencement:
     resource: ../src/Controller/SitemapController.php
+    type: attribute
+
+# Notifications de paiement envoyées par Stripe : adresse fixe, sans langue
+paiement:
+    resource: ../src/Controller/StripeWebhookController.php
     type: attribute

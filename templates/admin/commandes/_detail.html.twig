@@ -17,8 +17,15 @@
         </div>
         <div>
             <h2>Paiement</h2>
-            <p><strong>{{ row.mode_paiement == 'virement' ? 'Virement' : 'Chèque' }}</strong><br>
-               Commande du {{ row.date_commande|date('d/m/Y à H:i') }}</p>
+            <p><strong>{{ { virement: 'Virement', cheque: 'Chèque', carte: 'Carte bancaire' }[row.mode_paiement] ?? row.mode_paiement }}</strong><br>
+               Commande du {{ row.date_commande|date('d/m/Y à H:i') }}
+               {% if row.date_paiement ?? false %}<br>Payée en ligne le {{ row.date_paiement|date('d/m/Y à H:i') }}{% endif %}</p>
+            {% if row.stripe_paiement_id ?? false %}
+                {# lien vers le paiement dans le tableau de bord Stripe (remboursement, reçu…) #}
+                <p><a href="https://dashboard.stripe.com/{{ stripe_mode_test() ? 'test/' }}payments/{{ row.stripe_paiement_id }}" target="_blank" rel="noopener" class="admin-badge">Voir le paiement sur Stripe {{ icone('externe') }}</a></p>
+            {% elseif row.mode_paiement == 'carte' and row.statut == 'en_attente' %}
+                <p><span class="admin-badge admin-badge--attente">Paiement par carte non abouti</span></p>
+            {% endif %}
             {% if row.stock_restitue ?? false %}
                 <p><span class="admin-badge admin-badge--attente">Pièces remises en stock</span></p>
             {% endif %}
