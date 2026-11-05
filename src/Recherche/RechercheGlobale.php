@@ -3,7 +3,9 @@
 namespace App\Recherche;
 
 use App\Boutique\Catalogue;
+use App\Boutique\Fonctionnalites;
 use App\I18n\Contenu;
+use App\Modele\PageModele;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -27,6 +29,8 @@ final class RechercheGlobale
         private readonly Catalogue $catalogue,
         private readonly Contenu $contenu,
         private readonly UrlGeneratorInterface $urls,
+        private readonly Fonctionnalites $fonctionnalites,
+        private readonly PageModele $pagesModeles,
     ) {
     }
 
@@ -129,12 +133,13 @@ final class RechercheGlobale
 
             case 'modeles':
                 $modeles = $this->connection->fetchAllAssociative('SELECT * FROM modeles_emblematiques ORDER BY ordre ASC, id ASC');
+                $pages = $this->fonctionnalites->active('page_modele'); // « Une page par modèle »
                 foreach ($this->contenu->traduireTout($modeles, ['type_moto', 'description']) as $m) {
                     $annees = ($m['annee_debut'] || $m['annee_fin']) ? ($m['annee_debut'] ?: '?') . ' – ' . ($m['annee_fin'] ?: '?') : null;
                     yield [
                         'titre' => $m['nom'],
                         'sous_titre' => implode(' · ', array_filter([$m['type_moto'], $annees])) ?: null,
-                        'url' => $this->urls->generate('app_modeles_liste') . '#modele-' . $m['id'],
+                        'url' => $pages ? $this->pagesModeles->url($m) : $this->urls->generate('app_modeles_liste') . '#modele-' . $m['id'],
                         'image' => $m['image_path'] ?: null,
                         'prix' => null,
                         'texte' => implode(' ', [$m['type_moto'] ?? '', $m['cylindree'] ?? '', $m['annee_debut'] ?? '', $m['annee_fin'] ?? '', $m['description'] ?? '']),

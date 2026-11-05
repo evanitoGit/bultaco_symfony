@@ -81,6 +81,7 @@
                     </div>
                     ${modele.description ? `<div class='carte-section'><p class='description-text'>${nl2br(modele.description)}</p></div>` : ''}
                     ${modele.caracteristiques ? `<div class='carte-section'><h3 class='carte-titre'>{{ 'modeles.caracteristiques'|trans }}</h3><div class='caracteristiques-text'>${nl2br(modele.caracteristiques)}</div></div>` : ''}
+                    ${modele.page ? `<div class='carte-section carte-pieces'><a href='${escapeHtml(modele.page)}' class='btn-commander'>{{ 'modele_page.voir_page'|trans|e('js') }}</a></div>` : ''}
                     ${modele.motos.length ? `<div class='carte-section carte-pieces'>${modele.motos.map(moto =>
                         `<a href='${escapeHtml(moto.url)}' class='btn-commander'>⚙️ ${escapeHtml(modele.motos.length > 1 ? {{ 'modeles.pieces_pour'|trans({ moto: '__MOTO__' })|json_encode|raw }}.replace('__MOTO__', moto.nom) : {{ 'modeles.voir_pieces'|trans|json_encode|raw }})}</a>`).join('')}</div>` : ''}
                 </div>

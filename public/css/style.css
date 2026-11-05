@@ -3582,3 +3582,71 @@ body.page-erreur { background-image: url("../img/pieces.png"); }
     .garage-ajout-champs { grid-template-columns: minmax(0, 1fr); }
     .garage-ajout .btn-commander { width: 100%; }
 }
+
+/* ==========================================================================
+   Une page par modèle (fonctionnalité en test)
+   ========================================================================== */
+.modele-page { width: 100%; max-width: 1100px; padding: 30px 20px 50px; }
+
+.modele-entete {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 32px;
+    padding: 28px;
+    background-color: white;
+    border: 3px solid var(--carbone);
+    border-radius: 15px;
+}
+.modele-photo img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; }
+.modele-photo-vide { display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; border-radius: 10px; background-color: #f3eee8; color: #b9ad9f; font-size: 3em; }
+.modele-identite { display: flex; flex-direction: column; gap: 12px; }
+.container .modele-titre { margin: 0; color: var(--carbone); font-size: clamp(1.6em, 3.4vw, 2.4em); line-height: 1.15; text-align: left; }
+.modele-type { color: #8a7a6a; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.9em; }
+.modele-infos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 6px 0; }
+.modele-infos div { padding: 12px 14px; border-radius: 10px; background-color: #f8f3ed; }
+.modele-infos dt { color: #8a7a6a; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.06em; }
+.modele-infos dd { margin: 4px 0 0; color: var(--carbone); font-weight: bold; font-size: 1.1em; }
+.modele-motos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+.modele-motos .btn-commander { padding: 11px 20px; font-size: 0.95em; }
+
+.modele-bloc { margin-top: 24px; padding: 28px; background-color: white; border: 3px solid var(--carbone); border-radius: 15px; }
+.modele-page h2 { margin: 0 0 18px; color: var(--carbone); -webkit-text-stroke: 0; font-size: 1.25em; letter-spacing: 0.05em; text-align: left; }
+.modele-texte { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; }
+.modele-texte:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
+.modele-description { line-height: 1.75; }
+.modele-caracteristiques ul { margin: 0; padding: 0; list-style: none; }
+.modele-caracteristiques li { padding: 9px 0 9px 22px; border-bottom: 1px solid #f0ebe5; position: relative; }
+.modele-caracteristiques li::before { content: ""; position: absolute; left: 4px; top: 1.05em; width: 8px; height: 8px; border-radius: 50%; background-color: var(--sepia); }
+.modele-plus { margin: 16px 0 0; text-align: right; }
+
+.modele-restaurations { margin: 0; padding: 0; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
+.restau-legende h3 a { color: inherit; text-decoration: none; }
+.restau-legende h3 a:hover { text-decoration: underline; }
+
+.modele-colonnes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 0 24px; }
+.modele-liens { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.modele-liens a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px;
+    border: 2px solid #f0ebe5;
+    border-radius: 10px;
+    color: var(--carbone);
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+}
+.modele-liens a:hover { border-color: var(--carbone); }
+.modele-liens img { width: 64px; height: 64px; flex-shrink: 0; object-fit: cover; border-radius: 8px; }
+.modele-liens span { display: flex; flex-direction: column; gap: 2px; }
+.modele-liens small { color: #8a7a6a; }
+.modele-page .piece-voisines { margin-top: 24px; }
+
+@media (max-width: 800px) {
+    .modele-page { padding: 20px 16px 40px; }
+    .modele-entete, .modele-texte { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 18px; }
+    .modele-bloc { padding: 20px 18px; }
+    .modele-motos .btn-commander { flex: 1 1 100%; text-align: center; }
+    .modele-page .piece-similaires { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .modele-page .piece-similaires img, .modele-page .piece-similaires .no-image { height: 100px; }
+}

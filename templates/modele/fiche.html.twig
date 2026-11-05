@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{#
+    Page complète d'un modèle de l'album (fonctionnalité en test « Une page par modèle ») :
+    photo, caractéristiques, pièces compatibles, restaurations, pilotes et articles qui en parlent.
+#}
+{% set resume = (modele.description ?: 'modele_page.meta'|trans({ nom: modele.nom }))|striptags|replace({ "\n": ' ', "\r": '' }) %}
+{% set resume = resume|length > 160 ? resume|slice(0, 157) ~ '…' : resume %}
+{% set periode = (modele.annee_debut or modele.annee_fin) ? (modele.annee_debut ?: '?') ~ ' – ' ~ (modele.annee_fin ?: '?') : null %}
+
+{% block title %}{{ modele.nom }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta_description %}{{ resume }}{% endblock %}
+{% block meta %}
+    <meta property="og:title" content="{{ modele.nom }}">
+    <meta property="og:description" content="{{ resume }}">
+    {% if modele.image_path %}<meta property="og:image" content="{{ absolute_url(asset(modele.image_path)) }}">{% endif %}
+{% endblock %}
+{% block body_class %}page-album page-modele{% endblock %}
+
+{% block body %}
+    <div class='head'>
+        <p class='head-titre'>{{ 'modeles.titre'|trans }}</p>
+    </div>
+
+    <div class='container'>
+        <section class='modele-page'>
+            {% include '_partials/_badge_test.html.twig' with { nom: 'page_modele' } %}
+
+            <nav class='fil-ariane' aria-label='{{ 'piece.fil_ariane'|trans }}'>
+                <a href='{{ path('app_modeles_liste') }}'>{{ 'modeles.titre'|trans }}</a>
+                {{ icone('chevron-droite', 'separateur') }}
+                <span>{{ modele.nom }}</span>
+            </nav>
+
+            {# ----- Présentation ----- #}
+            <div class='modele-entete'>
+                <div class='modele-photo'>
+                    {% if modele.image_path %}
+                        <img src='{{ asset(modele.image_path) }}' alt='{{ modele.nom }}'>
+                    {% else %}
+                        <div class='modele-photo-vide' aria-hidden='true'>{{ icone('agrandir') }}</div>
+                    {% endif %}
+                </div>
+                <div class='modele-identite'>
+                    <h1 class='modele-titre'>{{ modele.nom }}</h1>
+                    {% if modele.type_moto %}<p class='modele-type'>{{ modele.type_moto }}</p>{% endif %}
+                    <dl class='modele-infos'>
+                        <div><dt>{{ 'modeles.periode'|trans }}</dt><dd>{{ periode ?: 'commun.non_renseigne'|trans }}</dd></div>
+                        <div><dt>{{ 'modeles.cylindree'|trans }}</dt><dd>{{ modele.cylindree ?: 'commun.non_renseigne'|trans }}</dd></div>
+                    </dl>
+                    {% if modele.motos is not empty %}
+                        <div class='modele-motos'>
+                            {% for moto in modele.motos %}
+                                <a href='{{ path('app_boutique_pieces', { moto: moto.id }) }}' class='btn-commander'>
+                                    {{ modele.motos|length > 1 ? 'modeles.pieces_pour'|trans({ moto: moto.nom }) : 'modeles.voir_pieces'|trans }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if modele.description or modele.caracteristiques_liste is not empty %}
+                <div class='modele-bloc modele-texte'>
+                    {% if modele.description %}
+                        <div class='modele-description'>{{ modele.description|nl2br }}</div>
+                    {% endif %}
+                    {% if modele.caracteristiques_liste is not empty %}
+                        <div class='modele-caracteristiques'>
+                            <h2>{{ 'modeles.caracteristiques'|trans }}</h2>
+                            <ul>
+                                {% for ligne in modele.caracteristiques_liste %}<li>{{ ligne }}</li>{% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# ----- Pièces compatibles ----- #}
+            {% if modele.pieces.total > 0 %}
+                <div class='modele-bloc'>
+                    <h2>{{ 'modele_page.pieces'|trans({ n: modele.pieces.total }) }}</h2>
+                    <ul class='piece-similaires'>
+                        {% for piece in modele.pieces.liste %}
+                            {% include '_partials/_piece_mini.html.twig' with { piece: piece } only %}
+                        {% endfor %}
+                    </ul>
+                    {% if modele.pieces.total > modele.pieces.liste|length and modele.motos is not empty %}
+                        <p class='modele-plus'><a href='{{ path('app_boutique_pieces', { moto: (modele.motos|first).id }) }}' class='panier-continuer'>{{ 'modele_page.toutes_pieces'|trans({ n: modele.pieces.total }) }} {{ icone('fleche-droite') }}</a></p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# ----- Restaurations ----- #}
+            {% if modele.restaurations is not empty %}
+                <div class='modele-bloc'>
+                    <h2>{{ 'modele_page.restaurations'|trans }}</h2>
+                    <div class='restau-liste modele-restaurations'>
+                        {% for restauration in modele.restaurations %}
+                            <figure class='restau-carte'>
+                                <div class='restau-visuel'>
+                                    {% if restauration.photo_avant and restauration.photo_apres %}
+                                        {% include '_partials/_comparateur.html.twig' with {
+                                            avant: asset(restauration.photo_avant),
+                                            apres: asset(restauration.photo_apres),
+                                            titre: restauration.titre
+                                        } %}
+                                    {% else %}
+                                        <img class='restau-photo-seule' src='{{ asset(restauration.photo_avant ?: restauration.photo_apres) }}' alt='{{ restauration.titre }}' loading='lazy'>
+                                    {% endif %}
+                                </div>
+                                <figcaption class='restau-legende'>
+                                    <h3><a href='{{ path('app_modeles_restaurations') }}#restauration-{{ restauration.id }}'>{{ restauration.titre }}</a></h3>
+                                </figcaption>
+                            </figure>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {# ----- Pilotes et pressbook ----- #}
+            {% if modele.pilotes is not empty or modele.articles is not empty %}
+                <div class='modele-colonnes'>
+                    {% if modele.pilotes is not empty %}
+                        <div class='modele-bloc'>
+                            <h2>{{ 'modele_page.pilotes'|trans }}</h2>
+                            <ul class='modele-liens'>
+                                {% for pilote in modele.pilotes %}
+                                    <li>
+                                        <a href='{{ path('app_modeles_pilotes') }}#pilote-{{ pilote.id }}'>
+                                            {% if pilote.image_path %}<img src='{{ asset(pilote.image_path) }}' alt='' loading='lazy'>{% endif %}
+                                            <span><strong>{{ pilote.prenom }} {{ pilote.nom }}</strong>{% if pilote.nationalite %}<small>{{ pilote.nationalite }}</small>{% endif %}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if modele.articles is not empty %}
+                        <div class='modele-bloc'>
+                            <h2>{{ 'modele_page.articles'|trans }}</h2>
+                            <ul class='modele-liens'>
+                                {% for article in modele.articles %}
+                                    <li>
+                                        <a href='{{ path('app_doc_pressbook') }}#doc-{{ article.id }}'>
+                                            {% if article.image_path %}<img src='{{ asset(article.image_path) }}' alt='' loading='lazy'>{% endif %}
+                                            <span><strong>{{ article.titre }}</strong><small>{{ [article.source, article.date_publication]|filter(v => v)|join(' · ') }}</small></span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# ----- Modèles voisins dans l'album ----- #}
+            {% if modele.precedent or modele.suivant %}
+                <nav class='piece-voisines' aria-label='{{ 'modele_page.voisins'|trans }}'>
+                    {% for sens, voisin in { precedente: modele.precedent, suivante: modele.suivant } %}
+                        {% if voisin %}
+                            <a href='{{ voisin.url }}' class='piece-voisine piece-voisine--{{ sens }}' rel='{{ sens == 'precedente' ? 'prev' : 'next' }}'>
+                                {{ icone(sens == 'precedente' ? 'chevron-gauche' : 'chevron-droite') }}
+                                {% if voisin.image_path %}<img src='{{ asset(voisin.image_path) }}' alt='' loading='lazy'>{% endif %}
+                                <span>
+                                    <small>{{ ('modele_page.' ~ sens)|trans }}</small>
+                                    <strong>{{ voisin.nom }}</strong>
+                                </span>
+                            </a>
+                        {% else %}
+                            <span aria-hidden='true'></span>
+                        {% endif %}
+                    {% endfor %}
+                </nav>
+            {% endif %}
+
+            <p><a href='{{ path('app_modeles_liste') }}' class='panier-continuer'>{{ icone('fleche-gauche') }} {{ 'modele_page.retour'|trans }}</a></p>
+        </section>
+    </div>
+{% endblock %}

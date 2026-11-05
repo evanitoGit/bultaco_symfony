@@ -353,6 +353,18 @@ logos:
 meta:
     description: "Bultaco Club France: models, restorations, legendary riders, documentation and spare parts."
     suffixe: "Bultaco Club"
+modele_page:
+    articles: "In the press book"
+    meta: "{nom}: history, specifications, spare parts, restorations and riders, by the Bultaco Club France."
+    pieces: "{n, plural, one {Compatible part} other {Compatible parts (#)}}"
+    pilotes: "Riders"
+    precedente: "Previous model"
+    restaurations: "Restorations by members"
+    retour: "All models"
+    suivante: "Next model"
+    toutes_pieces: "{n, plural, one {See the part in the shop} other {See the # parts in the shop}}"
+    voir_page: "See the full page for this model"
+    voisins: "Other models in the album"
 modeles:
     aucun: "No models yet"
     badge: "Model"

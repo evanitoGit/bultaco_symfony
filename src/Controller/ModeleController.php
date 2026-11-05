@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Boutique\Catalogue;
+use App\Boutique\Fonctionnalites;
 use App\I18n\Contenu;
+use App\Modele\PageModele;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -20,7 +23,7 @@ class ModeleController extends AbstractController
     }
 
     #[Route('/modeles/liste', name: 'app_modeles_liste')]
-    public function liste(Catalogue $catalogue): Response
+    public function liste(Catalogue $catalogue, PageModele $pages, Fonctionnalites $fonctionnalites): Response
     {
         // Pas encore d'entité pour cette table : requête SQL directe via DBAL
         $modeles = $this->connection
@@ -34,10 +37,40 @@ class ModeleController extends AbstractController
             $motos[(int) $modele['id']] ?? []
         )], $modeles);
 
+        // « Une page par modèle » : la fiche ouverte dans la fenêtre mène à la page complète
+        if ($fonctionnalites->active('page_modele')) {
+            $modeles = array_map(fn (array $modele) => $modele + ['page' => $pages->url($modele)], $modeles);
+        }
+
         return $this->render('modele/liste.html.twig', [
             'texte_presentation' => $this->contenu->texte('album_photos', $this->translator->trans('modeles.texte_defaut')),
             'modeles' => $this->contenu->traduireTout($modeles, ['type_moto', 'description', 'caracteristiques']),
         ]);
+    }
+
+    /**
+     * Page complète d'un modèle de l'album (fonctionnalité en test « Une page par modèle »).
+     * Seul le numéro compte : si le nom a changé, l'ancienne adresse redirige vers la nouvelle.
+     */
+    #[Route('/modeles/{id}-{slug}', name: 'app_modele', requirements: ['id' => '\d+', 'slug' => '[a-z0-9-]*'], methods: ['GET'])]
+    public function fiche(int $id, string $slug, Request $request, PageModele $pages, Fonctionnalites $fonctionnalites): Response
+    {
+        $fonctionnalites->exiger('page_modele');
+        $modele = $pages->fiche($id);
+        if ($modele === null) {
+            throw $this->createNotFoundException('Modèle introuvable.');
+        }
+        if ($request->getBaseUrl() . $request->getPathInfo() !== $modele['url']) {
+            return $this->redirect($modele['url'], Response::HTTP_MOVED_PERMANENTLY);
+        }
+
+        // drapeaux et balises hreflang : même page dans chaque langue
+        $request->attributes->set('_urls_langues', array_combine(
+            array_keys(Contenu::LANGUES),
+            array_map(fn (string $langue) => $pages->url($modele, $langue), array_keys(Contenu::LANGUES))
+        ));
+
+        return $this->render('modele/fiche.html.twig', ['modele' => $modele]);
     }
 
     #[Route('/modeles/restaurations', name: 'app_modeles_restaurations')]
