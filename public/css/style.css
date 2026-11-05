@@ -3433,3 +3433,128 @@ body.page-erreur { background-image: url("../img/pieces.png"); }
     header:has(.selection-lien:not([hidden])) .recherche-lien { right: 156px; }
     header:has(.selection-lien:not([hidden])) .header-nav > ul > li:first-child { padding-right: 206px; }
 }
+
+/* ==========================================================================
+   Mon garage
+   ========================================================================== */
+/* boutique : raccourcis « Mes motos » sous le filtre */
+.garage-raccourcis {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: calc(100% - 40px);
+    max-width: 1060px;
+    margin: -6px auto 20px;
+    font-size: 0.92em;
+}
+.garage-raccourcis-titre { font-weight: bold; color: var(--carbone); }
+.garage-puce {
+    padding: 6px 14px;
+    border: 2px solid var(--carbone);
+    border-radius: 50px;
+    color: var(--carbone);
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.garage-puce:hover, .garage-puce.actif { background-color: var(--carbone); color: var(--beige); }
+.garage-gerer { color: #8a7a6a; text-decoration: underline; }
+
+/* fiche pièce */
+.piece-compat-garage {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background-color: #e3f3e8;
+    color: #2e7d4f;
+    font-weight: bold;
+}
+
+/* espace client */
+.garage-motos { display: flex; flex-direction: column; gap: 12px; margin: 0 0 28px; padding: 0; list-style: none; }
+.garage-moto {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 16px 18px;
+    border: 2px solid #e4ddd5;
+    border-radius: 12px;
+    background-color: white;
+}
+.garage-moto-nom { display: flex; flex-direction: column; gap: 2px; }
+.garage-moto-nom strong { font-size: 1.1em; color: var(--carbone); }
+.garage-moto-nom span { color: #8a7a6a; font-size: 0.92em; }
+.garage-moto-pieces { display: inline-flex; align-items: center; gap: 4px; color: var(--carbone); font-weight: bold; text-decoration: none; }
+.garage-moto-pieces:hover { text-decoration: underline; }
+.garage-moto-alertes, .garage-moto-retirer { margin: 0; }
+.garage-moto-retirer { justify-self: end; }
+
+.garage-interrupteur {
+    display: inline-flex;
+    text-align: left;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #6b6b6b;
+    font: inherit;
+    font-size: 0.92em;
+    cursor: pointer;
+}
+.garage-interrupteur-piste {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background-color: #cfc6bc;
+    transition: background-color 0.2s ease;
+}
+.garage-interrupteur-piste::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s var(--ease);
+}
+.garage-interrupteur[aria-checked="true"] { color: var(--carbone); }
+.garage-interrupteur[aria-checked="true"] .garage-interrupteur-piste { background-color: #2e7d4f; }
+.garage-interrupteur[aria-checked="true"] .garage-interrupteur-piste::after { transform: translateX(18px); }
+.garage-interrupteur:focus-visible { outline: 3px solid var(--sepia); outline-offset: 3px; border-radius: 4px; }
+
+.garage-ajout { padding: 20px; border: 2px dashed var(--sepia); border-radius: 12px; background-color: #fdfaf6; }
+.garage-ajout h3 { margin: 0 0 14px; color: var(--carbone); }
+.garage-ajout-champs { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.5fr); gap: 12px; margin-bottom: 10px; }
+.garage-ajout label { display: flex; flex-direction: column; gap: 6px; font-weight: bold; color: var(--carbone); font-size: 0.92em; }
+.garage-ajout label small { font-weight: normal; color: #8a7a6a; }
+.garage-ajout select, .garage-ajout input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e4ddd5;
+    border-radius: 10px;
+    background-color: white;
+    font: inherit;
+    font-weight: normal;
+}
+.garage-ajout select:focus, .garage-ajout input:focus { outline: none; border-color: var(--carbone); }
+.garage-ajout-aide { font-size: 0.9em; }
+.garage-ajout .btn-commander { border: none; padding: 12px 22px; font-size: 1em; cursor: pointer; font-family: inherit; }
+
+@media (max-width: 700px) {
+    .garage-moto { grid-template-columns: minmax(0, 1fr); }
+    .garage-moto-retirer { justify-self: start; }
+    .garage-ajout-champs { grid-template-columns: minmax(0, 1fr); }
+    .garage-ajout .btn-commander { width: 100%; }
+}

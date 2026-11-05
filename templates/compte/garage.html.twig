@@ -1,0 +1,79 @@
+{% extends 'compte/_layout.html.twig' %}
+
+{% block title %}{{ 'compte.onglet.garage'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+
+{% block contenu %}
+    <div class='compte-bloc'>
+        <h2 class='compte-titre'>{{ 'compte.onglet.garage'|trans }}</h2>
+        <p class='compte-intro'>{{ 'garage.intro'|trans }}</p>
+
+        {% if motos is empty %}
+            <div class='empty-state'>
+                <p>{{ 'garage.vide'|trans }}</p>
+            </div>
+        {% else %}
+            <ul class='garage-motos'>
+                {% for m in motos %}
+                    <li class='garage-moto'>
+                        <div class='garage-moto-nom'>
+                            <strong>{{ m.nom }}</strong>
+                            {% if m.annee or m.surnom %}
+                                <span>{{ [m.annee, m.surnom ? '« ' ~ m.surnom ~ ' »' : null]|filter(v => v)|join(' · ') }}</span>
+                            {% endif %}
+                        </div>
+                        <a href='{{ path('app_boutique_pieces', { moto: m.modele_id }) }}' class='garage-moto-pieces'>
+                            {{ 'garage.voir_pieces'|trans({ n: m.nb_pieces }) }} {{ icone('chevron-droite') }}
+                        </a>
+                        <form method='post' class='garage-moto-alertes'>
+                            <input type='hidden' name='_token' value='{{ csrf_token('garage') }}'>
+                            <input type='hidden' name='action' value='alertes'>
+                            <input type='hidden' name='moto' value='{{ m.id }}'>
+                            <input type='hidden' name='alertes' value='{{ m.alertes ? '0' : '1' }}'>
+                            <button type='submit' class='garage-interrupteur' role='switch' aria-checked='{{ m.alertes ? 'true' : 'false' }}'>
+                                <span class='garage-interrupteur-piste' aria-hidden='true'></span>
+                                {{ 'garage.alertes'|trans }}
+                            </button>
+                        </form>
+                        <form method='post' class='garage-moto-retirer' onsubmit='return confirm({{ 'garage.confirmer_retirer'|trans({ moto: m.nom })|json_encode }});'>
+                            <input type='hidden' name='_token' value='{{ csrf_token('garage') }}'>
+                            <input type='hidden' name='action' value='retirer'>
+                            <input type='hidden' name='moto' value='{{ m.id }}'>
+                            <button type='submit' class='panier-vider'>{{ 'garage.retirer'|trans }}</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if motos|length < max %}
+            <form method='post' class='garage-ajout'>
+                <h3>{{ 'garage.ajouter_titre'|trans }}</h3>
+                <input type='hidden' name='_token' value='{{ csrf_token('garage') }}'>
+                <input type='hidden' name='action' value='ajouter'>
+                <div class='garage-ajout-champs'>
+                    <label>
+                        <span>{{ 'garage.modele'|trans }}</span>
+                        <select name='modele' required>
+                            <option value=''>{{ 'garage.choisir'|trans }}</option>
+                            {% for modele in modeles_moto %}
+                                <option value='{{ modele.id }}'>{{ modele.nom }}{{ modele.cylindree ? ' — ' ~ modele.cylindree }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span>{{ 'garage.annee'|trans }} <small>({{ 'garage.facultatif'|trans }})</small></span>
+                        <input type='number' name='annee' min='{{ annee_min }}' max='{{ 'now'|date('Y') }}' inputmode='numeric' placeholder='1975'>
+                    </label>
+                    <label>
+                        <span>{{ 'garage.surnom'|trans }} <small>({{ 'garage.facultatif'|trans }})</small></span>
+                        <input type='text' name='surnom' maxlength='60' placeholder='{{ 'garage.surnom_exemple'|trans }}'>
+                    </label>
+                </div>
+                <p class='compte-intro garage-ajout-aide'>{{ 'garage.modele_absent'|trans({ lien: '<a href="' ~ path('app_demande_piece') ~ '">', fin: '</a>' })|raw }}</p>
+                <button type='submit' class='btn-commander'>{{ 'garage.ajouter'|trans }}</button>
+            </form>
+        {% else %}
+            <p class='compte-intro'>{{ 'garage.plein'|trans({ max: max }) }}</p>
+        {% endif %}
+    </div>
+{% endblock %}
