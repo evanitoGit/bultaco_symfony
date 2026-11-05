@@ -14,6 +14,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -92,6 +93,49 @@ class AdminController extends AbstractController
             'groups' => $this->registry->grouped(),
             'choice_labels' => $this->choiceLabels($config),
         ]);
+    }
+
+    /**
+     * Nouvel ordre d'une liste après un glisser-déposer : {"ids": [5, 2, 9], "_token": "…"}.
+     * Les éléments sont renumérotés 10, 20, 30… (dans leur groupe pour les sous-catégories).
+     */
+    #[Route('/{resource}/ordre', name: 'app_admin_ordre', requirements: ['resource' => ResourceRegistry::ROUTE_REQUIREMENT], methods: ['POST'])]
+    public function ordre(string $resource, Request $request): JsonResponse
+    {
+        $config = $this->registry->get($resource);
+        if (!($config['reordonner'] ?? false)) {
+            throw $this->createNotFoundException();
+        }
+        $donnees = $request->toArray();
+        if (!$this->isCsrfTokenValid('ordre-' . $resource, (string) ($donnees['_token'] ?? ''))) {
+            return $this->json(['message' => 'La page a expiré : rechargez-la puis recommencez.'], Response::HTTP_BAD_REQUEST);
+        }
+        $ids = array_map('intval', is_array($donnees['ids'] ?? null) ? $donnees['ids'] : []);
+
+        // la liste envoyée doit être complète (toute la table, ou tout le groupe) et sans doublon
+        $groupe = is_array($config['reordonner']) ? $config['reordonner']['groupe'] : null;
+        $sql = sprintf('SELECT id FROM %s', $config['table']);
+        $parametres = [];
+        if ($groupe !== null) {
+            $valeur = $ids === [] ? false : $this->connection->fetchOne(sprintf('SELECT %s FROM %s WHERE id = ?', $groupe, $config['table']), [$ids[0]]);
+            $sql .= sprintf(' WHERE %s = ?', $groupe);
+            $parametres[] = $valeur;
+        }
+        $attendus = array_map('intval', $this->connection->fetchFirstColumn($sql, $parametres));
+        $tries = $ids;
+        sort($tries);
+        sort($attendus);
+        if ($ids === [] || $tries !== $attendus) {
+            return $this->json(['message' => 'La liste a changé entre-temps : rechargez la page puis recommencez.'], Response::HTTP_CONFLICT);
+        }
+
+        $this->connection->transactional(function (Connection $connection) use ($config, $ids): void {
+            foreach ($ids as $position => $id) {
+                $connection->update($config['table'], ['ordre' => ($position + 1) * 10], ['id' => $id]);
+            }
+        });
+
+        return $this->json(['message' => 'Ordre enregistré', 'ordres' => array_combine($ids, array_map(fn (int $i) => ($i + 1) * 10, array_keys($ids)))]);
     }
 
     #[Route('/{resource}/nouveau', name: 'app_admin_new', requirements: ['resource' => ResourceRegistry::ROUTE_REQUIREMENT], methods: ['GET', 'POST'])]

@@ -36,10 +36,20 @@
             </div>
         {% endif %}
 
+        {% set reordonner = resource.reordonner ?? false %}
+        {% set groupe = reordonner is iterable ? reordonner.groupe : null %}
+        {% if reordonner and rows|length > 1 %}
+            <p class="admin-ordre-aide" data-ordre-aide>
+                {{ icone('poignee') }} Glissez une ligne par sa poignée pour changer l'ordre d'affichage{{ groupe ? ' (à l\'intérieur de sa ' ~ (resource.list[reordonner.libelle].label|lower) ~ ')' }}, ou utilisez les flèches. L'ordre est enregistré automatiquement.
+            </p>
+            <p class="admin-ordre-aide admin-ordre-aide--pause" data-ordre-pause hidden>Videz le filtre pour pouvoir changer l'ordre.</p>
+        {% endif %}
+
         <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table"{% if reordonner and rows|length > 1 %} data-reordonner data-url="{{ path('app_admin_ordre', { resource: resource.key }) }}" data-token="{{ csrf_token('ordre-' ~ resource.key) }}"{% endif %}>
                 <thead>
                     <tr>
+                        {% if reordonner and rows|length > 1 %}<th class="ordre"><span class="sr-only">Déplacer</span></th>{% endif %}
                         {% for column, col in resource.list %}
                             <th class="{{ col.format ?? '' }}">{{ col.label }}</th>
                         {% endfor %}
@@ -48,11 +58,20 @@
                 </thead>
                 <tbody>
                     {% for row in rows %}
-                        <tr>
+                        {% set debut_groupe = groupe and (loop.first or rows[loop.index0 - 1][groupe] != row[groupe]) %}
+                        <tr data-id="{{ row.id }}"{% if groupe %} data-groupe="{{ row[groupe] }}"{% endif %}{% if debut_groupe and not loop.first %} class="admin-groupe-debut"{% endif %}>
+                            {% if reordonner and rows|length > 1 %}
+                                {% set titre = resource.title|map(c => row[c] ?? '')|join(' ')|trim ?: 'n° ' ~ row.id %}
+                                <td class="ordre" data-label="Déplacer">
+                                    <button type="button" class="admin-poignee" data-poignee aria-label="Déplacer « {{ titre }} » (flèches haut et bas du clavier)" title="Glisser pour déplacer">{{ icone('poignee') }}</button>
+                                    <button type="button" class="admin-ordre-fleche" data-deplacer="-1" aria-label="Monter « {{ titre }} »" title="Monter">{{ icone('chevron-haut') }}</button>
+                                    <button type="button" class="admin-ordre-fleche" data-deplacer="1" aria-label="Descendre « {{ titre }} »" title="Descendre">{{ icone('chevron-bas') }}</button>
+                                </td>
+                            {% endif %}
                             {% for column, col in resource.list %}
                                 {% set value = row[column] ?? null %}
                                 {% set format = col.format ?? 'text' %}
-                                <td class="{{ format }}" data-label="{{ col.label }}">
+                                <td class="{{ format }}" data-label="{{ col.label }}"{% if column == 'ordre' %} data-valeur-ordre{% endif %}>
                                     {% if format == 'image' %}
                                         {% if value %}
                                             <img src="{{ asset(value) }}" alt="" loading="lazy" class="admin-thumb" title="{{ value }}" onerror="this.onerror = null; this.classList.add('is-missing'); this.removeAttribute('src');">
@@ -120,6 +139,7 @@
             const empty = document.querySelector('.admin-filter-empty');
             const normaliser = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
             filter.addEventListener('input', () => {
+                document.dispatchEvent(new CustomEvent('admin-filtre', { detail: filter.value.trim() !== '' }));
                 const q = normaliser(filter.value.trim());
                 let visibles = 0;
                 rows.forEach(row => {
@@ -131,4 +151,5 @@
             });
         }
     </script>
+    <script src="{{ asset('js/admin-ordre.js') }}"></script>
 {% endblock %}
