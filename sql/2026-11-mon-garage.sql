@@ -1,4 +1,4 @@
--- « Mon garage » (fonctionnalité en test) : les motos enregistrées par les clients dans leur compte,
+-- « Mon garage » : les motos enregistrées par les clients dans leur compte,
 -- et les e-mails « nouvelle pièce pour votre moto » déjà envoyés (un seul par client et par pièce).
 -- À exécuter une fois dans phpMyAdmin (base dockerDB).
 

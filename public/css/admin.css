@@ -787,32 +787,3 @@ a { color: inherit; }
     .admin-table td.ordre::before { margin-right: auto; }
     .admin-poignee, .admin-ordre-fleche { width: 40px; height: 40px; }
 }
-
-/* ==========================================================================
-   Fonctionnalités en test (tableau de bord)
-   ========================================================================== */
-.admin-fonctionnalites { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 28px; border-left: 6px solid #d4a017; }
-.admin-fonctionnalites-entete h2 { font-size: 1.15em; margin-bottom: 4px; }
-.admin-fonctionnalite { margin: 0; padding: 14px 0 0; border: none; border-top: 1px solid var(--border); }
-.admin-fonctionnalite legend { float: left; width: 100%; margin-bottom: 4px; padding: 0; font-weight: bold; }
-.admin-fonctionnalite > p { clear: both; margin-bottom: 10px; font-size: 0.92em; }
-.admin-fonctionnalite-modes { display: flex; flex-wrap: wrap; gap: 8px; }
-.admin-fonctionnalite-mode { position: relative; cursor: pointer; }
-.admin-fonctionnalite-mode input { position: absolute; opacity: 0; pointer-events: none; }
-.admin-fonctionnalite-mode span {
-    display: inline-block;
-    padding: 7px 14px;
-    border: 2px solid var(--border);
-    border-radius: 50px;
-    font-size: 0.9em;
-    font-weight: bold;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-.admin-fonctionnalite-mode:hover span { border-color: var(--sepia); }
-.admin-fonctionnalite-mode input:focus-visible + span { outline: 2px solid var(--sepia); outline-offset: 2px; }
-.admin-fonctionnalite-mode--off input:checked + span { border-color: var(--muted); background-color: #ece7e1; }
-.admin-fonctionnalite-mode--admin input:checked + span { border-color: #d4a017; background-color: #fff3c4; }
-.admin-fonctionnalite-mode--tous input:checked + span { border-color: var(--success); background-color: #dff1e6; color: var(--success); }
-.admin-fonctionnalites > .admin-btn { align-self: flex-start; }
-.admin-fonctionnalite textarea { width: 100%; max-width: 520px; padding: 10px 12px; border: 2px solid var(--border); border-radius: 10px; font: inherit; }
-.admin-fonctionnalite textarea:focus { outline: none; border-color: var(--sepia); }

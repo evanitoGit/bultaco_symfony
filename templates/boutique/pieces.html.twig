@@ -35,7 +35,7 @@
                 <noscript><button type='submit' class='btn-commander'>{{ 'boutique.filtrer'|trans }}</button></noscript>
             </form>
             {# « Mon garage » : les motos du client en un clic #}
-            {% if fonctionnalite('mon_garage') and is_granted('ROLE_CLIENT') %}
+            {% if is_granted('ROLE_CLIENT') %}
                 <div class='garage-raccourcis'>
                     {% if garage is not empty %}
                         <span class='garage-raccourcis-titre'>{{ 'garage.mes_motos'|trans }}</span>

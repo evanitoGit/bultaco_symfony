@@ -3434,32 +3434,8 @@ body.page-erreur { background-image: url("../img/pieces.png"); }
     header:has(.selection-lien:not([hidden])) .header-nav > ul > li:first-child { padding-right: 206px; }
 }
 
-/* Étiquette « Test » vue par les administrateurs (fonctionnalités en test) */
-.badge-test {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin: 0 0 20px;
-    padding: 10px 14px;
-    border: 2px dashed #d4a017;
-    border-radius: 10px;
-    background-color: #fffbea;
-    color: #6b5310;
-    font-size: 0.9em;
-}
-.badge-test strong {
-    flex-shrink: 0;
-    padding: 2px 8px;
-    border-radius: 50px;
-    background-color: #d4a017;
-    color: white;
-    font-size: 0.8em;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
 /* ==========================================================================
-   Mon garage (fonctionnalité en test)
+   Mon garage
    ========================================================================== */
 /* boutique : raccourcis « Mes motos » sous le filtre */
 .garage-raccourcis {
