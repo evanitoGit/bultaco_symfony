@@ -64,6 +64,41 @@ class CartController extends AbstractController
         return $this->repondre($request, $message, 'app_boutique_pieces', $apres > $avant);
     }
 
+    /**
+     * « Tout ajouter au panier » depuis Ma sélection : une de chaque pièce disponible,
+     * sans augmenter la quantité de celles déjà dans le panier.
+     */
+    #[Route('/ajouter-selection', name: 'app_panier_ajouter_selection', methods: ['POST'])]
+    public function ajouterSelection(Request $request, Connection $connection): Response
+    {
+        if ($erreur = $this->jetonInvalide($request, 'app_boutique_selection')) {
+            return $erreur;
+        }
+
+        $ids = array_slice(array_unique(array_filter(array_map('intval', explode(',', $request->getPayload()->getString('ids'))))), 0, BoutiqueController::SELECTION_MAX);
+        $ajoutees = 0;
+        $indisponibles = 0;
+        foreach ($ids as $id) {
+            $stock = $connection->fetchOne('SELECT stock FROM pieces_detachees WHERE id = ?', [$id]);
+            if ($stock === false || $this->cart->quantite($id) > 0) {
+                continue; // pièce supprimée, ou déjà dans le panier
+            }
+            if ($stock !== null && (int) $stock <= 0) {
+                ++$indisponibles;
+                continue;
+            }
+            $this->cart->add($id);
+            ++$ajoutees;
+        }
+
+        $message = $this->translator->trans('panier.flash.selection_ajoutee', ['n' => $ajoutees]);
+        if ($indisponibles > 0) {
+            $message .= ' ' . $this->translator->trans('panier.flash.selection_rupture', ['n' => $indisponibles]);
+        }
+
+        return $this->repondre($request, $message, 'app_panier', $ajoutees > 0);
+    }
+
     #[Route('/quantite/{id}', name: 'app_panier_quantite', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function quantite(int $id, Request $request): Response
     {

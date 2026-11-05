@@ -108,6 +108,7 @@
                     {% if prix_visibles() %}
                         <p class='piece-page-prix'>{{ piece.prix|euros }}</p>
                     {% endif %}
+                    {% include '_partials/_coeur.html.twig' with { avec_texte: true } %}
                     {% if not vente_ouverte() %}
                         {# boutique en mode vitrine : pas de stock ni de panier, contact du club #}
                         <a href='{{ path('app_demande_piece', { piece: piece.id }) }}' class='btn-commander piece-achat'>{{ 'vitrine.contacter'|trans }}</a>

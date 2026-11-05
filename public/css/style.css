@@ -3330,3 +3330,106 @@ body.page-erreur { background-image: url("../img/pieces.png"); }
 .erreur-page .recherche-form { margin: 18px 0 30px; text-align: left; }
 .erreur-liens { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 22px; margin: 14px 0 0; padding: 0; list-style: none; }
 .erreur-liens a:not(.btn-commander) { color: var(--carbone); font-weight: bold; }
+
+/* ==========================================================================
+   Ma sélection : cœur sur les pièces, compteur dans l'en-tête, page de la sélection
+   ========================================================================== */
+.piece-card { position: relative; }
+
+.coeur-bouton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    background: none;
+    color: var(--carbone);
+    font: inherit;
+    cursor: pointer;
+}
+.coeur-bouton .icone { width: 22px; height: 22px; transition: transform 0.25s var(--ease), fill 0.2s ease; }
+.coeur-bouton[aria-pressed="true"] { color: #c0392b; }
+.coeur-bouton[aria-pressed="true"] .icone { fill: currentColor; }
+.coeur-bouton.coeur-pulse .icone { animation: panierPulse 0.4s var(--ease); }
+.coeur-bouton:focus-visible { outline: 3px solid var(--sepia); outline-offset: 2px; }
+
+/* pastille ronde en haut à droite de la photo (cartes) */
+.piece-card .coeur-bouton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.piece-card .coeur-bouton:hover .icone { transform: scale(1.15); }
+
+/* fiche pièce : bouton avec libellé */
+.coeur-bouton--texte {
+    align-self: flex-start;
+    padding: 8px 16px 8px 12px;
+    border: 2px solid #e4ddd5;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 0.92em;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.coeur-bouton--texte:hover { border-color: var(--carbone); }
+.coeur-bouton--texte[aria-pressed="true"] { border-color: #e8b4ad; background-color: #fdf1ef; }
+
+/* en-tête : même gabarit que le compte et le panier */
+.selection-lien { display: flex; align-items: center; height: 100%; margin-left: 4px; }
+.selection-bouton {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: var(--beige);
+    transition: color 0.25s ease, background-color 0.25s ease;
+}
+.selection-bouton .icone { width: 24px; height: 24px; }
+.selection-bouton:hover { color: var(--sepia); background-color: rgba(204, 175, 146, 0.15); }
+
+/* page « Ma sélection » */
+.selection { padding-top: 30px; }
+.selection-intro { margin-bottom: 24px; color: #6b6b6b; text-align: center; }
+.selection-chargement { text-align: center; color: #8a7a6a; }
+.selection .empty-icon .icone { width: 1em; height: 1em; color: #c0392b; }
+.selection .piece-reference { margin: 2px 0 6px; font-size: 0.85em; }
+.selection-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 28px;
+}
+.selection-boutons { display: flex; flex-wrap: wrap; gap: 12px; }
+.selection-boutons .btn-commander { display: inline-block; padding: 12px 22px; font-size: 1em; border: none; cursor: pointer; font-family: inherit; }
+.selection-boutons .btn-secondaire { background-color: transparent; color: var(--carbone); box-shadow: inset 0 0 0 2px var(--carbone); }
+.selection-boutons .btn-secondaire:hover { background-color: var(--carbone); color: var(--beige); }
+
+@media (max-width: 900px) {
+    /* à gauche du compte ; la loupe et le logo se décalent quand le cœur est visible */
+    .selection-lien { position: absolute; top: 0; right: 156px; height: var(--header-height); margin: 0; }
+    header:has(.selection-lien:not([hidden])) .recherche-lien { right: 202px; }
+    header:has(.selection-lien:not([hidden])) .header-nav > ul > li:first-child { padding-right: 252px; }
+
+    .selection { padding: 24px 16px 0; }
+    .selection-actions { flex-direction: column-reverse; align-items: stretch; text-align: center; }
+    .selection-boutons { flex-direction: column; }
+    .selection-boutons form, .selection-boutons .btn-commander { width: 100%; }
+}
+
+/* très petits écrans : pas la place pour un 4e bouton, la sélection reste dans le menu du compte */
+@media (max-width: 374px) {
+    .selection-lien { display: none !important; }
+    header:has(.selection-lien:not([hidden])) .recherche-lien { right: 156px; }
+    header:has(.selection-lien:not([hidden])) .header-nav > ul > li:first-child { padding-right: 206px; }
+}

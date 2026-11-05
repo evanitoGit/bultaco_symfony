@@ -73,6 +73,14 @@
                 </div>
             </li>
 
+            {# Ma sélection : visible dès qu'une pièce a été ajoutée avec le cœur (script.js) #}
+            <li class='selection-lien' data-selection-lien hidden>
+                <a href='{{ path('app_boutique_selection') }}' class='selection-bouton' aria-label='{{ 'selection.titre'|trans }}' title='{{ 'selection.titre'|trans }}'>
+                    {{ icone('coeur') }}
+                    <span class='panier-badge' data-selection-nombre></span>
+                </a>
+            </li>
+
             {% set client_connecte = is_granted('ROLE_CLIENT') %}
             <li class='compte-lien'>
                 {# Sans JavaScript, le bouton reste un lien vers l'espace client #}
@@ -95,6 +103,7 @@
                             </p>
                             <ul class='menu-compte-liens' role='menu'>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte') }}'>{{ 'compte.onglet.commandes'|trans }}</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_boutique_selection') }}'>{{ 'selection.titre'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_demandes') }}'>{{ 'compte.onglet.demandes'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'>{{ 'compte.onglet.informations'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'>{{ 'compte.onglet.mot_de_passe'|trans }}</a></li>
@@ -109,6 +118,7 @@
                             <a href='{{ path('app_compte_connexion') }}' class='mini-panier-lien'>{{ 'compte.menu.se_connecter'|trans }}</a>
                             <ul class='menu-compte-liens' role='menu'>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_inscription') }}'>{{ 'compte.menu.creer_compte'|trans }}</a></li>
+                                <li role='none'><a role='menuitem' href='{{ path('app_boutique_selection') }}'>{{ 'selection.titre'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe_oublie') }}'>{{ 'compte.menu.mot_de_passe_oublie'|trans }}</a></li>
                             </ul>
                         {% endif %}
@@ -261,6 +271,12 @@
         fermerMenu: 'nav.fermer_menu'|trans,
         ajoute: 'panier.js.ajoute'|trans,
         erreurPanier: 'panier.js.erreur_chargement'|trans,
+        selectionAjouter: 'selection.ajouter'|trans,
+        selectionRetirer: 'selection.retirer'|trans,
+        selectionDans: 'selection.dans'|trans,
+        selectionAjoutee: 'selection.ajoutee'|trans,
+        selectionRetiree: 'selection.retiree'|trans,
+        selectionPleine: 'selection.pleine'|trans,
         locale: { fr: 'fr-FR', en: 'en-GB', es: 'es-ES' }[app.request.locale] ?? 'fr-FR'
     }|json_encode(constant('JSON_HEX_TAG'))|raw }};
 </script>

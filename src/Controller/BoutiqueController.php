@@ -15,6 +15,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BoutiqueController extends AbstractController
 {
+    /** Nombre maximal de pièces dans « Ma sélection » (même limite dans script.js) */
+    public const SELECTION_MAX = 50;
+
     /** Modèle choisi dans « Ma moto », gardé pour les visites suivantes */
     private const SESSION_MOTO = 'boutique_moto';
 
@@ -86,15 +89,43 @@ class BoutiqueController extends AbstractController
     #[Route('/boutique/pieces/vues', name: 'app_boutique_pieces_vues', methods: ['GET'])]
     public function piecesVues(Request $request): Response
     {
-        $ids = array_slice(array_unique(array_filter(array_map('intval', explode(',', $request->query->getString('ids'))))), 0, 12);
-        $pieces = array_column($this->catalogue->pieces(), null, 'id');
-
         $response = $this->render('boutique/_pieces_vues.html.twig', [
-            'pieces' => array_values(array_filter(array_map(fn (int $id) => $pieces[$id] ?? null, $ids))),
+            'pieces' => $this->piecesDemandees($request, 12),
         ]);
         $response->headers->set('X-Robots-Tag', 'noindex');
 
         return $response;
+    }
+
+    /**
+     * « Ma sélection » : les pièces gardées de côté avec le cœur. La liste est mémorisée dans
+     * le navigateur du visiteur (sans compte) ; la page la charge ensuite avec l'adresse ci-dessous.
+     */
+    #[Route('/boutique/selection', name: 'app_boutique_selection', methods: ['GET'])]
+    public function selection(): Response
+    {
+        return $this->render('boutique/selection.html.twig');
+    }
+
+    /** Cartes des pièces de la sélection (?ids=3,12,7), dans cet ordre ; les pièces supprimées sont ignorées */
+    #[Route('/boutique/selection/liste', name: 'app_boutique_selection_liste', methods: ['GET'])]
+    public function selectionListe(Request $request): Response
+    {
+        $response = $this->render('boutique/_selection_liste.html.twig', [
+            'pieces' => $this->piecesDemandees($request, self::SELECTION_MAX),
+        ]);
+        $response->headers->set('X-Robots-Tag', 'noindex');
+
+        return $response;
+    }
+
+    /** Pièces dont les numéros sont passés dans ?ids=, dans l'ordre demandé */
+    private function piecesDemandees(Request $request, int $max): array
+    {
+        $ids = array_slice(array_unique(array_filter(array_map('intval', explode(',', $request->query->getString('ids'))))), 0, $max);
+        $pieces = array_column($this->catalogue->pieces(), null, 'id');
+
+        return array_values(array_filter(array_map(fn (int $id) => $pieces[$id] ?? null, $ids)));
     }
 
     #[Route('/boutique/pieces/{id}-{slug}', name: 'app_boutique_piece', requirements: ['id' => '\d+', 'slug' => '[a-z0-9-]*'], methods: ['GET'])]

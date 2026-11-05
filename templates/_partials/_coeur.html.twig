@@ -1,0 +1,9 @@
+{#
+    Cœur « Ma sélection » d'une pièce (script.js : état, ajout et retrait).
+    avec_texte : bouton avec libellé (fiche pièce) ; sinon simple pastille (cartes).
+#}
+<button type='button' class='coeur-bouton{{ avec_texte ?? false ? ' coeur-bouton--texte' }}' data-selection-coeur data-id='{{ piece.id }}'
+        aria-pressed='false' aria-label='{{ 'selection.ajouter'|trans }} : {{ piece.nom }}' title='{{ 'selection.ajouter'|trans }}'>
+    {{ icone('coeur') }}
+    {% if avec_texte ?? false %}<span data-selection-texte>{{ 'selection.ajouter'|trans }}</span>{% endif %}
+</button>

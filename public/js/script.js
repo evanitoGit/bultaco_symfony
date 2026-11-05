@@ -303,7 +303,7 @@ document.querySelectorAll('[data-vues-recentes]').forEach(async bloc => {
         const liste = bloc.querySelector('[data-vues-liste]');
         liste.innerHTML = await reponse.text();
         // pièces supprimées entre-temps : retirées de l'historique
-        const trouvees = [...liste.querySelectorAll('[data-id]')].map(li => Number(li.dataset.id));
+        const trouvees = [...liste.querySelectorAll(':scope > [data-id]')].map(li => Number(li.dataset.id));
         PiecesVues.ecrire(PiecesVues.lire().filter(id => id === courante || trouvees.includes(id)));
         bloc.hidden = trouvees.length === 0;
     } catch { /* hors ligne : le bloc reste caché */ }
@@ -315,6 +315,131 @@ document.addEventListener('click', e => {
     PiecesVues.ecrire([]);
     bouton.closest('[data-vues-recentes]').hidden = true;
 });
+
+// ---------- Ma sélection : pièces gardées de côté avec le cœur ----------
+// Mémorisée dans le navigateur (sans compte), comme les vues récentes.
+const Selection = {
+    cle: 'bultaco.selection',
+    max: 50, // même limite que BoutiqueController::SELECTION_MAX
+    lire() {
+        try {
+            const ids = JSON.parse(localStorage.getItem(this.cle));
+            return Array.isArray(ids) ? ids.filter(Number.isInteger) : [];
+        } catch {
+            return [];
+        }
+    },
+    ecrire(ids) {
+        try {
+            if (ids.length) localStorage.setItem(this.cle, JSON.stringify(ids.slice(0, this.max)));
+            else localStorage.removeItem(this.cle);
+        } catch { /* stockage indisponible : tant pis */ }
+        majSelection();
+    },
+};
+
+// Cœurs, compteur de l'en-tête et page « Ma sélection » mis à jour d'après la liste mémorisée
+function majSelection() {
+    const ids = Selection.lire();
+    document.querySelectorAll('[data-selection-lien]').forEach(li => { li.hidden = ids.length === 0; });
+    document.querySelectorAll('[data-selection-nombre]').forEach(badge => { badge.textContent = ids.length; });
+    document.querySelectorAll('[data-selection-coeur]').forEach(bouton => {
+        const dedans = ids.includes(Number(bouton.dataset.id));
+        const action = dedans ? window.I18N?.selectionRetirer : window.I18N?.selectionAjouter;
+        bouton.setAttribute('aria-pressed', String(dedans));
+        bouton.title = action;
+        const nom = bouton.getAttribute('aria-label').split(' : ').slice(1).join(' : ');
+        bouton.setAttribute('aria-label', nom ? `${action} : ${nom}` : action);
+        const texte = bouton.querySelector('[data-selection-texte]');
+        if (texte) texte.textContent = dedans ? window.I18N?.selectionDans : window.I18N?.selectionAjouter;
+    });
+    PageSelection.etat();
+}
+
+document.addEventListener('click', e => {
+    const bouton = e.target.closest('[data-selection-coeur]');
+    if (!bouton) return;
+    e.preventDefault();
+    const id = Number(bouton.dataset.id);
+    const ids = Selection.lire();
+    const dedans = ids.includes(id);
+    if (!dedans && ids.length >= Selection.max) {
+        afficherToast(window.I18N?.selectionPleine);
+        return;
+    }
+    Selection.ecrire(dedans ? ids.filter(i => i !== id) : [id, ...ids]);
+    afficherToast(dedans ? window.I18N?.selectionRetiree : window.I18N?.selectionAjoutee);
+
+    bouton.classList.remove('coeur-pulse');
+    void bouton.offsetWidth; // relance l'animation
+    bouton.classList.add('coeur-pulse');
+    document.querySelectorAll('[data-selection-nombre]').forEach(badge => {
+        badge.classList.remove('panier-pulse');
+        void badge.offsetWidth;
+        badge.classList.add('panier-pulse');
+    });
+    // page « Ma sélection » : la carte retirée disparaît
+    if (dedans) PageSelection.retirer(id);
+});
+
+// Page « Ma sélection » : cartes chargées depuis le serveur d'après la liste mémorisée
+const PageSelection = {
+    page: document.querySelector('[data-selection-page]'),
+    async charger() {
+        if (!this.page) return;
+        const liste = this.page.querySelector('[data-selection-liste]');
+        const ids = Selection.lire();
+        if (ids.length) {
+            try {
+                const reponse = await fetch(`${this.page.dataset.url}?ids=${ids.join(',')}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (reponse.ok) {
+                    liste.innerHTML = await reponse.text();
+                    // pièces supprimées entre-temps : retirées de la sélection
+                    const trouvees = [...liste.querySelectorAll(':scope > [data-id]')].map(carte => Number(carte.dataset.id));
+                    if (trouvees.length !== ids.length) {
+                        Selection.ecrire(ids.filter(id => trouvees.includes(id)));
+                        return; // majSelection() a tout mis à jour
+                    }
+                }
+            } catch { /* hors ligne : la liste reste vide */ }
+        } else {
+            liste.innerHTML = '';
+        }
+        majSelection();
+    },
+    retirer(id) {
+        this.page?.querySelector(`[data-selection-liste] > [data-id="${id}"]`)?.remove();
+        this.etat();
+    },
+    // vide / actions / liens d'après les cartes affichées
+    etat() {
+        if (!this.page) return;
+        const cartes = [...this.page.querySelectorAll('[data-selection-liste] > [data-id]')].map(carte => carte.dataset.id);
+        this.page.querySelector('[data-selection-chargement]').hidden = true;
+        this.page.querySelector('[data-selection-vide]').hidden = cartes.length > 0;
+        this.page.querySelector('[data-selection-actions]').hidden = cartes.length === 0;
+        const demande = this.page.querySelector('[data-selection-demande]');
+        const url = new URL(demande.href, location.href);
+        url.searchParams.set('pieces', cartes.join(','));
+        demande.href = url.pathname + url.search;
+        const champ = this.page.querySelector('[data-selection-ids]');
+        if (champ) champ.value = cartes.join(',');
+    },
+};
+
+document.addEventListener('click', e => {
+    const bouton = e.target.closest('[data-selection-vider]');
+    if (!bouton || !confirm(bouton.dataset.confirmer)) return;
+    PageSelection.page.querySelector('[data-selection-liste]').innerHTML = '';
+    Selection.ecrire([]);
+});
+
+// sélection modifiée dans un autre onglet
+window.addEventListener('storage', e => {
+    if (e.key === Selection.cle || e.key === null) PageSelection.page ? PageSelection.charger() : majSelection();
+});
+
+PageSelection.page ? PageSelection.charger() : majSelection();
 
 // Ouvre un élément de la page désigné par l'adresse (#modele-12, #pilote-3…), à l'arrivée sur la page
 // et quand l'ancre change (résultat de la recherche globale qui pointe vers la page affichée)

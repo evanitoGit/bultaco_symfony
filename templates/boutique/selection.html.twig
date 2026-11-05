@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'selection.titre'|trans }} - {{ 'meta.suffixe'|trans }}{% endblock %}
+{% block meta %}<meta name='robots' content='noindex'>{% endblock %}
+{% block body_class %}page-pieces{% endblock %}
+
+{% block body %}
+    <div class='head'><h1>{{ 'selection.titre'|trans }}</h1></div>
+
+    <div class='container'>
+        {#
+            La sélection est mémorisée dans le navigateur : script.js charge les pièces
+            (data-url?ids=…) et affiche les actions. Sans JavaScript, la page reste vide.
+        #}
+        <section class='selection' data-selection-page data-url='{{ path('app_boutique_selection_liste') }}'>
+            <p class='selection-intro'>{{ 'selection.intro'|trans }}</p>
+
+            <p class='selection-chargement' data-selection-chargement>{{ 'commun.chargement'|trans }}</p>
+
+            <div class='selection-vide' data-selection-vide hidden>
+                <div class='empty-state'>
+                    <span class='empty-icon' aria-hidden='true'>{{ icone('coeur') }}</span>
+                    <p>{{ 'selection.vide'|trans }}</p>
+                </div>
+                <p class='panier-actions panier-actions--vide'>
+                    <a href='{{ path('app_boutique_pieces') }}' class='btn-commander'>{{ 'selection.parcourir'|trans }}</a>
+                </p>
+            </div>
+
+            <div class='pieces-grid' data-selection-liste></div>
+
+            <div class='selection-actions' data-selection-actions hidden>
+                <button type='button' class='panier-vider' data-selection-vider data-confirmer='{{ 'selection.confirmer_vider'|trans }}'>{{ 'selection.vider'|trans }}</button>
+                <div class='selection-boutons'>
+                    <a href='{{ path('app_demande_piece') }}' class='btn-commander{{ vente_ouverte() ? ' btn-secondaire' }}' data-selection-demande>{{ 'selection.demander'|trans }}</a>
+                    {% if vente_ouverte() %}
+                        <form method='post' action='{{ path('app_panier_ajouter_selection') }}'>
+                            <input type='hidden' name='_token' value='{{ csrf_token('panier') }}'>
+                            <input type='hidden' name='ids' value='' data-selection-ids>
+                            <button type='submit' class='btn-commander'>{{ 'selection.tout_ajouter'|trans }}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

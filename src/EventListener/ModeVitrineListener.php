@@ -20,7 +20,7 @@ final class ModeVitrineListener
 {
     private const ROUTES_FERMEES = [
         'app_panier', 'app_panier_apercu', 'app_panier_ajouter', 'app_panier_quantite',
-        'app_panier_retirer', 'app_panier_vider', 'app_commande', 'app_alerte_stock',
+        'app_panier_retirer', 'app_panier_vider', 'app_panier_ajouter_selection', 'app_commande', 'app_alerte_stock',
     ];
 
     public function __construct(
