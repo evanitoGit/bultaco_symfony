@@ -40,7 +40,7 @@
         <input type="hidden" name="_token" value="{{ csrf_token('fonctionnalites') }}">
         <div class="admin-fonctionnalites-entete">
             <h2>🧪 Fonctionnalités en test</h2>
-            <p class="admin-muted">Essayez une nouveauté sur le vrai site en la réservant aux administrateurs, puis ouvrez-la à tous quand elle vous convient.</p>
+            <p class="admin-muted">Essayez une nouveauté sur le vrai site en la réservant aux administrateurs et aux comptes testeurs, puis ouvrez-la à tous quand elle vous convient.</p>
         </div>
         {% for nom, info in fonctionnalites %}
             {% set actuel = fonctionnalite_mode(nom) %}
@@ -57,6 +57,11 @@
                 </div>
             </fieldset>
         {% endfor %}
+        <div class="admin-fonctionnalite">
+            <label for="testeurs"><strong>Comptes clients testeurs</strong></label>
+            <p class="admin-muted">Adresses e-mail de comptes clients qui voient aussi les fonctionnalités réglées sur « Administrateurs et testeurs ». Une adresse par ligne. Utile pour essayer « Mon garage », qui se trouve dans l'espace client.</p>
+            <textarea name="testeurs" id="testeurs" rows="3" placeholder="prenom.nom@exemple.fr">{{ testeurs|join("\n") }}</textarea>
+        </div>
         <button type="submit" class="admin-btn">Enregistrer</button>
     </form>
 

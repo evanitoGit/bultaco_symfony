@@ -814,3 +814,5 @@ a { color: inherit; }
 .admin-fonctionnalite-mode--admin input:checked + span { border-color: #d4a017; background-color: #fff3c4; }
 .admin-fonctionnalite-mode--tous input:checked + span { border-color: var(--success); background-color: #dff1e6; color: var(--success); }
 .admin-fonctionnalites > .admin-btn { align-self: flex-start; }
+.admin-fonctionnalite textarea { width: 100%; max-width: 520px; padding: 10px 12px; border: 2px solid var(--border); border-radius: 10px; font: inherit; }
+.admin-fonctionnalite textarea:focus { outline: none; border-color: var(--sepia); }

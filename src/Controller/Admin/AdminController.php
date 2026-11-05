@@ -38,6 +38,7 @@ class AdminController extends AbstractController
         private readonly CommandeService $commandes,
         private readonly AlerteStock $alertes,
         private readonly DemandePiece $demandes,
+        private readonly Fonctionnalites $fonctionnalitesService,
     ) {
     }
 
@@ -53,6 +54,7 @@ class AdminController extends AbstractController
         return $this->render('admin/dashboard.html.twig', [
             'fonctionnalites' => Fonctionnalites::LISTE,
             'modes_fonctionnalites' => Fonctionnalites::MODES,
+            'testeurs' => $this->fonctionnalitesService->testeurs(),
             'groups' => $this->registry->grouped(),
             'counts' => $counts,
         ]);
@@ -94,6 +96,7 @@ class AdminController extends AbstractController
                 $fonctionnalites->changer($nom, $modes[$nom]);
             }
         }
+        $fonctionnalites->changerTesteurs($request->getPayload()->getString('testeurs'));
         $this->addFlash('success', 'Fonctionnalités en test enregistrées.');
 
         return $this->redirect($this->generateUrl('app_admin') . '#fonctionnalites');
