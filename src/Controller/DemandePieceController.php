@@ -52,6 +52,19 @@ class DemandePieceController extends AbstractController
             }
         }
 
+        // « Demander ces pièces au club » depuis Ma sélection : ?pieces=3,12,7
+        if ($request->query->getString('pieces') !== '') {
+            $lignes = [];
+            foreach (array_slice(array_unique(array_filter(array_map('intval', explode(',', $request->query->getString('pieces'))))), 0, 30) as $id) {
+                if ($piece = $catalogue->piece($id)) {
+                    $lignes[] = '- ' . ($piece['reference_origine'] ? sprintf('%s (%s)', $piece['nom'], $piece['reference_origine']) : $piece['nom']);
+                }
+            }
+            if ($lignes !== []) {
+                $donnees['description'] = $translator->trans('vitrine.interesse_par_plusieurs') . "\n" . implode("\n", $lignes);
+            }
+        }
+
         $form = $this->createForm(DemandePieceType::class, $donnees, ['modeles' => array_map('strval', $modeles)]);
         $form->handleRequest($request);
 
