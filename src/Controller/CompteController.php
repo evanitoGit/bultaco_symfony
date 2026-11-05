@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Boutique\Catalogue;
 use App\Boutique\DemandePiece;
+use App\Boutique\Fonctionnalites;
 use App\Commande\CommandeService;
 use App\Compte\CompteService;
+use App\Compte\Garage;
 use App\Compte\ReinitialisationMotDePasse;
 use App\Entity\Client;
 use App\Form\ChangementEmailType;
@@ -261,6 +264,56 @@ class CompteController extends AbstractController
     {
         return $this->render('compte/demandes.html.twig', [
             'demandes' => $demandes->demandesDuClient($this->client()),
+        ]);
+    }
+
+    /**
+     * « Mon garage » (fonctionnalité en test) : les motos du client, proposées en un clic dans la boutique,
+     * avec un e-mail quand une pièce compatible est ajoutée.
+     */
+    #[Route('/garage', name: 'app_compte_garage', methods: ['GET', 'POST'])]
+    public function garage(Request $request, Garage $garage, Catalogue $catalogue, Fonctionnalites $fonctionnalites): Response
+    {
+        $fonctionnalites->exiger('mon_garage');
+        $client = $this->client();
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('garage', $request->getPayload()->getString('_token'))) {
+                $this->addFlash('compte_alerte', $this->t('commun.session_expiree'));
+
+                return $this->redirectToRoute('app_compte_garage');
+            }
+            // champs facultatifs ou laissés vides : 0 plutôt qu'une erreur
+            $entier = fn (string $champ): int => (int) filter_var($request->getPayload()->getString($champ), \FILTER_VALIDATE_INT, ['options' => ['default' => 0]]);
+            $moto = $entier('moto');
+            switch ($request->getPayload()->getString('action')) {
+                case 'ajouter':
+                    $annee = $entier('annee');
+                    $annee = $annee >= Garage::ANNEE_MIN && $annee <= (int) date('Y') ? $annee : null;
+                    $ajoutee = $garage->ajouter($client->getId(), $entier('modele'), $annee, $request->getPayload()->getString('surnom'));
+                    $ajoutee
+                        ? $this->addFlash('compte', $this->t('garage.flash.ajoutee'))
+                        : $this->addFlash('compte_alerte', $this->t('garage.flash.impossible', ['max' => Garage::MAX]));
+                    break;
+                case 'retirer':
+                    $garage->retirer($client->getId(), $moto);
+                    $this->addFlash('compte', $this->t('garage.flash.retiree'));
+                    break;
+                case 'alertes':
+                    $actives = $request->getPayload()->getBoolean('alertes');
+                    $garage->alertes($client->getId(), $moto, $actives);
+                    $this->addFlash('compte', $this->t($actives ? 'garage.flash.alertes_on' : 'garage.flash.alertes_off'));
+                    break;
+            }
+
+            return $this->redirectToRoute('app_compte_garage');
+        }
+
+        return $this->render('compte/garage.html.twig', [
+            'motos' => $garage->motos($client->getId()),
+            'modeles_moto' => $catalogue->modelesMoto(),
+            'max' => Garage::MAX,
+            'annee_min' => Garage::ANNEE_MIN,
         ]);
     }
 

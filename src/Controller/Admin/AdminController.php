@@ -9,6 +9,7 @@ use App\Boutique\DemandePiece;
 use App\Boutique\Fonctionnalites;
 use App\Boutique\Reglages;
 use App\Commande\CommandeService;
+use App\Compte\Garage;
 use App\Entity\Admin;
 use App\Form\AdminResourceType;
 use Doctrine\DBAL\Connection;
@@ -39,6 +40,7 @@ class AdminController extends AbstractController
         private readonly AlerteStock $alertes,
         private readonly DemandePiece $demandes,
         private readonly Fonctionnalites $fonctionnalitesService,
+        private readonly Garage $garage,
     ) {
     }
 
@@ -300,6 +302,8 @@ class AdminController extends AbstractController
             // pièce de nouveau en stock : les visiteurs qui l'attendaient sont prévenus
             if ($config['key'] === 'pieces') {
                 $alertesEnvoyees = $this->alertes->envoyerDisponibles([$id]);
+                // « Mon garage » : clients dont une moto est compatible (une seule fois par pièce)
+                $garagesPrevenus = $this->garage->prevenirNouvellePiece($id);
             }
             // nouvelle réponse à une demande de pièce : envoyée au demandeur
             if ($config['key'] === 'demandes' && ($values['reponse'] ?? null) !== null && $values['reponse'] !== trim((string) ($row['reponse'] ?? ''))) {
@@ -308,6 +312,9 @@ class AdminController extends AbstractController
                 } else {
                     $this->addFlash('error', 'La réponse est enregistrée, mais l\'e-mail n\'a pas pu être envoyé.');
                 }
+            }
+            if (($garagesPrevenus ?? 0) > 0) {
+                $this->addFlash('success', sprintf('🏍️ %d client%s prévenu%2$s par e-mail : la pièce est compatible avec une moto de son garage.', $garagesPrevenus, $garagesPrevenus > 1 ? 's' : ''));
             }
             if (($alertesEnvoyees ?? 0) > 0) {
                 $this->addFlash('success', sprintf('🔔 %d alerte%s « de retour en stock » envoyée%2$s par e-mail.', $alertesEnvoyees, $alertesEnvoyees > 1 ? 's' : ''));

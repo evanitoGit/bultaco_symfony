@@ -159,6 +159,9 @@
                     {# ----- Compatibilité ----- #}
                     <div class='piece-compatibilite'>
                         <h2>{{ 'piece.compatibilite'|trans }}</h2>
+                        {% if garage_compatibles is not empty %}
+                            <p class='piece-compat-garage'>{{ icone('coche') }} {{ 'garage.compatible_votre'|trans({ moto: garage_compatibles|map(m => m.nom ~ (m.annee ? ' (' ~ m.annee ~ ')' : ''))|join(', ') }) }}</p>
+                        {% endif %}
                         {% if piece.universelle %}
                             <p>✓ {{ 'piece.universelle_texte'|trans }}</p>
                         {% elseif piece.modeles is not empty %}

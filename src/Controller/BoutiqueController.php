@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Boutique\AlerteStock;
 use App\Boutique\Catalogue;
+use App\Boutique\Fonctionnalites;
+use App\Compte\Garage;
 use App\Entity\Client;
 use App\I18n\Contenu;
 use Doctrine\DBAL\Connection;
@@ -24,6 +26,8 @@ class BoutiqueController extends AbstractController
     public function __construct(
         private readonly Catalogue $catalogue,
         private readonly Contenu $contenu,
+        private readonly Fonctionnalites $fonctionnalites,
+        private readonly Garage $garage,
     ) {
     }
 
@@ -75,6 +79,8 @@ class BoutiqueController extends AbstractController
             'pieces' => $pieces,
             'modeles_moto' => $this->catalogue->modelesMoto(),
             'moto' => $moto,
+            // raccourcis « Mes motos » : un par modèle (deux Sherpa T 350 = un seul raccourci)
+            'garage' => array_values(array_reduce($this->motosDuGarage(), fn (array $uniques, array $m) => $uniques + [$m['modele_id'] => $m], [])),
         ]);
     }
 
@@ -155,6 +161,11 @@ class BoutiqueController extends AbstractController
             'similaires' => $this->catalogue->similaires($piece),
             'voisines' => $this->catalogue->voisines($piece, $moto['id'] ?? null),
             'moto' => $moto,
+            // « Mon garage » : motos du client compatibles avec cette pièce
+            'garage_compatibles' => array_values(array_filter(
+                $this->motosDuGarage(),
+                fn (array $m) => in_array((int) $m['modele_id'], array_map('intval', array_column($piece['modeles'], 'id')), true)
+            )),
             // client connecté déjà inscrit à l'alerte de retour en stock
             'alerte_en_attente' => $this->getUser() instanceof Client && !AlerteStock::disponible($piece)
                 && $alertes->enAttente($piece['id'], $this->getUser()->getEmail()),
@@ -170,17 +181,29 @@ class BoutiqueController extends AbstractController
 
         if ($modifiable && $request->query->has('moto')) {
             $moto = $request->query->getInt('moto') > 0 ? $this->catalogue->modeleMoto($request->query->getInt('moto')) : null;
-            if ($moto) {
-                $request->getSession()->set(self::SESSION_MOTO, (int) $moto['id']);
-            } else {
-                $session?->remove(self::SESSION_MOTO);
-            }
+            // 0 = « Toutes les motos » choisi exprès : la boutique ne se refiltre pas sur le garage
+            $request->getSession()->set(self::SESSION_MOTO, $moto ? (int) $moto['id'] : 0);
 
             return $moto;
         }
 
         $id = $session?->get(self::SESSION_MOTO);
+        if ($id === null) {
+            // aucun choix encore : première moto du garage du client (« Mon garage »)
+            $id = $this->motosDuGarage()[0]['modele_id'] ?? null;
+        }
 
-        return $id ? $this->catalogue->modeleMoto($id) : null;
+        return $id ? $this->catalogue->modeleMoto((int) $id) : null;
+    }
+
+    /** Motos du garage du client connecté (fonctionnalité « Mon garage » active), sinon aucune */
+    private function motosDuGarage(): array
+    {
+        $client = $this->getUser();
+        if (!$client instanceof Client || !$this->fonctionnalites->active('mon_garage')) {
+            return [];
+        }
+
+        return $this->garage->motos($client->getId());
     }
 }

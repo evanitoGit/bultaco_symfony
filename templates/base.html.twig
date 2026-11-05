@@ -105,6 +105,9 @@
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte') }}'>{{ 'compte.onglet.commandes'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_boutique_selection') }}'>{{ 'selection.titre'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_demandes') }}'>{{ 'compte.onglet.demandes'|trans }}</a></li>
+                                {% if fonctionnalite('mon_garage') %}
+                                    <li role='none'><a role='menuitem' href='{{ path('app_compte_garage') }}'>{{ 'compte.onglet.garage'|trans }}</a></li>
+                                {% endif %}
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_informations') }}'>{{ 'compte.onglet.informations'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_mot_de_passe') }}'>{{ 'compte.onglet.mot_de_passe'|trans }}</a></li>
                                 <li role='none'><a role='menuitem' href='{{ path('app_compte_donnees') }}'>{{ 'compte.onglet.donnees'|trans }}</a></li>

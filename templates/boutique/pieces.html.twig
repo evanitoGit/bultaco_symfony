@@ -34,6 +34,20 @@
                 </select>
                 <noscript><button type='submit' class='btn-commander'>{{ 'boutique.filtrer'|trans }}</button></noscript>
             </form>
+            {# « Mon garage » : les motos du client en un clic #}
+            {% if fonctionnalite('mon_garage') and is_granted('ROLE_CLIENT') %}
+                <div class='garage-raccourcis'>
+                    {% if garage is not empty %}
+                        <span class='garage-raccourcis-titre'>{{ 'garage.mes_motos'|trans }}</span>
+                        {% for m in garage %}
+                            <a href='{{ path('app_boutique_pieces', { moto: m.modele_id }) }}' class='garage-puce{{ moto and moto.id == m.modele_id ? ' actif' }}'>{{ m.nom }}</a>
+                        {% endfor %}
+                        <a href='{{ path('app_compte_garage') }}' class='garage-gerer'>{{ 'garage.gerer'|trans }}</a>
+                    {% else %}
+                        <a href='{{ path('app_compte_garage') }}' class='garage-gerer'>{{ 'garage.invitation'|trans }}</a>
+                    {% endif %}
+                </div>
+            {% endif %}
             {% if moto %}
                 <p class='filtre-moto-actif' role='status'>
                     {{ 'boutique.filtre_actif'|trans({ moto: '<strong>' ~ moto.nom|e ~ '</strong>', n: pieces|length })|raw }}

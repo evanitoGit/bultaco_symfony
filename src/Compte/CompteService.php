@@ -25,6 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CompteService
 {
     public function __construct(
+        private readonly Garage $garage,
         private readonly Connection $connection,
         private readonly EntityManagerInterface $entityManager,
         private readonly MailerInterface $mailer,
@@ -162,6 +163,7 @@ final class CompteService
                 [$client->getEmail()]
             ),
             'demandes_pieces' => $this->demandes->exporter($client),
+            'garage' => $this->garage->exporter($client->getId()),
         ];
     }
 
@@ -174,7 +176,7 @@ final class CompteService
         $this->connection->executeStatement('UPDATE commandes SET client_id = NULL WHERE client_id = ?', [$client->getId()]);
         $this->connection->executeStatement('DELETE FROM alertes_stock WHERE email = ?', [$client->getEmail()]);
         $this->demandes->supprimerPourClient($client); // avec leurs photos
-        // le panier sauvegardé et les demandes de réinitialisation suivent (ON DELETE CASCADE)
+        // le panier sauvegardé, les demandes de réinitialisation et les motos du garage suivent (ON DELETE CASCADE)
         $this->entityManager->remove($client);
         $this->entityManager->flush();
     }
