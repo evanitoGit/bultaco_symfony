@@ -32,39 +32,6 @@
         <button type="submit" class="admin-btn">{{ vitrine ? 'Réactiver la vente' : 'Passer en mode vitrine' }}</button>
     </form>
 
-    {#
-        Fonctionnalités en test : chacune peut être désactivée, essayée par les administrateurs
-        seulement (sur le vrai site, sans que les visiteurs la voient), ou ouverte à tous.
-    #}
-    <form method="post" action="{{ path('app_admin_fonctionnalites') }}" class="admin-form-card admin-fonctionnalites" id="fonctionnalites">
-        <input type="hidden" name="_token" value="{{ csrf_token('fonctionnalites') }}">
-        <div class="admin-fonctionnalites-entete">
-            <h2>🧪 Fonctionnalités en test</h2>
-            <p class="admin-muted">Essayez une nouveauté sur le vrai site en la réservant aux administrateurs et aux comptes testeurs, puis ouvrez-la à tous quand elle vous convient.</p>
-        </div>
-        {% for nom, info in fonctionnalites %}
-            {% set actuel = fonctionnalite_mode(nom) %}
-            <fieldset class="admin-fonctionnalite">
-                <legend>{{ info.titre }}</legend>
-                <p class="admin-muted">{{ info.description }}</p>
-                <div class="admin-fonctionnalite-modes" role="radiogroup">
-                    {% for mode, libelle in modes_fonctionnalites %}
-                        <label class="admin-fonctionnalite-mode admin-fonctionnalite-mode--{{ mode }}">
-                            <input type="radio" name="mode[{{ nom }}]" value="{{ mode }}"{{ actuel == mode ? ' checked' }}>
-                            <span>{{ libelle }}</span>
-                        </label>
-                    {% endfor %}
-                </div>
-            </fieldset>
-        {% endfor %}
-        <div class="admin-fonctionnalite">
-            <label for="testeurs"><strong>Comptes clients testeurs</strong></label>
-            <p class="admin-muted">Adresses e-mail de comptes clients qui voient aussi les fonctionnalités réglées sur « Administrateurs et testeurs ». Une adresse par ligne. Utile pour essayer « Mon garage », qui se trouve dans l'espace client.</p>
-            <textarea name="testeurs" id="testeurs" rows="3" placeholder="prenom.nom@exemple.fr">{{ testeurs|join("\n") }}</textarea>
-        </div>
-        <button type="submit" class="admin-btn">Enregistrer</button>
-    </form>
-
     {% for group, resources in groups %}
         <section class="admin-group">
             <h2 class="admin-group-title">{{ group }}</h2>

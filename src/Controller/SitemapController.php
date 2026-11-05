@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Boutique\Catalogue;
-use App\Boutique\Fonctionnalites;
 use App\I18n\Contenu;
 use App\Modele\PageModele;
 use Doctrine\DBAL\Connection;
@@ -22,7 +21,7 @@ class SitemapController extends AbstractController
     private const ROUTES = ['app_home', 'app_modeles_liste', 'app_modeles_restaurations', 'app_modeles_pilotes', 'app_doc_logos', 'app_doc_pressbook', 'app_boutique_pieces'];
 
     #[Route('/sitemap.xml', name: 'app_sitemap', methods: ['GET'])]
-    public function sitemap(Catalogue $catalogue, Connection $connection, Fonctionnalites $fonctionnalites, PageModele $modeles): Response
+    public function sitemap(Catalogue $catalogue, Connection $connection, PageModele $modeles): Response
     {
         $langues = array_keys(Contenu::LANGUES);
         $pages = [];
@@ -38,11 +37,9 @@ class SitemapController extends AbstractController
             $pages[] = array_combine($langues, array_map(fn (string $langue) => $catalogue->url($piece, $langue, true), $langues));
         }
 
-        // pages des modèles, une fois la fonctionnalité ouverte à tous
-        if ($fonctionnalites->publique('page_modele')) {
-            foreach ($modeles->modeles() as $modele) {
-                $pages[] = array_combine($langues, array_map(fn (string $langue) => $modeles->url($modele, $langue, true), $langues));
-            }
+        // pages des modèles de l'album
+        foreach ($modeles->modeles() as $modele) {
+            $pages[] = array_combine($langues, array_map(fn (string $langue) => $modeles->url($modele, $langue, true), $langues));
         }
 
         $response = $this->render('sitemap.xml.twig', ['pages' => $pages]);

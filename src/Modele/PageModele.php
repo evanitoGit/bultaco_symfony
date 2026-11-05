@@ -10,7 +10,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * « Une page par modèle » (fonctionnalité en test) : tout ce que le site sait sur un modèle de l'album.
+ * « Une page par modèle » : tout ce que le site sait sur un modèle de l'album.
  *
  * Rien à relier à la main dans l'administration : les restaurations, pilotes et articles du pressbook
  * sont retrouvés par le nom du modèle (« Sherpa T ») ou d'une moto qui lui est rattachée

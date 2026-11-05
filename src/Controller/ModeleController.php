@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Boutique\Catalogue;
-use App\Boutique\Fonctionnalites;
 use App\I18n\Contenu;
 use App\Modele\PageModele;
 use Doctrine\DBAL\Connection;
@@ -23,7 +22,7 @@ class ModeleController extends AbstractController
     }
 
     #[Route('/modeles/liste', name: 'app_modeles_liste')]
-    public function liste(Catalogue $catalogue, PageModele $pages, Fonctionnalites $fonctionnalites): Response
+    public function liste(Catalogue $catalogue, PageModele $pages): Response
     {
         // Pas encore d'entité pour cette table : requête SQL directe via DBAL
         $modeles = $this->connection
@@ -37,10 +36,8 @@ class ModeleController extends AbstractController
             $motos[(int) $modele['id']] ?? []
         )], $modeles);
 
-        // « Une page par modèle » : la fiche ouverte dans la fenêtre mène à la page complète
-        if ($fonctionnalites->active('page_modele')) {
-            $modeles = array_map(fn (array $modele) => $modele + ['page' => $pages->url($modele)], $modeles);
-        }
+        // la fiche ouverte dans la fenêtre mène à la page complète du modèle
+        $modeles = array_map(fn (array $modele) => $modele + ['page' => $pages->url($modele)], $modeles);
 
         return $this->render('modele/liste.html.twig', [
             'texte_presentation' => $this->contenu->texte('album_photos', $this->translator->trans('modeles.texte_defaut')),
@@ -49,13 +46,12 @@ class ModeleController extends AbstractController
     }
 
     /**
-     * Page complète d'un modèle de l'album (fonctionnalité en test « Une page par modèle »).
+     * Page complète d'un modèle de l'album.
      * Seul le numéro compte : si le nom a changé, l'ancienne adresse redirige vers la nouvelle.
      */
     #[Route('/modeles/{id}-{slug}', name: 'app_modele', requirements: ['id' => '\d+', 'slug' => '[a-z0-9-]*'], methods: ['GET'])]
-    public function fiche(int $id, string $slug, Request $request, PageModele $pages, Fonctionnalites $fonctionnalites): Response
+    public function fiche(int $id, string $slug, Request $request, PageModele $pages): Response
     {
-        $fonctionnalites->exiger('page_modele');
         $modele = $pages->fiche($id);
         if ($modele === null) {
             throw $this->createNotFoundException('Modèle introuvable.');

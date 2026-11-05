@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {#
-    Page complète d'un modèle de l'album (fonctionnalité en test « Une page par modèle ») :
+    Page complète d'un modèle de l'album :
     photo, caractéristiques, pièces compatibles, restaurations, pilotes et articles qui en parlent.
 #}
 {% set resume = (modele.description ?: 'modele_page.meta'|trans({ nom: modele.nom }))|striptags|replace({ "\n": ' ', "\r": '' }) %}
@@ -24,7 +24,6 @@
 
     <div class='container'>
         <section class='modele-page'>
-            {% include '_partials/_badge_test.html.twig' with { nom: 'page_modele' } %}
 
             <nav class='fil-ariane' aria-label='{{ 'piece.fil_ariane'|trans }}'>
                 <a href='{{ path('app_modeles_liste') }}'>{{ 'modeles.titre'|trans }}</a>

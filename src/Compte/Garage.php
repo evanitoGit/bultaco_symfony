@@ -3,7 +3,6 @@
 namespace App\Compte;
 
 use App\Boutique\Catalogue;
-use App\Boutique\Fonctionnalites;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
@@ -31,7 +30,6 @@ final class Garage
     public function __construct(
         private readonly Connection $connection,
         private readonly Catalogue $catalogue,
-        private readonly Fonctionnalites $fonctionnalites,
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly TranslatorInterface $translator,
@@ -101,16 +99,13 @@ final class Garage
 
     /**
      * Pièce ajoutée ou modifiée dans l'administration : les clients dont une moto du garage est
-     * compatible sont prévenus, une seule fois par pièce. Seulement quand « Mon garage » est ouvert à tous.
+     * compatible sont prévenus, une seule fois par pièce.
      * Les pièces « universelles » ne déclenchent pas d'e-mail (elles iraient à tout le monde).
      *
      * @return int e-mails envoyés
      */
     public function prevenirNouvellePiece(int $pieceId): int
     {
-        if (!$this->fonctionnalites->publique('mon_garage')) {
-            return 0;
-        }
         $piece = $this->catalogue->piece($pieceId);
         if ($piece === null || $piece['universelle'] || ($piece['stock'] !== null && (int) $piece['stock'] <= 0)) {
             return 0;

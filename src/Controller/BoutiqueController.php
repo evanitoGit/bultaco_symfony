@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Boutique\AlerteStock;
 use App\Boutique\Catalogue;
-use App\Boutique\Fonctionnalites;
 use App\Compte\Garage;
 use App\Entity\Client;
 use App\I18n\Contenu;
@@ -26,7 +25,6 @@ class BoutiqueController extends AbstractController
     public function __construct(
         private readonly Catalogue $catalogue,
         private readonly Contenu $contenu,
-        private readonly Fonctionnalites $fonctionnalites,
         private readonly Garage $garage,
     ) {
     }
@@ -196,11 +194,11 @@ class BoutiqueController extends AbstractController
         return $id ? $this->catalogue->modeleMoto((int) $id) : null;
     }
 
-    /** Motos du garage du client connecté (fonctionnalité « Mon garage » active), sinon aucune */
+    /** Motos du garage du client connecté (« Mon garage »), sinon aucune */
     private function motosDuGarage(): array
     {
         $client = $this->getUser();
-        if (!$client instanceof Client || !$this->fonctionnalites->active('mon_garage')) {
+        if (!$client instanceof Client) {
             return [];
         }
 

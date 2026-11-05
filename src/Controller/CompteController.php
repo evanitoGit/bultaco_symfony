@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Boutique\Catalogue;
 use App\Boutique\DemandePiece;
-use App\Boutique\Fonctionnalites;
 use App\Commande\CommandeService;
 use App\Compte\CompteService;
 use App\Compte\Garage;
@@ -268,13 +267,12 @@ class CompteController extends AbstractController
     }
 
     /**
-     * « Mon garage » (fonctionnalité en test) : les motos du client, proposées en un clic dans la boutique,
+     * « Mon garage » : les motos du client, proposées en un clic dans la boutique,
      * avec un e-mail quand une pièce compatible est ajoutée.
      */
     #[Route('/garage', name: 'app_compte_garage', methods: ['GET', 'POST'])]
-    public function garage(Request $request, Garage $garage, Catalogue $catalogue, Fonctionnalites $fonctionnalites): Response
+    public function garage(Request $request, Garage $garage, Catalogue $catalogue): Response
     {
-        $fonctionnalites->exiger('mon_garage');
         $client = $this->client();
 
         if ($request->isMethod('POST')) {
