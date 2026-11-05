@@ -72,6 +72,8 @@ final class ResourceRegistry
             'icon' => '🏍️',
             'public_route' => 'app_modeles_liste',
             'order' => 'ordre ASC, id ASC',
+            // ordre modifiable par glisser-déposer dans la liste (colonne « ordre »)
+            'reordonner' => true,
             'title' => ['nom'],
             'list' => [
                 'image_path' => ['label' => 'Photo', 'format' => 'image'],
@@ -101,6 +103,8 @@ final class ResourceRegistry
             'icon' => '🏆',
             'public_route' => 'app_modeles_pilotes',
             'order' => 'ordre ASC, id ASC',
+            // ordre modifiable par glisser-déposer dans la liste (colonne « ordre »)
+            'reordonner' => true,
             'title' => ['prenom', 'nom'],
             'list' => [
                 'image_path' => ['label' => 'Photo', 'format' => 'image'],
@@ -130,6 +134,8 @@ final class ResourceRegistry
             'public_route' => 'app_modeles_restaurations',
             'description' => 'Chaque restauration associe une photo « avant » et une photo « après », comparées sur le site avec un curseur. Pour un bel effet, prenez les deux photos sous le même angle et le même cadrage.',
             'order' => 'ordre ASC, id ASC',
+            // ordre modifiable par glisser-déposer dans la liste (colonne « ordre »)
+            'reordonner' => true,
             'title' => ['titre'],
             'list' => [
                 'photo_avant' => ['label' => 'Avant', 'format' => 'image'],
@@ -207,6 +213,8 @@ final class ResourceRegistry
             'icon' => '🗂️',
             'public_route' => 'app_boutique_pieces',
             'order' => 'ordre ASC, id ASC',
+            // ordre modifiable par glisser-déposer dans la liste (colonne « ordre »)
+            'reordonner' => true,
             'title' => ['nom'],
             'list_sql' => 'SELECT c.*, (SELECT COUNT(*) FROM sous_categories sc WHERE sc.categorie_id = c.id) AS nb_sous_categories FROM categories c ORDER BY c.ordre ASC, c.id ASC',
             'list' => [
@@ -235,6 +243,8 @@ final class ResourceRegistry
             'icon' => '📂',
             'public_route' => 'app_boutique_pieces',
             'order' => 'ordre ASC, id ASC',
+            // ordre modifiable par glisser-déposer dans la liste (colonne « ordre »)
+            'reordonner' => ['groupe' => 'categorie_id', 'libelle' => 'categorie_nom'],
             'title' => ['nom'],
             'list_sql' => 'SELECT sc.*, c.nom AS categorie_nom, (SELECT COUNT(*) FROM pieces_detachees p WHERE p.sous_categorie_id = sc.id) AS nb_pieces FROM sous_categories sc LEFT JOIN categories c ON c.id = sc.categorie_id ORDER BY c.ordre ASC, sc.ordre ASC, sc.id ASC',
             'list' => [
@@ -310,6 +320,8 @@ final class ResourceRegistry
             'public_route' => 'app_boutique_pieces',
             'description' => 'Liste des motos proposées dans le filtre « Ma moto » de la boutique et cochées sur chaque pièce compatible.',
             'order' => 'ordre ASC, nom ASC',
+            // ordre modifiable par glisser-déposer dans la liste (colonne « ordre »)
+            'reordonner' => true,
             'title' => ['nom'],
             'list_sql' => 'SELECT m.*, a.nom AS album_nom, (SELECT COUNT(*) FROM piece_modeles pm WHERE pm.modele_id = m.id) AS nb_pieces
                 FROM modeles_moto m LEFT JOIN modeles_emblematiques a ON a.id = m.modele_album_id ORDER BY m.ordre ASC, m.nom ASC',
