@@ -32,6 +32,34 @@
         <button type="submit" class="admin-btn">{{ vitrine ? 'Réactiver la vente' : 'Passer en mode vitrine' }}</button>
     </form>
 
+    {#
+        Fonctionnalités en test : chacune peut être désactivée, essayée par les administrateurs
+        seulement (sur le vrai site, sans que les visiteurs la voient), ou ouverte à tous.
+    #}
+    <form method="post" action="{{ path('app_admin_fonctionnalites') }}" class="admin-form-card admin-fonctionnalites" id="fonctionnalites">
+        <input type="hidden" name="_token" value="{{ csrf_token('fonctionnalites') }}">
+        <div class="admin-fonctionnalites-entete">
+            <h2>🧪 Fonctionnalités en test</h2>
+            <p class="admin-muted">Essayez une nouveauté sur le vrai site en la réservant aux administrateurs, puis ouvrez-la à tous quand elle vous convient.</p>
+        </div>
+        {% for nom, info in fonctionnalites %}
+            {% set actuel = fonctionnalite_mode(nom) %}
+            <fieldset class="admin-fonctionnalite">
+                <legend>{{ info.titre }}</legend>
+                <p class="admin-muted">{{ info.description }}</p>
+                <div class="admin-fonctionnalite-modes" role="radiogroup">
+                    {% for mode, libelle in modes_fonctionnalites %}
+                        <label class="admin-fonctionnalite-mode admin-fonctionnalite-mode--{{ mode }}">
+                            <input type="radio" name="mode[{{ nom }}]" value="{{ mode }}"{{ actuel == mode ? ' checked' }}>
+                            <span>{{ libelle }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+        {% endfor %}
+        <button type="submit" class="admin-btn">Enregistrer</button>
+    </form>
+
     {% for group, resources in groups %}
         <section class="admin-group">
             <h2 class="admin-group-title">{{ group }}</h2>

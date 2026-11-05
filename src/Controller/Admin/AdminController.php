@@ -6,6 +6,7 @@ use App\Admin\ImageUploader;
 use App\Admin\ResourceRegistry;
 use App\Boutique\AlerteStock;
 use App\Boutique\DemandePiece;
+use App\Boutique\Fonctionnalites;
 use App\Boutique\Reglages;
 use App\Commande\CommandeService;
 use App\Entity\Admin;
@@ -50,6 +51,8 @@ class AdminController extends AbstractController
         }
 
         return $this->render('admin/dashboard.html.twig', [
+            'fonctionnalites' => Fonctionnalites::LISTE,
+            'modes_fonctionnalites' => Fonctionnalites::MODES,
             'groups' => $this->registry->grouped(),
             'counts' => $counts,
         ]);
@@ -73,6 +76,27 @@ class AdminController extends AbstractController
             : '🟢 La vente en ligne est ouverte.');
 
         return $this->redirectToRoute('app_admin');
+    }
+
+    /** Interrupteurs « Fonctionnalités en test » du tableau de bord */
+    #[Route('/fonctionnalites', name: 'app_admin_fonctionnalites', methods: ['POST'])]
+    public function fonctionnalites(Request $request, Fonctionnalites $fonctionnalites): Response
+    {
+        if (!$this->isCsrfTokenValid('fonctionnalites', $request->getPayload()->getString('_token'))) {
+            $this->addFlash('error', 'La demande a expiré, veuillez réessayer.');
+
+            return $this->redirectToRoute('app_admin');
+        }
+
+        $modes = $request->getPayload()->all('mode');
+        foreach (array_keys(Fonctionnalites::LISTE) as $nom) {
+            if (isset($modes[$nom]) && is_string($modes[$nom])) {
+                $fonctionnalites->changer($nom, $modes[$nom]);
+            }
+        }
+        $this->addFlash('success', 'Fonctionnalités en test enregistrées.');
+
+        return $this->redirect($this->generateUrl('app_admin') . '#fonctionnalites');
     }
 
     #[Route('/{resource}', name: 'app_admin_list', requirements: ['resource' => ResourceRegistry::ROUTE_REQUIREMENT], methods: ['GET'])]

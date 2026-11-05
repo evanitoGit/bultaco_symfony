@@ -1,0 +1,6 @@
+{# Étiquette vue par les administrateurs quand la fonctionnalité n'est ouverte qu'à eux #}
+{% if fonctionnalite_en_test(nom) %}
+    <p class='badge-test' role='note'>
+        <strong>Test</strong> Visible seulement par les administrateurs. Ouvrez-la à tous depuis l'administration, rubrique « Fonctionnalités en test ».
+    </p>
+{% endif %}
