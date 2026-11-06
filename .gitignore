@@ -24,4 +24,5 @@
 ###> uploads (fichiers envoyés depuis l administration) ###
 /public/uploads/*
 !/public/uploads/.gitkeep
+!/public/uploads/.htaccess
 ###< uploads ###

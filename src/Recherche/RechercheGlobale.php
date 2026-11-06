@@ -4,6 +4,7 @@ namespace App\Recherche;
 
 use App\Boutique\Catalogue;
 use App\I18n\Contenu;
+use App\Modele\PageModele;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -27,6 +28,7 @@ final class RechercheGlobale
         private readonly Catalogue $catalogue,
         private readonly Contenu $contenu,
         private readonly UrlGeneratorInterface $urls,
+        private readonly PageModele $pagesModeles,
     ) {
     }
 
@@ -134,7 +136,7 @@ final class RechercheGlobale
                     yield [
                         'titre' => $m['nom'],
                         'sous_titre' => implode(' · ', array_filter([$m['type_moto'], $annees])) ?: null,
-                        'url' => $this->urls->generate('app_modeles_liste') . '#modele-' . $m['id'],
+                        'url' => $this->pagesModeles->url($m),
                         'image' => $m['image_path'] ?: null,
                         'prix' => null,
                         'texte' => implode(' ', [$m['type_moto'] ?? '', $m['cylindree'] ?? '', $m['annee_debut'] ?? '', $m['annee_fin'] ?? '', $m['description'] ?? '']),

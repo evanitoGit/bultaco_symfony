@@ -1,0 +1,16 @@
+# Dossier des images envoyées depuis l'administration (serveur Apache).
+# Sécurité en plus : même si un fichier piégé arrivait ici, il ne serait jamais exécuté.
+
+# Aucun script n'est exécuté ni servi depuis ce dossier
+<FilesMatch "\.(php\d?|phtml|phar|pl|py|cgi|sh|html?|svgz?|js)$">
+    Require all denied
+</FilesMatch>
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+# Le navigateur ne devine pas le type des fichiers ; pas de liste du contenu du dossier
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+Options -Indexes

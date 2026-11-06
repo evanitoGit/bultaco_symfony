@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Boutique\Catalogue;
 use App\I18n\Contenu;
+use App\Modele\PageModele;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +21,7 @@ class SitemapController extends AbstractController
     private const ROUTES = ['app_home', 'app_modeles_liste', 'app_modeles_restaurations', 'app_modeles_pilotes', 'app_doc_logos', 'app_doc_pressbook', 'app_boutique_pieces'];
 
     #[Route('/sitemap.xml', name: 'app_sitemap', methods: ['GET'])]
-    public function sitemap(Catalogue $catalogue, Connection $connection): Response
+    public function sitemap(Catalogue $catalogue, Connection $connection, PageModele $modeles): Response
     {
         $langues = array_keys(Contenu::LANGUES);
         $pages = [];
@@ -34,6 +35,11 @@ class SitemapController extends AbstractController
 
         foreach ($connection->fetchAllAssociative('SELECT id, nom, nom_en, nom_es FROM pieces_detachees ORDER BY id') as $piece) {
             $pages[] = array_combine($langues, array_map(fn (string $langue) => $catalogue->url($piece, $langue, true), $langues));
+        }
+
+        // pages des modèles de l'album
+        foreach ($modeles->modeles() as $modele) {
+            $pages[] = array_combine($langues, array_map(fn (string $langue) => $modeles->url($modele, $langue, true), $langues));
         }
 
         $response = $this->render('sitemap.xml.twig', ['pages' => $pages]);

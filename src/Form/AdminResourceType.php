@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Admin\ImageUploader;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -109,9 +110,9 @@ class AdminResourceType extends AbstractType
                         'required' => false,
                         'multiple' => true,
                         'help' => 'Vous pouvez en choisir plusieurs à la fois. Formats : JPG, PNG, WEBP, GIF (10 Mo maximum chacune).',
-                        'attr' => ['accept' => 'image/*'],
+                        'attr' => ['accept' => implode(',', ImageUploader::TYPES)],
                         'constraints' => [new Assert\All([
-                            new Assert\Image(maxSize: '10M', mimeTypesMessage: 'Le fichier doit être une image (JPG, PNG, WEBP, GIF).'),
+                            new Assert\Image(maxSize: '10M', mimeTypes: ImageUploader::TYPES, mimeTypesMessage: 'Le fichier doit être une image (JPG, PNG, WEBP, GIF).'),
                         ])],
                     ]);
                     break;
@@ -132,10 +133,10 @@ class AdminResourceType extends AbstractType
                         // obligatoire seulement s'il n'y a pas encore d'image
                         'required' => $required && !$hasImage,
                         'help' => $hasImage ? 'Laisser vide pour conserver l\'image actuelle.' : 'Formats acceptés : JPG, PNG, WEBP, GIF (10 Mo maximum).',
-                        'attr' => ['accept' => 'image/*'],
+                        'attr' => ['accept' => implode(',', ImageUploader::TYPES)],
                         'constraints' => array_merge(
                             $required && !$hasImage ? [new Assert\NotBlank(message: 'Une image est obligatoire.')] : [],
-                            [new Assert\Image(maxSize: '10M', mimeTypesMessage: 'Le fichier doit être une image (JPG, PNG, WEBP, GIF).')]
+                            [new Assert\Image(maxSize: '10M', mimeTypes: ImageUploader::TYPES, mimeTypesMessage: 'Le fichier doit être une image (JPG, PNG, WEBP, GIF).')]
                         ),
                     ]);
                     if ($hasImage && !$required) {

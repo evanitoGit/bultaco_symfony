@@ -354,6 +354,18 @@ logos:
 meta:
     description: "Club Bultaco France : modèles, restaurations, pilotes de légende, documentation et pièces détachées."
     suffixe: "Club Bultaco"
+modele_page:
+    articles: "Dans le pressbook"
+    meta: "{nom} : histoire, caractéristiques, pièces détachées, restaurations et pilotes, par le Bultaco Club France."
+    pieces: "{n, plural, one {Pièce compatible} other {Pièces compatibles (#)}}"
+    pilotes: "Pilotes"
+    precedente: "Modèle précédent"
+    restaurations: "Restaurations par les membres"
+    retour: "Tous les modèles"
+    suivante: "Modèle suivant"
+    toutes_pieces: "{n, plural, one {Voir la pièce dans la boutique} other {Voir les # pièces dans la boutique}}"
+    voir_page: "Voir la page complète du modèle"
+    voisins: "Autres modèles de l'album"
 modeles:
     aucun: "Aucun modèle pour le moment"
     badge: "Modèle"

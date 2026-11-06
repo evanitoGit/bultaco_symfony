@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Admin\ImageUploader;
 use App\Boutique\DemandePiece;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -75,10 +76,10 @@ class DemandePieceType extends AbstractType
                 'help_translation_parameters' => ['max' => DemandePiece::PHOTOS_MAX],
                 'required' => false,
                 'multiple' => true,
-                'attr' => ['accept' => 'image/*'],
+                'attr' => ['accept' => implode(',', ImageUploader::TYPES)],
                 'constraints' => [
                     new Assert\Count(max: DemandePiece::PHOTOS_MAX, maxMessage: 'Trois photos au maximum.'),
-                    new Assert\All([new Assert\Image(maxSize: '5M', mimeTypesMessage: 'Chaque photo doit être une image (JPG, PNG…).', maxSizeMessage: 'Chaque photo doit faire 5 Mo au maximum.')]),
+                    new Assert\All([new Assert\Image(maxSize: '5M', mimeTypes: ImageUploader::TYPES, mimeTypesMessage: 'Chaque photo doit être une image (JPG, PNG…).', maxSizeMessage: 'Chaque photo doit faire 5 Mo au maximum.')]),
                 ],
             ])
             ->add('accord', CheckboxType::class, [
